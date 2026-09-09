@@ -930,38 +930,11 @@ body.is--night-mode .b-tag-model {
   color: #FFFFFF;
 }
 
-/* Macro Pointer SVG Overlay */
+/* Macro Pointer SVG Overlay — permanently hidden (removed per design) */
 .macro-pointers-svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 15;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.6s ease;
+  display: none !important;
 }
 
-body.step-dial-active .macro-pointers-svg {
-  opacity: 1;
-}
-
-.pointer-line {
-  stroke: rgba(0, 0, 0, 0.45);
-  stroke-width: 1.2px;
-  stroke-dasharray: 4 3;
-}
-
-.pointer-dot {
-  fill: #0284C7;
-  stroke: #FFFFFF;
-  stroke-width: 1.5px;
-}
-
-body.is--night-mode .pointer-line {
-  stroke: rgba(255, 255, 255, 0.45);
-}
 
 .sticky-3d-stage .canvas-3d-target {
   position: absolute;
@@ -1172,24 +1145,41 @@ body.story-completed .watch-hud-toolbar {
   position: absolute;
   top: calc(var(--header-height) + 14px);
   left: 50%;
-  transform: translateX(-50%);
-  background: var(--bg-card-glass);
-  border: 1px solid var(--color-border);
-  padding: 4px 14px;
-  border-radius: 20px;
+  transform: translateX(-50%) translateY(-10px);
+  background: rgba(10, 11, 15, 0.88);
+  border: 1px solid rgba(2, 132, 199, 0.4);
+  padding: 6px 18px;
+  border-radius: 24px;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  color: var(--color-ink-muted);
+  font-size: 0.70rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: #FFFFFF;
+  text-transform: uppercase;
   pointer-events: none;
-  backdrop-filter: blur(8px);
-  z-index: 20;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 35;
   opacity: 0;
-  transition: opacity 0.5s ease;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 16px rgba(2, 132, 199, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.drag-pill-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent-cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent-cyan);
+  animation: catDotPulse 1.8s infinite ease-in-out;
 }
 
 body.story-completed .stage-drag-pill {
   opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 /* ================= VERTICAL TIMELINE TRACKER ================= */
@@ -1279,6 +1269,14 @@ body.story-completed .vertical-timeline-tracker {
 
 .story-step.step--title {
   min-height: 130vh;
+}
+
+.story-step.step--bracelet {
+  min-height: 140vh;
+}
+
+.story-step.step--studio {
+  min-height: 220vh;
 }
 
 .story-panel {
@@ -1666,13 +1664,23 @@ body.step-exploded-active .exploded-pills-row .pill-badge {
 }
 
 /* ================= FINALE: FULL SPECS DOSSIER WRAPPER ================= */
+/* z-index: 3 keeps it BELOW the sticky-3d-stage (z-index: 5) so it never
+   bleeds over the 3D canvas while the narrative is still playing */
 .finale-dossier-wrapper {
   position: relative;
-  z-index: 25;
+  z-index: 3;
   background: var(--bg-base);
   box-shadow: 0 -30px 70px rgba(0, 0, 0, 0.12);
   border-top: 1px solid var(--color-border);
-  transition: background-color 0.6s ease;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease, background-color 0.6s ease;
+}
+
+/* Reveal the dossier only after the narrative is truly over */
+body.dossier-revealed .finale-dossier-wrapper {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* ================= CONTENT SECTIONS ================= */
@@ -2401,45 +2409,137 @@ body.step-exploded-active .exploded-pills-row .pill-badge {
   100% { transform: scale(2.2); opacity: 0; }
 }
 
+
+/* ── Free-rotate mode: "DRAG TO EXPLORE" hint at top of stage ── */
+.free-rotate-hint {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-40px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 18px;
+  background: rgba(10, 10, 12, 0.75);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.free-rotate-hint-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+}
+
+body.is--free-rotate .free-rotate-hint {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Premium hotspot card (glassmorphism, shown only in free-rotate zone) ── */
 .hotspot-card {
   position: absolute;
-  left: 16px;
-  top: -12px;
-  background: none !important;
-  border: none !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-  backdrop-filter: none !important;
-  white-space: nowrap;
+  left: 22px;
+  top: 50%;
+  transform: translate(0, -50%) translateX(-8px);
+  width: 250px;
+  max-width: 80vw;
+  background: rgba(10, 11, 15, 0.90) !important;
+  border: 1px solid rgba(2, 132, 199, 0.4) !important;
+  border-radius: 8px !important;
+  padding: 12px 16px !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
   opacity: 0;
-  transform: translateX(-6px);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 20px rgba(2, 132, 199, 0.25) !important;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
-  box-shadow: none !important;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+}
+
+/* Thin connector line */
+.hotspot-card::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  width: 16px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(2, 132, 199, 0.9), rgba(2, 132, 199, 0.4));
+  margin-top: 0;
 }
 
 .watch-hotspot-pin:hover .hotspot-card {
   opacity: 1;
-  transform: translateX(0);
+  transform: translate(0, -50%) translateX(0);
 }
 
 .watch-hotspot-pin:hover .hotspot-dot {
-  transform: scale(1.4);
+  transform: scale(1.5);
+  box-shadow: 0 0 16px rgba(2, 132, 199, 1);
+}
+
+.hotspot-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.hotspot-badge {
+  font-family: var(--font-mono);
+  font-size: 0.60rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+}
+
+.hotspot-metric {
+  font-family: var(--font-mono);
+  font-size: 0.60rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hotspot-label {
   font-family: var(--font-sans);
   font-weight: 700;
-  font-size: 0.76rem;
+  font-size: 0.88rem;
+  letter-spacing: -0.01em;
+  color: #FFFFFF;
   display: block;
+  line-height: 1.2;
 }
 
-.hotspot-metric {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--accent-cyan);
-  display: block;
+.hotspot-desc {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: #94a3b8;
+  margin: 0;
+  white-space: normal;
 }
+
+
 
 /* ================= VERTICAL TIMELINE TRACKER ================= */
 .vertical-timeline-tracker {
@@ -2623,15 +2723,15 @@ body.is--night-mode .cursor-ring {
 .feature-stage-item.feat--4 {
   --feat-y: var(--feat4-y, 65vh);
   --feat-opacity: var(--feat4-opacity, 0);
-  justify-content: center;
-  text-align: center;
+  justify-content: flex-start;
+  padding-left: clamp(24px, 6vw, 100px);
 }
 
 .feature-stage-item.feat--5 {
   --feat-y: var(--feat5-y, 65vh);
   --feat-opacity: var(--feat5-opacity, 0);
-  justify-content: center;
-  text-align: center;
+  justify-content: flex-start;
+  padding-left: clamp(24px, 6vw, 100px);
 }
 
 .feature-text-block.individual-feature,
@@ -2816,35 +2916,7 @@ body.is--night-mode .ed-lbl {
   max-width: 360px;
 }
 
-/* Bracelet Macro Section */
-.bracelet-panel {
-  text-align: center;
-}
 
-.bracelet-text-wrap {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.step--bracelet.is--active .bracelet-text-wrap {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.bracelet-huge-title {
-  font-family: var(--font-title);
-  font-size: clamp(2.5rem, 6vw, 5.5rem);
-  font-weight: 800;
-  letter-spacing: 0.35em;
-  color: #111111;
-  margin-bottom: 12px;
-  line-height: 1.1;
-}
-
-body.is--night-mode .bracelet-huge-title {
-  color: #FFFFFF;
-}
 
 .mt-5 { margin-top: 20px; }
 .mt-6 { margin-top: 28px; }

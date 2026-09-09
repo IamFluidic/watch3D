@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ALUNA A3016 — The Timeless Automatic Timepiece</title>
-  <meta name="description" content="Experience the ALUNA A3016 in real-time WebGL 3D. Explore the Swiss automatic calibre, flat engraved surgical caseback, sunburst guilloché dial, and luxury metallurgy finishes." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22none%22 stroke=%22%230A0A0A%22 stroke-width=%228%22/><line x1=%2250%22 y1=%2250%22 x2=%2250%22 y2=%2222%22 stroke=%22%230A0A0A%22 stroke-width=%226%22 stroke-linecap=%22round%22/><line x1=%2250%22 y1=%2250%22 x2=%2272%22 y2=%2250%22 stroke=%22%230A0A0A%22 stroke-width=%225%22 stroke-linecap=%22round%22/></svg>" />
-  <script type="module" crossorigin src="/assets/index-BnFrfWJv.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-CJsTN3V8.css">
+  <meta name="description"
+    content="Experience the ALUNA A3016 in real-time WebGL 3D. Explore the Swiss automatic calibre, flat engraved surgical caseback, sunburst guilloché dial, and luxury metallurgy finishes." />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22none%22 stroke=%22%230A0A0A%22 stroke-width=%228%22/><line x1=%2250%22 y1=%2250%22 x2=%2250%22 y2=%2222%22 stroke=%22%230A0A0A%22 stroke-width=%226%22 stroke-linecap=%22round%22/><line x1=%2250%22 y1=%2250%22 x2=%2272%22 y2=%2250%22 stroke=%22%230A0A0A%22 stroke-width=%225%22 stroke-linecap=%22round%22/></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="/assets/index-CIT0NWua.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DjDNu-My.css">
 </head>
+
 <body>
 
   <!-- ================= SCROLL PROGRESS BAR ================= -->
@@ -17,19 +24,10 @@
   <!-- ================= CIRCULAR LOADER ================= -->
   <div id="loader">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 700 700">
-      <path
-        stroke-opacity="0.3"
-        stroke="#CCCCCC"
-        stroke-width="2"
-        d="M350 695c190.538 0 345-154.462 345-345S540.538 5 350 5 5 159.462 5 350s154.462 345 345 345Z"
-      />
-      <path
-        class="progress-arc"
-        stroke-opacity="1"
-        stroke-width="3"
-        stroke="#111111"
-        d="M350 695c190.538 0 345-154.462 345-345S540.538 5 350 5 5 159.462 5 350s154.462 345 345 345Z"
-      />
+      <path stroke-opacity="0.3" stroke="#CCCCCC" stroke-width="2"
+        d="M350 695c190.538 0 345-154.462 345-345S540.538 5 350 5 5 159.462 5 350s154.462 345 345 345Z" />
+      <path class="progress-arc" stroke-opacity="1" stroke-width="3" stroke="#111111"
+        d="M350 695c190.538 0 345-154.462 345-345S540.538 5 350 5 5 159.462 5 350s154.462 345 345 345Z" />
     </svg>
     <div class="loader-text">
       <span>Now</span> loading <span id="loader-percent">100%</span>
@@ -91,22 +89,38 @@
             <div class="reticle-quadrant q4"></div>
           </div>
           <!-- Clear framing typography that is NEVER hidden behind watch -->
-          <div class="giant-bg-text-brand" id="giant-bg-text-brand">ALUNA</div>
-          <div class="giant-bg-text-model" id="giant-bg-text-model">A3016</div>
+          <!-- LEFT: ALUNA brand — vertical editorial column -->
+          <div class="giant-bg-text-brand" id="giant-bg-text-brand">
+            <span class="gbt-rule gbt-rule-top"></span>
+            <span class="gbt-eyebrow">SWISS AUTOMATIC</span>
+            <span class="gbt-main-brand">ALUNA</span>
+            <span class="gbt-rule gbt-rule-bottom"></span>
+            <span class="gbt-footer-label">EST. MMXXV</span>
+          </div>
+          <!-- RIGHT: A3016 model — large display serif numeral -->
+          <div class="giant-bg-text-model" id="giant-bg-text-model">
+            <span class="gbt-model-kicker">CALIBRE · NO.</span>
+            <span class="gbt-model-num">A<em>3016</em></span>
+            <span class="gbt-model-sub">40MM · DLC STEEL</span>
+          </div>
           <div class="giant-bg-text-stacked" id="giant-bg-text-stacked">
             <span>ALUNA</span>
             <span>—A3016</span>
           </div>
         </div>
 
-        <!-- Prominent Launch Watch Name Billboard (Ensures name is 100% visible) -->
-        <div class="launch-hero-brand" id="launch-hero-brand">
-          <div class="hero-brand-kicker">SWISS AUTOMATIC TIMEPIECE</div>
-          <h1 class="hero-brand-name">
-            <span class="name-brand">ALUNA</span>
-            <span class="name-model">A3016</span>
-          </h1>
-          <p class="hero-brand-sub">40.0 MM CHRONOMETER • SOLID SURGICAL STEEL</p>
+        <!-- Cinematic Black Curtain + Title — Slide in from right, exit to left together -->
+        <div class="cinematic-curtain" id="cinematic-curtain" aria-hidden="true">
+          <div class="curtain-grain"></div>
+          <!-- Title rides the curtain: sweeps in from right, holds, exits left -->
+          <div class="launch-hero-brand" id="launch-hero-brand">
+            <div class="hero-brand-kicker">SWISS AUTOMATIC TIMEPIECE</div>
+            <h1 class="hero-brand-name">
+              <span class="name-brand">ALUNA</span>
+              <span class="name-model">A3016</span>
+            </h1>
+            <p class="hero-brand-sub">40.0 MM CHRONOMETER • SOLID SURGICAL STEEL</p>
+          </div>
         </div>
 
         <!-- Authentic Bottom-Left Model Specs Tag -->
@@ -172,9 +186,10 @@
           </div>
         </div>
 
-        <!-- Drag Hint Pill -->
+        <!-- Drag Hint Pill in Free Orbit Mode -->
         <div class="stage-drag-pill" id="stage-drag-pill">
-          <span>🖱️ Click & Drag to Orbit 360° • Tilt to Examine Every Angle</span>
+          <span class="drag-pill-dot"></span>
+          <span>360° Free Orbit • Hover Points to Inspect</span>
         </div>
 
         <!-- ================= FEATURES STAGE OVERLAY (Pinned inside sticky stage, glides from bottom to center to top) ================= -->
@@ -193,7 +208,9 @@
                 Case &amp; <em class="serif-ital">Satin Finishes</em>
               </h2>
               <p class="editorial-feature-body">
-                Crafted with meticulous attention to proportion, the cold-forged 316L case alternates between hand-polished chamfered bevels and vertical satin-brushed surfaces, reflecting ambient light with surgical distinction.
+                Crafted with meticulous attention to proportion, the cold-forged 316L case alternates between
+                hand-polished chamfered bevels and vertical satin-brushed surfaces, reflecting ambient light with
+                surgical distinction.
               </p>
               <div class="editorial-specs-grid">
                 <div class="ed-spec-item">
@@ -214,7 +231,8 @@
 
           <!-- FEATURE 02: REFINED DIAL ARCHITECTURE WITH HAIRLINE POINTERS -->
           <div class="feature-stage-item feat--2" id="feat-item-2">
-            <div class="feature-text-block individual-feature left-feature editorial-feature-card pointer-callouts-panel">
+            <div
+              class="feature-text-block individual-feature left-feature editorial-feature-card pointer-callouts-panel">
               <div class="feature-index-header">
                 <span class="feature-roman-num">02</span>
                 <div class="feature-category-pill">
@@ -225,19 +243,22 @@
               <div class="pointer-callout-item" id="callout-dial">
                 <h3 class="editorial-callout-title">Refined <em class="serif-ital">Guilloché Dial</em></h3>
                 <p class="editorial-feature-body">
-                  Deep anthracite sunburst face with radial engraved grooves, Moonphase aperture at 12, open-heart tourbillon at 6, and inner Swiss numerals.
+                  Deep anthracite sunburst face with radial engraved grooves, Moonphase aperture at 12, open-heart
+                  tourbillon at 6, and inner Swiss numerals.
                 </p>
               </div>
               <div class="pointer-callout-item mt-5" id="callout-hands">
                 <h3 class="editorial-callout-title">Faceted <em class="serif-ital">Dauphine Hands</em></h3>
                 <p class="editorial-feature-body">
-                  Diamond-cut surgical steel sword hands with luminous Super-LumiNova® inlays and an electric cyan continuous sweep seconds needle.
+                  Diamond-cut surgical steel sword hands with luminous Super-LumiNova® inlays and an electric cyan
+                  continuous sweep seconds needle.
                 </p>
               </div>
               <div class="pointer-callout-item mt-5" id="callout-bezel">
                 <h3 class="editorial-callout-title">Minimalist <em class="serif-ital">Bezel Screws</em></h3>
                 <p class="editorial-feature-body">
-                  Brushed steel bezel anchored by 6 authentic recessed slotted screws in an unadorned, sleek perimeter ring.
+                  Brushed steel bezel anchored by 6 authentic recessed slotted screws in an unadorned, sleek perimeter
+                  ring.
                 </p>
               </div>
             </div>
@@ -257,7 +278,9 @@
                 Flat Plane <em class="serif-ital">Steel Caseback</em>
               </h2>
               <p class="editorial-feature-body">
-                Clean, flat, and completely plane with no design clutter. The solid surgical steel back is hand-finished with fine circular graining and laser-engraved with the iconic <strong class="serif-ital">ALUNA</strong> signature in classic italic script and model reference <strong class="mono-code">A3016</strong>.
+                Clean, flat, and completely plane with no design clutter. The solid surgical steel back is hand-finished
+                with fine circular graining and laser-engraved with the iconic <strong class="serif-ital">ALUNA</strong>
+                signature in classic italic script and model reference <strong class="mono-code">A3016</strong>.
               </p>
               <div class="editorial-specs-grid">
                 <div class="ed-spec-item">
@@ -278,35 +301,67 @@
 
           <!-- FEATURE 04: HORIZONTAL DECONSTRUCTED ARCHITECTURE -->
           <div class="feature-stage-item feat--4" id="feat-item-4">
-            <div class="exploded-header-wrap text-center">
-              <div class="feature-index-header justify-center">
+            <div class="feature-text-block individual-feature left-feature editorial-feature-card">
+              <div class="feature-index-header">
                 <span class="feature-roman-num">04</span>
                 <div class="feature-category-pill">
                   <span class="cat-dot"></span>
                   <span>KINETIC ARCHITECTURE</span>
                 </div>
               </div>
-              <h2 class="exploded-headline">Calibre A3016 <em class="serif-ital">Exploded View</em></h2>
-              <p class="exploded-sub">
-                The 8 precision horological assemblies separated along the central horizontal axis. Inspect the dual-domed crystal, guilloché dial, mechanical balance, and solid engraved caseback.
+              <h2 class="editorial-feature-headline">
+                Deconstructed <em class="serif-ital">Calibre Layers</em>
+              </h2>
+              <p class="editorial-feature-body">
+                The 8 precision horological assemblies separated along the central horizontal axis in dynamic mechanical suspension. Inspect the dual-domed crystal, guilloché dial, oscillating balance wheel, and solid engraved caseback.
               </p>
+              <div class="editorial-specs-grid">
+                <div class="ed-spec-item">
+                  <span class="ed-val">8 Layers</span>
+                  <span class="ed-lbl">Modular Assembly</span>
+                </div>
+                <div class="ed-spec-item">
+                  <span class="ed-val">28,800 vph</span>
+                  <span class="ed-lbl">Escapement Beat</span>
+                </div>
+                <div class="ed-spec-item">
+                  <span class="ed-val">Linear Axis</span>
+                  <span class="ed-lbl">Exploded Alignment</span>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- FEATURE 05: INTEGRATED 3-LINK STEEL BRACELET -->
           <div class="feature-stage-item feat--5" id="feat-item-5">
-            <div class="bracelet-text-wrap text-center">
-              <div class="feature-index-header justify-center">
+            <div class="feature-text-block individual-feature left-feature editorial-feature-card">
+              <div class="feature-index-header">
                 <span class="feature-roman-num">05</span>
                 <div class="feature-category-pill">
                   <span class="cat-dot"></span>
                   <span>ERGONOMIC FIT</span>
                 </div>
               </div>
-              <h2 class="bracelet-huge-title">B R A C E L E T</h2>
-              <p class="editorial-feature-body max-w-lg mx-auto">
-                Crafted from cold-rolled steel links with brushed outer flanks and mirror-polished center pieces, perfectly contoured for ergonomic wrist drape.
+              <h2 class="editorial-feature-headline">
+                Sculpted <em class="serif-ital">3-Link Bracelet</em>
+              </h2>
+              <p class="editorial-feature-body">
+                Crafted from cold-forged 316L steel links with vertical satin-brushed flanks and mirror-polished chamfers. Features a precision micro-adjusting butterfly deployant clasp for seamless ergonomic wrist drape.
               </p>
+              <div class="editorial-specs-grid">
+                <div class="ed-spec-item">
+                  <span class="ed-val">20.0 mm</span>
+                  <span class="ed-lbl">Tapered Width</span>
+                </div>
+                <div class="ed-spec-item">
+                  <span class="ed-val">Solid 316L</span>
+                  <span class="ed-lbl">Cold-Forged Links</span>
+                </div>
+                <div class="ed-spec-item">
+                  <span class="ed-val">Deployant</span>
+                  <span class="ed-lbl">Micro-Adjust Clasp</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -334,6 +389,9 @@
 
         <!-- STEP 5: INTEGRATED 3-LINK STEEL BRACELET -->
         <section id="story-rotor" class="story-step step--feature step--bracelet" data-step="5"></section>
+
+        <!-- STEP 6: 360° INTERACTIVE STUDIO (Free Orbit & Hotspot Inspection before 04/Metallurgy) -->
+        <section id="story-studio" class="story-step step--studio" data-step="6"></section>
       </div>
     </div>
 
@@ -347,7 +405,8 @@
             <span class="mono-step">04 / METALLURGY</span>
             <h2 class="section-heading">Four Distinct Editions</h2>
             <p class="section-summary">
-              Hover over any edition card to trigger 3D perspective tilt and preview the timepiece materials in real-time.
+              Hover over any edition card to trigger 3D perspective tilt and preview the timepiece materials in
+              real-time.
             </p>
           </div>
 
@@ -365,7 +424,8 @@
               <span class="mono-step">05 / MECHANICS</span>
               <h2 class="section-heading">Calibre 60P Specifications</h2>
               <p class="movement-desc">
-                Operating at 28,800 vibrations per hour (4Hz), each Calibre 60P movement undergoes 15 consecutive days of precision chronometer testing across 5 spatial positions and 3 temperature variances.
+                Operating at 28,800 vibrations per hour (4Hz), each Calibre 60P movement undergoes 15 consecutive days
+                of precision chronometer testing across 5 spatial positions and 3 temperature variances.
               </p>
 
               <div class="movement-specs-matrix">
@@ -446,12 +506,14 @@
               <span class="mono-badge">LIMITED ALLOCATION</span>
               <h2 class="reserve-title">Commission Your FS 60P</h2>
               <p class="reserve-subtitle">
-                Each timepiece is hand-assembled, individually calibrated, and certified in our atelier. Complimentary worldwide insured courier delivery with a 5-year international warranty.
+                Each timepiece is hand-assembled, individually calibrated, and certified in our atelier. Complimentary
+                worldwide insured courier delivery with a 5-year international warranty.
               </p>
 
               <div class="reserve-edition-preview">
                 <span class="preview-label">Selected Edition:</span>
-                <strong id="reserve-active-edition" class="preview-edition-name">01. Steel Classic (Cobalt Sunray)</strong>
+                <strong id="reserve-active-edition" class="preview-edition-name">01. Steel Classic (Cobalt
+                  Sunray)</strong>
               </div>
 
               <div class="reserve-features-list">
@@ -481,7 +543,8 @@
 
                 <div class="form-group">
                   <label for="caseback-engraving" class="form-label">Optional Caseback Initials / Date</label>
-                  <input type="text" id="caseback-engraving" class="form-input" placeholder="e.g. A.G. 2026" maxlength="12" />
+                  <input type="text" id="caseback-engraving" class="form-input" placeholder="e.g. A.G. 2026"
+                    maxlength="12" />
                 </div>
 
                 <button type="submit" id="reserve-submit-btn" class="btn-swiss-primary is--block">
@@ -500,7 +563,8 @@
             <div class="footer-col">
               <span class="footer-logo">60FPS / FS 60P</span>
               <p class="footer-desc">
-                Experimental real-time WebGL horology. Designed with devotion to micro-mechanical engineering and digital craft.
+                Experimental real-time WebGL horology. Designed with devotion to micro-mechanical engineering and
+                digital craft.
               </p>
             </div>
 
@@ -600,4 +664,5 @@
   <div id="cursor-ring" class="cursor-ring"></div>
 
 </body>
+
 </html>

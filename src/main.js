@@ -288,10 +288,14 @@ document.addEventListener('DOMContentLoaded', () => {
   initHeroParallax();
 
   // 17. Synchronize UI visibility with story completion
+  // Must use the same narrative container height as watchThreeViewer for correct threshold
+  // NOTE: HTML id is 'scrolly-narrative' (not 'scrolly-narrative-container')
   function handleScrollUI() {
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    const scrollProgress = maxScroll > 0 ? Math.min(Math.max(window.scrollY / maxScroll, 0), 1) : 0;
-    const isCompleted = scrollProgress >= 0.85;
+    const narrativeEl = document.getElementById('scrolly-narrative');
+    const containerHeight = narrativeEl ? narrativeEl.offsetHeight : document.documentElement.scrollHeight;
+    const maxScroll = Math.max(containerHeight - window.innerHeight, 1);
+    const scrollProgress = Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
+    const isCompleted = scrollProgress >= 0.82;
     document.body.classList.toggle('story-completed', isCompleted);
   }
   window.addEventListener('scroll', handleScrollUI, { passive: true });

@@ -135,30 +135,36 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
   // Initialize Exploded View Controller
   const explodedController = new WatchExplodedController(watchInstance.layers);
   let manualExplode = false;
-
+  
   // Initialize 3D Hotspot Manager
+  // Hotspots are HIDDEN during scrollytelling; shown only in free-rotate finale
   const hotspotsManager = new WatchHotspotsManager(hotspotsContainerId, (pinData) => {
-    targetRotX = pinData.targetRotX;
-    targetRotY = pinData.targetRotY;
-    targetZoom = pinData.zoom;
+    if (scrollProgress >= 0.82) {
+      // Only respond to pin clicks during free-rotate zone
+      targetRotX = pinData.targetRotX;
+      targetRotY = pinData.targetRotY;
+      targetZoom = pinData.zoom;
+      hasUserRotatedInFinale = true;
+    }
   });
+  hotspotsManager.setVisible(false); // start hidden
 
-  // User Interaction & Camera States (Starts facing front so dial, numerals, and hands are prominent)
+  // Interactive Drag & Free Orbit Controls
   let isDragging = false;
   let prevX = 0;
   let prevY = 0;
+  let currentZoom = 11;
+  let targetZoom = 9.8;
   let rotX = 0.08;
   let rotY = 0.04;
   let targetRotX = 0.08;
   let targetRotY = 0.04;
-  let targetZoom = 9.8;
-  let currentZoom = 11;
+  let posX = 0;
+  let targetPosX = 0;
   let isNightMode = false;
   let scrollProgress = 0;
-
-  // Track cursor velocity for rotor spinning
-  let rotorVelocity = 0;
   let rotorAngle = 0;
+  let rotorVelocity = 0;
   let hasUserRotatedInFinale = false;
 
   container.style.cursor = 'grab';
@@ -181,9 +187,9 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
       const dy = e.clientY - prevY;
 
       targetRotY += dx * 0.008;
-      targetRotX += dy * 0.008;
+      targetRotX = Math.max(-1.4, Math.min(1.4, targetRotX + dy * 0.008));
 
-      if (scrollProgress >= 0.80) {
+      if (scrollProgress >= 0.82) {
         hasUserRotatedInFinale = true;
       }
 
@@ -196,7 +202,7 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
 
   // Wheel zoom in completed studio
   container.addEventListener('wheel', (e) => {
-    if (scrollProgress >= 0.80) {
+    if (scrollProgress >= 0.82) {
       targetZoom = Math.min(Math.max(targetZoom + e.deltaY * 0.004, 7.5), 15);
     }
   }, { passive: true });
@@ -218,7 +224,7 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
       targetRotY += dx * 0.008;
       targetRotX += dy * 0.008;
 
-      if (scrollProgress >= 0.80) {
+      if (scrollProgress >= 0.82) {
         hasUserRotatedInFinale = true;
       }
 
@@ -234,19 +240,22 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
   });
 
   // Global Scroll Listener for Choreography
+  // NOTE: HTML id is 'scrolly-narrative' (not 'scrolly-narrative-container')
+  const narrativeContainer = document.getElementById('scrolly-narrative');
   function onScroll() {
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    scrollProgress = maxScroll > 0 ? Math.min(Math.max(window.scrollY / maxScroll, 0), 1) : 0;
+    const containerHeight = narrativeContainer ? narrativeContainer.offsetHeight : document.documentElement.scrollHeight;
+    const maxScroll = Math.max(containerHeight - window.innerHeight, 1);
+    scrollProgress = Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
 
     // Active narrative steps for 60fps luxury narrative with dedicated title showcase space
-    const isLaunch = scrollProgress < 0.07;
-    const isTitlePhase = scrollProgress >= 0.07 && scrollProgress < 0.20;
-    const isIdentity = scrollProgress >= 0.20 && scrollProgress < 0.35;
-    const isDial = scrollProgress >= 0.35 && scrollProgress < 0.50;
-    const isMovement = scrollProgress >= 0.50 && scrollProgress < 0.65;
-    const isExploded = scrollProgress >= 0.65 && scrollProgress < 0.78;
-    const isBracelet = scrollProgress >= 0.78 && scrollProgress < 0.88;
-    const isCompleted = scrollProgress >= 0.88;
+    const isLaunch = scrollProgress < 0.05;
+    const isTitlePhase = scrollProgress >= 0.05 && scrollProgress < 0.16;
+    const isIdentity = scrollProgress >= 0.16 && scrollProgress < 0.29;
+    const isDial = scrollProgress >= 0.29 && scrollProgress < 0.42;
+    const isMovement = scrollProgress >= 0.42 && scrollProgress < 0.55;
+    const isExploded = scrollProgress >= 0.55 && scrollProgress < 0.68;
+    const isBracelet = scrollProgress >= 0.68 && scrollProgress < 0.82;
+    const isCompleted = scrollProgress >= 0.82;
 
     document.getElementById('story-launch')?.classList.toggle('is--active', isLaunch);
     document.getElementById('story-title')?.classList.toggle('is--active', isTitlePhase);
@@ -255,6 +264,7 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     document.getElementById('story-movement')?.classList.toggle('is--active', isMovement);
     document.getElementById('story-exploded')?.classList.toggle('is--active', isExploded);
     document.getElementById('story-rotor')?.classList.toggle('is--active', isBracelet);
+    document.getElementById('story-studio')?.classList.toggle('is--active', isCompleted);
 
     document.body.classList.toggle('step-identity-active', isIdentity);
     document.body.classList.toggle('step-dial-active', isDial);
@@ -269,10 +279,10 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
 
     if (scrollProgress < 0.02) {
       bgNameOpacity = 0.90;
-    } else if (scrollProgress >= 0.02 && scrollProgress < 0.07) {
-      const p = (scrollProgress - 0.02) / 0.05;
+    } else if (scrollProgress >= 0.02 && scrollProgress < 0.05) {
+      const p = (scrollProgress - 0.02) / 0.03;
       bgNameOpacity = 0.90 * (1 - p) + 0.10 * p;
-    } else if (scrollProgress >= 0.07 && scrollProgress < 0.21) {
+    } else if (scrollProgress >= 0.05 && scrollProgress < 0.16) {
       bgNameOpacity = 0.10; // dim while curtain is covering the screen
     } else {
       bgNameOpacity = 0.08;
@@ -281,25 +291,25 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     document.documentElement.style.setProperty('--bg-name-opacity', `${bgNameOpacity.toFixed(3)}`);
 
     // ─── CINEMATIC CURTAIN ─────────────────────────────────────────────────
-    // Phase A  0.03 → 0.07 : black panel sweeps IN from right (100% → 0%)
-    // Phase B  0.07 → 0.16 : curtain holds at 0% — title is white on black
-    // Phase C  0.16 → 0.21 : curtain sweeps OUT to left  (0% → -100%)
+    // Phase A  0.04 → 0.07 : black panel sweeps IN from right (100% → 0%)
+    // Phase B  0.07 → 0.13 : curtain holds at 0% — title is white on black
+    // Phase C  0.13 → 0.16 : curtain sweeps OUT to left  (0% → -100%)
     // Outside these ranges : curtain is fully off screen
     let curtainX = 100; // default: off to the right
     let isCurtainActive = false;
 
-    if (scrollProgress < 0.03) {
+    if (scrollProgress < 0.04) {
       curtainX = 100;
-    } else if (scrollProgress >= 0.03 && scrollProgress < 0.07) {
-      const p = (scrollProgress - 0.03) / 0.04;
+    } else if (scrollProgress >= 0.04 && scrollProgress < 0.07) {
+      const p = (scrollProgress - 0.04) / 0.03;
       const ease = 1 - Math.pow(1 - p, 3); // ease-out cubic: fast then slows to a stop
       curtainX = (1 - ease) * 100;
       isCurtainActive = ease > 0.1;
-    } else if (scrollProgress >= 0.07 && scrollProgress < 0.16) {
+    } else if (scrollProgress >= 0.07 && scrollProgress < 0.13) {
       curtainX = 0; // fully covering
       isCurtainActive = true;
-    } else if (scrollProgress >= 0.16 && scrollProgress < 0.21) {
-      const p = (scrollProgress - 0.16) / 0.05;
+    } else if (scrollProgress >= 0.13 && scrollProgress < 0.16) {
+      const p = (scrollProgress - 0.13) / 0.03;
       const ease = Math.pow(p, 2.2); // ease-in quad: starts slow then accelerates away
       curtainX = -ease * 100;
       isCurtainActive = p < 0.9;
@@ -337,11 +347,11 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
       }
     }
 
-    const feat1 = calcFeatureMotion(scrollProgress, 0.20, 0.245, 0.305, 0.35);
-    const feat2 = calcFeatureMotion(scrollProgress, 0.35, 0.395, 0.455, 0.50);
-    const feat3 = calcFeatureMotion(scrollProgress, 0.50, 0.545, 0.605, 0.65);
-    const feat4 = calcFeatureMotion(scrollProgress, 0.65, 0.690, 0.740, 0.78);
-    const feat5 = calcFeatureMotion(scrollProgress, 0.78, 0.815, 0.850, 0.88);
+    const feat1 = calcFeatureMotion(scrollProgress, 0.16, 0.19, 0.26, 0.29);
+    const feat2 = calcFeatureMotion(scrollProgress, 0.29, 0.32, 0.39, 0.42);
+    const feat3 = calcFeatureMotion(scrollProgress, 0.42, 0.45, 0.52, 0.55);
+    const feat4 = calcFeatureMotion(scrollProgress, 0.55, 0.58, 0.65, 0.68);
+    const feat5 = calcFeatureMotion(scrollProgress, 0.68, 0.71, 0.78, 0.82);
 
     document.documentElement.style.setProperty('--feat1-y', `${feat1.y.toFixed(2)}vh`);
     document.documentElement.style.setProperty('--feat1-opacity', `${feat1.opacity.toFixed(3)}`);
@@ -360,6 +370,19 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
 
     // Dynamic dark mode during Mechanical Heart movement view
     document.body.classList.toggle('is--night-mode', isMovement);
+
+    // Show hotspot pins ONLY in the free-rotate finale zone (>= 82% scroll)
+    // Hidden during the entire scrollytelling narrative
+    hotspotsManager.setVisible(isCompleted);
+    document.body.classList.toggle('is--free-rotate', isCompleted);
+
+    // Reveal the Metallurgy / specs dossier ONLY when the user has physically
+    // scrolled past the narrative container — not while Features 4/5 or Free
+    // Orbit Studio are still on screen.
+    const narrativeOffsetTop = narrativeContainer ? narrativeContainer.offsetTop : 0;
+    const narrativeBottom = narrativeOffsetTop + (narrativeContainer ? narrativeContainer.offsetHeight : 0);
+    const isDossierInView = window.scrollY + window.innerHeight >= narrativeBottom - 40;
+    document.body.classList.toggle('dossier-revealed', isDossierInView);
 
     // Update vertical timeline indicator in DOM
     updateScrollTimeline(scrollProgress);
@@ -413,50 +436,57 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
 
     // 4. Scroll-Driven 3D Choreography (when not manually dragging)
     if (!isDragging) {
-      if (scrollProgress < 0.20) {
+      if (scrollProgress < 0.16) {
         // Step 0 & 0B: Pristine Watch Launch (Watch faces camera upright during launch, bg fade, and title entrance/exit)
         targetRotX = 0.0;
         targetRotY = 0.0;
         targetZoom = 9.2;
+        targetPosX = 0;
         if (!manualExplode) explodedController.setExploded(false);
-      } else if (scrollProgress >= 0.20 && scrollProgress < 0.35) {
-        // Step 1: Case & Finishes (Feature 01 appears only here)
-        const p = (scrollProgress - 0.20) / 0.15;
+      } else if (scrollProgress >= 0.16 && scrollProgress < 0.29) {
+        // Step 1: Case & Finishes (Feature 01)
+        const p = (scrollProgress - 0.16) / 0.13;
         targetRotX = 0.0 + p * 0.12;
         targetRotY = 0.0 - 0.58 * p;
         targetZoom = 9.2 + p * 0.8;
+        targetPosX = window.innerWidth > 900 ? 1.3 : 0;
         if (!manualExplode) explodedController.setExploded(false);
-      } else if (scrollProgress >= 0.35 && scrollProgress < 0.50) {
-        // Step 2: Refined Dial & Pointers (Deep macro zoom directly facing dial face!)
-        const p = (scrollProgress - 0.35) / 0.15;
+      } else if (scrollProgress >= 0.29 && scrollProgress < 0.42) {
+        // Step 2: Refined Dial & Pointers (Feature 02)
+        const p = (scrollProgress - 0.29) / 0.13;
         targetRotX = 0.12 * (1 - p) + 0.01 * p;
         targetRotY = -0.58 * (1 - p) + 0.06 * p;
-        targetZoom = 10.0 * (1 - p) + 6.8 * p; // Close macro zoom on dial face
+        targetZoom = 10.0 * (1 - p) + 6.8 * p;
+        targetPosX = window.innerWidth > 900 ? 1.3 : 0;
         if (!manualExplode) explodedController.setExploded(false);
-      } else if (scrollProgress >= 0.50 && scrollProgress < 0.65) {
-        // Step 3: Flat Plane Steel Caseback (Flip 180° to directly inspect engraved ALUNA in italic and A3016)
-        const p = (scrollProgress - 0.50) / 0.15;
+      } else if (scrollProgress >= 0.42 && scrollProgress < 0.55) {
+        // Step 3: Flat Plane Steel Caseback (Feature 03)
+        const p = (scrollProgress - 0.42) / 0.13;
         targetRotX = 0.01 * (1 - p) + 0.02 * p;
         targetRotY = 0.06 * (1 - p) + Math.PI * p; // Full 180° rotation
-        targetZoom = 6.8 * (1 - p) + 7.6 * p; // Crisp clear framing of flat caseback
+        targetZoom = 6.8 * (1 - p) + 7.6 * p;
+        targetPosX = window.innerWidth > 900 ? 1.3 : 0;
         rotorVelocity += 0.02;
         if (!manualExplode) explodedController.setExploded(false);
-      } else if (scrollProgress >= 0.65 && scrollProgress < 0.78) {
-        // Step 4: Deconstructed Architecture (Horizontal exploded view)
-        const p = (scrollProgress - 0.65) / 0.13;
-        targetRotX = 0.02 * (1 - p) + 0.32 * p;
+      } else if (scrollProgress >= 0.55 && scrollProgress < 0.68) {
+        // Step 4: Deconstructed Architecture (Feature 04)
+        const p = (scrollProgress - 0.55) / 0.13;
+        targetRotX = 0.02 * (1 - p) + 0.28 * p;
         targetRotY = Math.PI * (1 - p) + (Math.PI + 0.50) * p;
-        targetZoom = 7.6 * (1 - p) + 13.5 * p;
+        targetZoom = 7.6 * (1 - p) + 13.0 * p;
+        targetPosX = window.innerWidth > 900 ? 1.3 : 0;
         explodedController.targetProgress = Math.max(p, manualExplode ? 1 : 0);
-      } else if (scrollProgress >= 0.78 && scrollProgress < 0.88) {
-        // Step 5: Integrated Bracelet Macro (Close view of bracelet links)
-        const p = (scrollProgress - 0.78) / 0.10;
-        targetRotX = 0.32 * (1 - p) + 0.06 * p;
+      } else if (scrollProgress >= 0.68 && scrollProgress < 0.82) {
+        // Step 5: Sculpted 3-Link Bracelet (Feature 05)
+        const p = (scrollProgress - 0.68) / 0.14;
+        targetRotX = 0.28 * (1 - p) + 0.10 * p;
         targetRotY = (Math.PI + 0.50) * (1 - p) + (Math.PI * 2) * p;
-        targetZoom = 13.5 * (1 - p) + 7.6 * p;
+        targetZoom = 13.0 * (1 - p) + 7.8 * p;
+        targetPosX = window.innerWidth > 900 ? 1.3 : 0;
         explodedController.targetProgress = 0;
       } else {
         // Step 6: Finale / Free Orbit Showcase
+        targetPosX = 0;
         if (!hasUserRotatedInFinale) {
           targetRotX = 0.15;
           targetRotY += delta * 0.25; // Gentle majestic idle spin
@@ -482,10 +512,12 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     // Smooth inertia camera/rotation damping
     rotX += (targetRotX - rotX) * 0.08;
     rotY += (targetRotY - rotY) * 0.08;
+    posX += (targetPosX - posX) * 0.08;
     currentZoom += (targetZoom - currentZoom) * 0.08;
 
     watchAnchor.rotation.x = rotX;
     watchAnchor.rotation.y = rotY;
+    watchAnchor.position.x = posX;
     camera.position.z = currentZoom;
 
     // Dynamic light intensity shift for night lume (metallic black tuned)
@@ -506,13 +538,13 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
   function updateScrollTimeline(progress) {
     const chapters = document.querySelectorAll('.vertical-timeline-tracker .timeline-step');
     let activeIdx = 0;
-    if (progress >= 0.05 && progress < 0.18) activeIdx = 1;
-    else if (progress >= 0.18 && progress < 0.32) activeIdx = 2;
-    else if (progress >= 0.32 && progress < 0.46) activeIdx = 3;
-    else if (progress >= 0.46 && progress < 0.60) activeIdx = 4;
-    else if (progress >= 0.60 && progress < 0.74) activeIdx = 5;
-    else if (progress >= 0.74 && progress < 0.85) activeIdx = 6;
-    else if (progress >= 0.85) activeIdx = 7;
+    if (progress >= 0.05 && progress < 0.16) activeIdx = 1;
+    else if (progress >= 0.16 && progress < 0.29) activeIdx = 2;
+    else if (progress >= 0.29 && progress < 0.42) activeIdx = 3;
+    else if (progress >= 0.42 && progress < 0.55) activeIdx = 4;
+    else if (progress >= 0.55 && progress < 0.68) activeIdx = 5;
+    else if (progress >= 0.68 && progress < 0.82) activeIdx = 6;
+    else if (progress >= 0.82) activeIdx = 7;
 
     chapters.forEach((ch, idx) => {
       ch.classList.toggle('is--active', idx === activeIdx);
