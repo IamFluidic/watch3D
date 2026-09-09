@@ -74,7 +74,7 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.25;
+  renderer.toneMappingExposure = 1.55; // Higher exposure — lifts metallic specular highlights off the black
 
   // Set Studio Environment Map for Realistic PBR Specular Reflections
   const studioEnv = createStudioEnvironment(renderer);
@@ -83,27 +83,36 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
   container.innerHTML = '';
   container.appendChild(renderer.domElement);
 
-  // Lighting System: Studio Softboxes
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1.1);
+  // Lighting System: Studio Softboxes (tuned for metallic black PBR)
+  // Reduced ambient so the deep black case has real depth and contrast
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
   scene.add(ambientLight);
 
-  // Direct front light onto dial face for luminous numerals and hands
-  const dialFaceLight = new THREE.DirectionalLight(0xffffff, 2.4);
+  // Direct front light onto dial face — brighter to separate hands from black dial
+  const dialFaceLight = new THREE.DirectionalLight(0xffffff, 3.2);
   dialFaceLight.position.set(0, 2, 9);
   scene.add(dialFaceLight);
 
-  const keyLight = new THREE.DirectionalLight(0xffffff, 2.6);
-  keyLight.position.set(6, 8, 8);
+  // Strong top-left key light — creates crisp specular streak on black case bevel
+  const keyLight = new THREE.DirectionalLight(0xffffff, 3.8);
+  keyLight.position.set(6, 10, 8);
   keyLight.castShadow = true;
   scene.add(keyLight);
 
-  const fillLight = new THREE.DirectionalLight(0xdfe6f2, 1.8);
-  fillLight.position.set(-7, -4, 4);
+  // Cool blue-tinted fill to give metallic black a multi-tone depth
+  const fillLight = new THREE.DirectionalLight(0xb8ceff, 1.2);
+  fillLight.position.set(-8, -3, 5);
   scene.add(fillLight);
 
-  const rimLight = new THREE.DirectionalLight(0xffffff, 3.2);
-  rimLight.position.set(0, 8, -6);
+  // Very strong white rim light — punches out the case silhouette against dark background
+  const rimLight = new THREE.DirectionalLight(0xffffff, 4.8);
+  rimLight.position.set(0, 10, -7);
   scene.add(rimLight);
+
+  // Secondary low-angle rim to catch bracelet link edges
+  const rimLight2 = new THREE.DirectionalLight(0xd0e4ff, 2.2);
+  rimLight2.position.set(-6, -8, -4);
+  scene.add(rimLight2);
 
   // Soft Ground Shadow
   const shadowPlaneGeom = new THREE.PlaneGeometry(16, 16);
@@ -476,9 +485,9 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     watchAnchor.rotation.y = rotY;
     camera.position.z = currentZoom;
 
-    // Dynamic light intensity shift for night lume
-    const targetAmbient = isNightMode ? 0.08 : 1.2;
-    const targetKey = isNightMode ? 0.15 : 2.4;
+    // Dynamic light intensity shift for night lume (metallic black tuned)
+    const targetAmbient = isNightMode ? 0.04 : 0.7;
+    const targetKey = isNightMode ? 0.10 : 3.8;
     ambientLight.intensity += (targetAmbient - ambientLight.intensity) * 0.1;
     keyLight.intensity += (targetKey - keyLight.intensity) * 0.1;
 

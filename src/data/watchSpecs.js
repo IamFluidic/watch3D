@@ -1,9 +1,27 @@
 export const WATCH_EDITIONS = [
   {
+    id: "dlc",
+    name: "01. Midnight Phantom",
+    subtitle: "Metallic Black DLC Coated",
+    dialColor: "#09090B", // Deep obsidian black
+    dialName: "Obsidian Black",
+    caseColor: "#111318",   // Gun-metal deep black
+    caseMetalness: 0.96,
+    caseRoughness: 0.14,    // Semi-gloss — metallic sheen
+    bezelColor: "#0A0B0E",
+    strapType: "metal",
+    strapColor: "#0F1115",  // Matching black link bracelet
+    handsColor: "#CBD5E1",  // Cool silver-grey hands for contrast
+    lumeColor: "#38BDF8",   // Cyan lume
+    accentColor: "#38BDF8", // Cyan seconds hand
+    price: "$2,850",
+    description: "Vapor-deposited DLC coating bonds to the surgical steel core at the atomic level, creating an obsidian-black surface with 3,500 Vickers hardness and mirror-metallic sheen."
+  },
+  {
     id: "steel",
-    name: "01. Steel Classic",
+    name: "02. Steel Classic",
     subtitle: "316L Surgical Stainless Steel",
-    dialColor: "#1B2A4A", // Deep Sunburst Cobalt Blue
+    dialColor: "#1B2A4A",
     dialName: "Cobalt Sunray",
     caseColor: "#E2E8F0",
     caseMetalness: 0.95,
@@ -12,43 +30,25 @@ export const WATCH_EDITIONS = [
     strapType: "metal",
     strapColor: "#CBD5E1",
     handsColor: "#F8FAFC",
-    lumeColor: "#38BDF8", // Cyan lume
+    lumeColor: "#38BDF8",
     accentColor: "#38BDF8",
     price: "$2,450",
     description: "Cold-forged from marine-grade 316L stainless steel with vertical satin brushing, polished chamfered bevels, and a deep cobalt sunray dial."
   },
   {
-    id: "dlc",
-    name: "02. Phantom DLC",
-    subtitle: "Diamond-Like Carbon Coating",
-    dialColor: "#111215", // Matte Anthracite
-    dialName: "Stealth Anthracite",
-    caseColor: "#1F2228",
-    caseMetalness: 0.85,
-    caseRoughness: 0.38,
-    bezelColor: "#0A0A0C",
-    strapType: "metal",
-    strapColor: "#1A1D23",
-    handsColor: "#94A3B8",
-    lumeColor: "#22C55E", // Green lume
-    accentColor: "#E2E8F0",
-    price: "$2,850",
-    description: "Vapor-deposited diamond-like carbon provides extreme scratch hardness (3,500 Vickers) with a stealth matte phantom finish."
-  },
-  {
     id: "rose",
     name: "03. Champagne 18K",
     subtitle: "18K Rose Gold & Opaline",
-    dialColor: "#FBF6EE", // Warm Opaline Ivory
+    dialColor: "#FBF6EE",
     dialName: "Ivory Opaline",
     caseColor: "#E6B89C",
     caseMetalness: 0.92,
     caseRoughness: 0.2,
     bezelColor: "#C99276",
     strapType: "leather",
-    strapColor: "#3A2118", // Deep chocolate leather
+    strapColor: "#3A2118",
     handsColor: "#B4654A",
-    lumeColor: "#FDE047", // Warm vintage lume
+    lumeColor: "#FDE047",
     accentColor: "#B4654A",
     price: "$4,200",
     description: "Cast in proprietary 18-karat rose gold alloy enriched with copper and platinum for lasting lustre, paired with an opaline dial and French calfskin."
@@ -57,16 +57,16 @@ export const WATCH_EDITIONS = [
     id: "titanium",
     name: "04. Racing Titanium",
     subtitle: "Grade 5 Satin Titanium",
-    dialColor: "#0D2818", // British Racing Green
+    dialColor: "#0D2818",
     dialName: "Racing Emerald",
     caseColor: "#94A3B8",
     caseMetalness: 0.88,
     caseRoughness: 0.42,
     bezelColor: "#041B0E",
     strapType: "leather",
-    strapColor: "#1E2228", // Perforated rally strap
+    strapColor: "#1E2228",
     handsColor: "#F8FAFC",
-    lumeColor: "#4ADE80", // Electric lime
+    lumeColor: "#4ADE80",
     accentColor: "#22C55E",
     price: "$3,150",
     description: "Ultra-light Grade 5 aerospace titanium bead-blasted to a satin sheen, boasting 40% less weight than steel with double the tensile resistance."

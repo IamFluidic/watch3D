@@ -25,12 +25,11 @@ export function create3DWatch(edition) {
       envMapIntensity: 1.8
     }),
     bezelInsert: new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(edition.bezelColor),
       map: createBezelTexture(),
-      roughness: 0.03,
-      metalness: 0.2,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.02,
-      envMapIntensity: 2.0
+      roughness: 0.18,
+      metalness: 0.9,
+      envMapIntensity: 1.6
     }),
     dial: new THREE.MeshStandardMaterial({
       map: createDialTexture(edition),
@@ -456,6 +455,11 @@ export function create3DWatch(edition) {
       materials.case.color.set(newEdition.caseColor);
       materials.case.metalness = newEdition.caseMetalness;
       materials.case.roughness = newEdition.caseRoughness;
+
+      // Update outer bezel ring color to match edition
+      materials.bezelInsert.color.set(newEdition.bezelColor);
+      materials.bezelInsert.map = createBezelTexture();
+      materials.bezelInsert.map.needsUpdate = true;
 
       materials.caseback.map = createFlatCasebackTexture(newEdition);
       materials.caseback.map.needsUpdate = true;

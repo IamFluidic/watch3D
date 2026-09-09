@@ -526,20 +526,20 @@ export function createBezelTexture() {
   const outerR = 500;
   const innerR = 410;
 
-  // Base circular gradient (steel reflection)
-  ctx.fillStyle = '#8B94A0';
+  // Base circular gradient (DLC black with subtle metallic sheen)
+  ctx.fillStyle = '#0E1014';
   ctx.beginPath();
   ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
   ctx.arc(cx, cy, innerR, 0, Math.PI * 2, true);
   ctx.fill();
 
-  // Satin-brushed concentric grain
+  // Satin-brushed concentric grain (dark metallic — very subtle)
   ctx.save();
   ctx.translate(cx, cy);
   for (let r = innerR; r < outerR; r += 1.5) {
-    const grainAlpha = 0.08 + Math.random() * 0.15;
-    const isBright = Math.random() > 0.5;
-    ctx.strokeStyle = isBright ? `rgba(255, 255, 255, ${grainAlpha})` : `rgba(30, 35, 45, ${grainAlpha})`;
+    const grainAlpha = 0.04 + Math.random() * 0.09;
+    const isBright = Math.random() > 0.7; // fewer bright strokes on black
+    ctx.strokeStyle = isBright ? `rgba(180, 200, 220, ${grainAlpha})` : `rgba(8, 10, 14, ${grainAlpha})`;
     ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.arc(0, 0, r, 0, Math.PI * 2);
@@ -563,11 +563,11 @@ export function createBezelTexture() {
     ctx.arc(0, 0, 18, 0, Math.PI * 2);
     ctx.fill();
 
-    // Polished screw head bevel
+    // Polished screw head bevel (dark chrome on black bezel)
     const screwGrad = ctx.createLinearGradient(-12, -12, 12, 12);
-    screwGrad.addColorStop(0, '#EAEFF5');
-    screwGrad.addColorStop(0.5, '#A4B0C0');
-    screwGrad.addColorStop(1, '#687484');
+    screwGrad.addColorStop(0, '#4A5160');
+    screwGrad.addColorStop(0.5, '#1E2330');
+    screwGrad.addColorStop(1, '#0D0F14');
     ctx.fillStyle = screwGrad;
     ctx.beginPath();
     ctx.arc(0, 0, 15, 0, Math.PI * 2);
