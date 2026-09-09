@@ -8,7 +8,7 @@ export const WATCH_EDITIONS = [
     caseColor: "#E2E8F0",
     caseMetalness: 0.95,
     caseRoughness: 0.22,
-    bezelColor: "#E2E8F0",
+    bezelColor: "#0F172A",
     strapType: "metal",
     strapColor: "#CBD5E1",
     handsColor: "#F8FAFC",
