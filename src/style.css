@@ -537,36 +537,99 @@ body.is--night-mode .reticle-circle {
   background: radial-gradient(circle at 0% 0%, rgba(235, 230, 215, 0.25) 0%, transparent 70%);
 }
 
-/* ================= HERO BRAND BILLBOARD (Appears from bottom to center on scroll) ================= */
+/* ===============================================================
+   CINEMATIC BLACK CURTAIN — Scroll-driven wipe reveal
+   Slides in from right  → holds → exits to left
+   Driven by --curtain-x (100% = off-right, 0% = full cover, -100% = off-left)
+   =============================================================== */
+.cinematic-curtain {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #050507;
+  z-index: 28; /* below title (z:30), above watch (z:2) */
+  transform: translateX(var(--curtain-x, 100%));
+  will-change: transform;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Subtle film grain texture on curtain using SVG noise */
+.curtain-grain {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* Thin vertical light-leak stripe on leading edge of curtain */
+.cinematic-curtain::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255,255,255,0.08) 20%,
+    rgba(255,255,255,0.18) 50%,
+    rgba(255,255,255,0.08) 80%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* When curtain is up, force title text to white for legibility */
+body.curtain--active .name-brand,
+body.curtain--active .name-model {
+  color: #FFFFFF !important;
+  text-shadow: 0 0 60px rgba(255,255,255,0.15) !important;
+}
+
+body.curtain--active .hero-brand-sub {
+  color: rgba(255,255,255,0.55) !important;
+}
+
+body.curtain--active .hero-brand-kicker {
+  color: var(--accent-cyan) !important;
+}
+
+/* ================= HERO BRAND BILLBOARD (Inside curtain — rides right-to-left wipe) ================= */
 .launch-hero-brand {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, calc(-50% + var(--brand-y-offset, 50vh)));
-  width: min(1240px, 95vw);
-  padding: 0 24px;
+  transform: translate(-50%, -50%); /* permanently centered inside the curtain */
+  width: min(1300px, 96vw);
+  padding: 0 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  z-index: 30;
+  z-index: 31; /* above curtain grain */
   pointer-events: none;
-  opacity: var(--brand-opacity, 0);
-  transition: opacity 0.25s ease-out;
-  will-change: opacity, transform;
+  opacity: 1;  /* always visible — curtain itself handles show/hide */
+  will-change: auto;
 }
 
 .hero-brand-kicker {
   font-family: var(--font-mono);
-  font-size: clamp(0.72rem, 1.1vw, 0.85rem);
-  letter-spacing: 0.32em;
+  font-size: clamp(0.7rem, 1vw, 0.88rem);
+  letter-spacing: 0.36em;
   color: var(--accent-cyan);
   font-weight: 700;
   text-transform: uppercase;
-  margin-bottom: clamp(140px, 20vh, 240px); /* sits gracefully above the watch dial */
+  margin-bottom: 28px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .hero-brand-kicker::before,
@@ -588,47 +651,43 @@ body.is--night-mode .reticle-circle {
   line-height: 1;
 }
 
+/* Giant names — on black curtain so always white */
 .name-brand {
-  font-family: var(--font-title);
-  font-size: clamp(2.8rem, 6.4vw, 5.6rem);
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  color: #0A0A0A;
+  font-family: 'Bebas Neue', var(--font-title), sans-serif;
+  font-size: clamp(5rem, 14vw, 13rem);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  color: #FFFFFF;
   text-align: right;
-  padding-right: 2vw;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding-right: 3vw;
+  line-height: 0.9;
+  text-shadow: 0 0 120px rgba(255,255,255,0.08);
 }
 
 .name-model {
-  font-family: var(--font-mono);
-  font-size: clamp(2.2rem, 5.0vw, 4.4rem);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #1A1A1A;
+  font-family: 'Cormorant Garamond', var(--font-serif), Georgia, serif;
+  font-size: clamp(5rem, 13vw, 12rem);
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.75);
   text-align: left;
-  padding-left: 2vw;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding-left: 3vw;
+  line-height: 0.9;
+  text-shadow: 0 0 80px rgba(255,255,255,0.06);
 }
 
 .hero-brand-sub {
   font-family: var(--font-mono);
-  font-size: clamp(0.7rem, 1vw, 0.82rem);
-  letter-spacing: 0.25em;
-  color: var(--color-ink-dim);
-  margin-top: clamp(140px, 20vh, 240px); /* sits gracefully below the watch dial */
+  font-size: clamp(0.68rem, 0.9vw, 0.82rem);
+  letter-spacing: 0.28em;
+  color: rgba(255,255,255,0.4);
+  margin-top: 28px;
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 500;
 }
 
-body.is--night-mode .name-brand {
-  color: #FFFFFF;
-  text-shadow: 0 4px 30px rgba(255, 255, 255, 0.2);
-}
-
-body.is--night-mode .name-model {
-  color: #E2E8F0;
-  text-shadow: 0 4px 30px rgba(255, 255, 255, 0.15);
-}
+/* night-mode overrides no longer needed — title is always on black curtain */
 
 /* Responsive adjustment for tablet/mobile */
 @media (max-width: 900px) {

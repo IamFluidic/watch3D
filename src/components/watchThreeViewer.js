@@ -263,50 +263,53 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     document.body.classList.toggle('step-bracelet-active', isBracelet);
     document.body.classList.toggle('story-completed', isCompleted);
 
-    // Dynamic title & background motion:
-    // 1. When page loads in beginning (scroll < 0.02): show ALUNA A3016 solid in background (0.90)
-    // 2. When scrolling (0.02 -> 0.07): background text fades down to subtle color (0.12)
-    // 3. After then (0.07 -> 0.14): Main title name appears from bottom to center in motion
-    // 4. Then when scrolling down (0.14 -> 0.20): Main title disappears into the top!
-    // 5. Again scrolling (>= 0.20): only then show Feature 01 (Case & Finishes)
-    let brandYOffset = 60; // vh
-    let brandOpacity = 0;
+    // Background ghost text opacity (ALUNA / A3016 editorial outline text)
+    // Fades from solid → subtle as user begins scrolling, then dims further
     let bgNameOpacity = 0.90;
 
     if (scrollProgress < 0.02) {
       bgNameOpacity = 0.90;
-      brandOpacity = 0;
-      brandYOffset = 60;
     } else if (scrollProgress >= 0.02 && scrollProgress < 0.07) {
       const p = (scrollProgress - 0.02) / 0.05;
-      bgNameOpacity = 0.90 * (1 - p) + 0.12 * p;
-      brandOpacity = 0;
-      brandYOffset = 60;
-    } else if (scrollProgress >= 0.07 && scrollProgress < 0.11) {
-      const p = (scrollProgress - 0.07) / 0.04;
-      const ease = 1 - Math.pow(1 - p, 3);
-      bgNameOpacity = 0.12;
-      brandOpacity = ease;
-      brandYOffset = (1 - ease) * 60;
-    } else if (scrollProgress >= 0.11 && scrollProgress < 0.14) {
-      bgNameOpacity = 0.12;
-      brandOpacity = 1;
-      brandYOffset = 0;
-    } else if (scrollProgress >= 0.14 && scrollProgress < 0.20) {
-      const p = (scrollProgress - 0.14) / 0.06;
-      const ease = Math.pow(p, 1.8);
-      bgNameOpacity = 0.12 * (1 - p) + 0.08 * p;
-      brandOpacity = Math.max(1 - p * 1.6, 0);
-      brandYOffset = -ease * 140; // Glides UP and completely disappears into the top!
+      bgNameOpacity = 0.90 * (1 - p) + 0.10 * p;
+    } else if (scrollProgress >= 0.07 && scrollProgress < 0.21) {
+      bgNameOpacity = 0.10; // dim while curtain is covering the screen
     } else {
       bgNameOpacity = 0.08;
-      brandOpacity = 0;
-      brandYOffset = -140;
     }
 
-    document.documentElement.style.setProperty('--brand-y-offset', `${brandYOffset.toFixed(2)}vh`);
-    document.documentElement.style.setProperty('--brand-opacity', `${brandOpacity.toFixed(3)}`);
     document.documentElement.style.setProperty('--bg-name-opacity', `${bgNameOpacity.toFixed(3)}`);
+
+    // ─── CINEMATIC CURTAIN ─────────────────────────────────────────────────
+    // Phase A  0.03 → 0.07 : black panel sweeps IN from right (100% → 0%)
+    // Phase B  0.07 → 0.16 : curtain holds at 0% — title is white on black
+    // Phase C  0.16 → 0.21 : curtain sweeps OUT to left  (0% → -100%)
+    // Outside these ranges : curtain is fully off screen
+    let curtainX = 100; // default: off to the right
+    let isCurtainActive = false;
+
+    if (scrollProgress < 0.03) {
+      curtainX = 100;
+    } else if (scrollProgress >= 0.03 && scrollProgress < 0.07) {
+      const p = (scrollProgress - 0.03) / 0.04;
+      const ease = 1 - Math.pow(1 - p, 3); // ease-out cubic: fast then slows to a stop
+      curtainX = (1 - ease) * 100;
+      isCurtainActive = ease > 0.1;
+    } else if (scrollProgress >= 0.07 && scrollProgress < 0.16) {
+      curtainX = 0; // fully covering
+      isCurtainActive = true;
+    } else if (scrollProgress >= 0.16 && scrollProgress < 0.21) {
+      const p = (scrollProgress - 0.16) / 0.05;
+      const ease = Math.pow(p, 2.2); // ease-in quad: starts slow then accelerates away
+      curtainX = -ease * 100;
+      isCurtainActive = p < 0.9;
+    } else {
+      curtainX = -100; // off to the left, completely gone
+    }
+
+    document.documentElement.style.setProperty('--curtain-x', `${curtainX.toFixed(2)}%`);
+    document.body.classList.toggle('curtain--active', isCurtainActive);
+    // ──────────────────────────────────────────────────────────────────────
 
     // Calculate scroll-driven vertical motion for each feature:
     // Slowly comes from bottom (+65vh -> 0vh), rests at center (0vh), then moves to top (0vh -> -65vh)
