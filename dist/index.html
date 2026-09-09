@@ -11,9 +11,11 @@
     href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22none%22 stroke=%22%230A0A0A%22 stroke-width=%228%22/><line x1=%2250%22 y1=%2250%22 x2=%2250%22 y2=%2222%22 stroke=%22%230A0A0A%22 stroke-width=%226%22 stroke-linecap=%22round%22/><line x1=%2250%22 y1=%2250%22 x2=%2272%22 y2=%2250%22 stroke=%22%230A0A0A%22 stroke-width=%225%22 stroke-linecap=%22round%22/></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/assets/index-D3aPmJzO.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-Cp3V5J4u.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&display=swap"
+    rel="stylesheet">
+  <script type="module" crossorigin src="/assets/index-D-jWFATN.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-OKtO_dj1.css">
 </head>
 
 <body>
@@ -21,16 +23,14 @@
   <!-- ================= SCROLL PROGRESS BAR ================= -->
   <div id="scroll-progress-bar" class="scroll-progress-bar"></div>
 
-  <!-- ================= CIRCULAR LOADER ================= -->
-  <div id="loader">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 700 700">
-      <path stroke-opacity="0.3" stroke="#CCCCCC" stroke-width="2"
-        d="M350 695c190.538 0 345-154.462 345-345S540.538 5 350 5 5 159.462 5 350s154.462 345 345 345Z" />
-      <path class="progress-arc" stroke-opacity="1" stroke-width="3" stroke="#111111"
-        d="M350 695c190.538 0 345-154.462 345-345S540.538 5 350 5 5 159.462 5 350s154.462 345 345 345Z" />
-    </svg>
-    <div class="loader-text">
-      <span>Now</span> loading <span id="loader-percent">100%</span>
+  <!-- ================= DIGITAL STOPWATCH LOADER ================= -->
+  <div id="loader" class="stopwatch-loader">
+    <div class="stopwatch-chassis">
+      <div class="stopwatch-display">
+        <span class="stopwatch-digits" id="stopwatch-main">23:59</span>
+        <span class="stopwatch-ms" id="stopwatch-ms">:99</span>
+      </div>
+      <div class="stopwatch-loading-text">Loading....</div>
     </div>
   </div>
 
@@ -313,7 +313,9 @@
                 Deconstructed <em class="serif-ital">Calibre Layers</em>
               </h2>
               <p class="editorial-feature-body">
-                The 7 precision horological assemblies separated along the central horizontal axis in dynamic mechanical suspension. Inspect the dual-domed crystal, guilloché dial, oscillating balance wheel, and solid engraved caseback.
+                The 7 precision horological assemblies separated along the central horizontal axis in dynamic mechanical
+                suspension. Inspect the dual-domed crystal, guilloché dial, oscillating balance wheel, and solid
+                engraved caseback.
               </p>
               <div class="editorial-specs-grid">
                 <div class="ed-spec-item">
@@ -346,7 +348,9 @@
                 Sculpted <em class="serif-ital">3-Link Bracelet</em>
               </h2>
               <p class="editorial-feature-body">
-                Crafted from cold-forged 316L steel links with vertical satin-brushed flanks and mirror-polished chamfers. Features a precision micro-adjusting butterfly deployant clasp for seamless ergonomic wrist drape.
+                Crafted from cold-forged 316L steel links with vertical satin-brushed flanks and mirror-polished
+                chamfers. Features a precision micro-adjusting butterfly deployant clasp for seamless ergonomic wrist
+                drape.
               </p>
               <div class="editorial-specs-grid">
                 <div class="ed-spec-item">
@@ -595,7 +599,7 @@
 
           <div class="footer-bottom">
             <span>© 2026 iamfludic. All rights reserved.</span>
-            <span class="footer-homage">Inspired by</span>
+            <!-- <span class="footer-homage">Inspired by</span> -->
           </div>
         </div>
       </footer>

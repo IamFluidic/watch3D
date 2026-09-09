@@ -5,28 +5,43 @@ import { soundEngine } from './components/soundEngine.js';
 import confetti from 'canvas-confetti';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Initial 60fps Circular Loader Sequence
+  // 1. Digital Chronometer Countdown Loader (23:59 -> 00:00)
   const loader = document.getElementById('loader');
-  const loaderPercent = document.getElementById('loader-percent');
+  const stopwatchMain = document.getElementById('stopwatch-main');
+  const stopwatchMs = document.getElementById('stopwatch-ms');
 
-  let progress = 0;
-  const loadInterval = setInterval(() => {
-    progress += Math.floor(Math.random() * 20) + 15;
-    if (progress >= 100) {
-      progress = 100;
-      clearInterval(loadInterval);
-      if (loaderPercent) loaderPercent.textContent = '100%';
+  const COUNTDOWN_DURATION = 1250; // smooth continuous 1.25s countdown
+  const startTime = performance.now();
+  const startSec = 23 * 60 + 59; // 1439 total units
 
+  function updateStopwatch(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / COUNTDOWN_DURATION, 1);
+
+    // Strictly linear progression: zero stalls or hesitation in the middle
+    const current = Math.max(0, (1 - progress) * startSec);
+    const m = Math.floor(current / 60);
+    const s = Math.floor(current % 60);
+    const ms = progress >= 1 ? 0 : Math.floor((1 - (progress * 24) % 1) * 99);
+
+    const timeStr = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    const msStr = `:${String(ms).padStart(2, '0')}`;
+
+    if (stopwatchMain) stopwatchMain.textContent = timeStr;
+    if (stopwatchMs) stopwatchMs.textContent = msStr;
+
+    if (progress < 1) {
+      requestAnimationFrame(updateStopwatch);
+    } else {
       setTimeout(() => {
         if (loader) loader.classList.add('is--hidden');
         document.body.classList.add('hero-revealed');
         // Trigger initial hero counters
         document.querySelectorAll('.hero-metrics-ribbon .counter-number').forEach(el => animateNumber(el));
-      }, 400);
-    } else {
-      if (loaderPercent) loaderPercent.textContent = `${progress}%`;
+      }, 100);
     }
-  }, 80);
+  }
+  requestAnimationFrame(updateStopwatch);
 
   // 2. Initialize 3D Watch WebGL Viewer with Hotspots
   let viewer = null;

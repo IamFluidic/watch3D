@@ -237,17 +237,17 @@ body.hero-revealed .anim-text-line {
   transform: scaleX(1);
 }
 
-/* ================= 60FPS CIRCULAR LOADER ================= */
+/* ================= DIGITAL STOPWATCH COUNTDOWN LOADER ================= */
 #loader {
   position: fixed;
   inset: 0;
-  background: #EBEBEB;
+  background: #FFFFFF;
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: all;
-  transition: opacity 0.7s cubic-bezier(0.65, 0, 0.35, 1), visibility 0.7s;
+  transition: opacity 0.5s cubic-bezier(0.65, 0, 0.35, 1), visibility 0.5s;
 }
 
 #loader.is--hidden {
@@ -256,39 +256,45 @@ body.hero-revealed .anim-text-line {
   pointer-events: none;
 }
 
-#loader svg {
-  position: absolute;
-  inset: -100%;
-  margin: auto;
-  max-width: 90%;
-  max-height: 90%;
-  min-width: 480px;
+.stopwatch-chassis {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
-.progress-arc {
-  transform: rotate(-180deg) scale(-1, 1);
-  transform-origin: center;
-  stroke-dasharray: 2168;
-  stroke-dashoffset: 2168;
-  animation: fill-circle 1.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+.stopwatch-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 
-@keyframes fill-circle {
-  from { stroke-dashoffset: 2168; }
-  to   { stroke-dashoffset: 0; }
+.stopwatch-digits {
+  font-size: clamp(3.8rem, 10vw, 6.5rem);
+  color: #0A0A0A;
+  font-weight: 800;
 }
 
-.loader-text {
-  position: relative;
-  font-size: 12px;
-  color: #000;
-  font-family: var(--font-sans);
-  letter-spacing: 0.12em;
+.stopwatch-ms {
+  font-size: clamp(1.8rem, 4.5vw, 3rem);
+  color: #64748B;
+  font-weight: 600;
+  margin-left: 3px;
+  min-width: 2.2ch;
+}
+
+.stopwatch-loading-text {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  letter-spacing: 0.26em;
+  color: #52525B;
   text-transform: uppercase;
-}
-
-.loader-text span {
-  color: rgba(0, 0, 0, 0.45);
+  font-weight: 600;
 }
 
 /* ================= FLOATING HEADER ================= */

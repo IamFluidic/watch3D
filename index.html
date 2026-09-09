@@ -22,16 +22,14 @@
   <!-- ================= SCROLL PROGRESS BAR ================= -->
   <div id="scroll-progress-bar" class="scroll-progress-bar"></div>
 
-  <!-- ================= CIRCULAR LOADER ================= -->
-  <div id="loader">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 700 700">
-      <path stroke-opacity="0.3" stroke="#CCCCCC" stroke-width="2"
-        d="M350 695c190.538 0 345-154.462 345-345S540.538 5 350 5 5 159.462 5 350s154.462 345 345 345Z" />
-      <path class="progress-arc" stroke-opacity="1" stroke-width="3" stroke="#111111"
-        d="M350 695c190.538 0 345-154.462 345-345S540.538 5 350 5 5 159.462 5 350s154.462 345 345 345Z" />
-    </svg>
-    <div class="loader-text">
-      <span>Now</span> loading <span id="loader-percent">100%</span>
+  <!-- ================= DIGITAL STOPWATCH LOADER ================= -->
+  <div id="loader" class="stopwatch-loader">
+    <div class="stopwatch-chassis">
+      <div class="stopwatch-display">
+        <span class="stopwatch-digits" id="stopwatch-main">23:59</span>
+        <span class="stopwatch-ms" id="stopwatch-ms">:99</span>
+      </div>
+      <div class="stopwatch-loading-text">Loading....</div>
     </div>
   </div>
 
