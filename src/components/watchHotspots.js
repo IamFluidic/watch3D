@@ -51,11 +51,11 @@ export const HOTSPOT_DATA = [
     zoom: 8.8
   },
   {
-    id: 'rotor',
-    badge: 'CALIBRE',
-    label: 'Tungsten Oscillating Rotor',
-    metric: '21K Heavy Rim • 360° Bearings',
-    desc: 'High-density winding weight powers the 42-hour mainspring in both directions.',
+    id: 'caseback',
+    badge: 'CASEBACK',
+    label: 'Solid Engraved Caseback',
+    metric: '316L Surgical Steel • Hermetic Seal',
+    desc: 'Laser-engraved ALUNA italic signature and A3016 reference with circular satin graining.',
     localPos: new THREE.Vector3(0, -0.5, -0.45),
     normal: new THREE.Vector3(0, 0, -1),
     targetRotX: 0.1,

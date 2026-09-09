@@ -1,7 +1,25 @@
 export const WATCH_EDITIONS = [
   {
+    id: "steel",
+    name: "01. Steel Classic",
+    subtitle: "316L Surgical Stainless Steel",
+    dialColor: "#1B2A4A",
+    dialName: "Cobalt Sunray",
+    caseColor: "#E2E8F0",
+    caseMetalness: 0.95,
+    caseRoughness: 0.22,
+    bezelColor: "#E2E8F0",
+    strapType: "metal",
+    strapColor: "#CBD5E1",
+    handsColor: "#F8FAFC",
+    lumeColor: "#38BDF8",
+    accentColor: "#38BDF8",
+    price: "$2,450",
+    description: "Cold-forged from marine-grade 316L stainless steel with vertical satin brushing, polished chamfered bevels, and a deep cobalt sunray dial."
+  },
+  {
     id: "dlc",
-    name: "01. Midnight Phantom",
+    name: "02. Midnight Phantom",
     subtitle: "Metallic Black DLC Coated",
     dialColor: "#09090B", // Deep obsidian black
     dialName: "Obsidian Black",
@@ -16,24 +34,6 @@ export const WATCH_EDITIONS = [
     accentColor: "#38BDF8", // Cyan seconds hand
     price: "$2,850",
     description: "Vapor-deposited DLC coating bonds to the surgical steel core at the atomic level, creating an obsidian-black surface with 3,500 Vickers hardness and mirror-metallic sheen."
-  },
-  {
-    id: "steel",
-    name: "02. Steel Classic",
-    subtitle: "316L Surgical Stainless Steel",
-    dialColor: "#1B2A4A",
-    dialName: "Cobalt Sunray",
-    caseColor: "#E2E8F0",
-    caseMetalness: 0.95,
-    caseRoughness: 0.22,
-    bezelColor: "#0F172A",
-    strapType: "metal",
-    strapColor: "#CBD5E1",
-    handsColor: "#F8FAFC",
-    lumeColor: "#38BDF8",
-    accentColor: "#38BDF8",
-    price: "$2,450",
-    description: "Cold-forged from marine-grade 316L stainless steel with vertical satin brushing, polished chamfered bevels, and a deep cobalt sunray dial."
   },
   {
     id: "rose",
@@ -118,17 +118,10 @@ export const EXPLODED_LAYERS = [
   },
   {
     id: "caseback",
-    name: "Exhibition Sapphire Caseback",
-    metric: "Threaded screw-in • Mineral gasket",
+    name: "Solid Plane Steel Caseback",
+    metric: "Threaded screw-in • Surgical 316L",
     offsetZ: -2.6,
-    description: "Exhibition window revealing the rhythmic dance of the escapement and circular bridge finishing."
-  },
-  {
-    id: "rotor",
-    name: "Tungsten Oscillating Weight",
-    metric: "High-density 21K tungsten alloy • 360° Ball Bearings",
-    offsetZ: -3.4,
-    description: "Heavy bidirectional winding rotor with Geneva stripes (Côtes de Genève) that harnesses every arm movement into kinetic energy."
+    description: "Solid surgical steel back laser-engraved with the iconic ALUNA italic script and model reference A3016."
   }
 ];
 

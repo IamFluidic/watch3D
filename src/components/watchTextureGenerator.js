@@ -515,7 +515,7 @@ export function createFlatCasebackTexture(edition) {
  * - 6 recessed screw holes with dark slotted screw heads
  * - NO numbers on the bezel!
  */
-export function createBezelTexture() {
+export function createBezelTexture(edition) {
   const canvas = document.createElement('canvas');
   canvas.width = 1024;
   canvas.height = 1024;
@@ -526,20 +526,21 @@ export function createBezelTexture() {
   const outerR = 500;
   const innerR = 410;
 
-  // Base circular gradient (DLC black with subtle metallic sheen)
-  ctx.fillStyle = '#0E1014';
+  // Base circular color matching the edition's bezelColor
+  const baseColor = edition?.bezelColor || '#E2E8F0';
+  ctx.fillStyle = baseColor;
   ctx.beginPath();
   ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
   ctx.arc(cx, cy, innerR, 0, Math.PI * 2, true);
   ctx.fill();
 
-  // Satin-brushed concentric grain (dark metallic — very subtle)
+  // Satin-brushed concentric grain
   ctx.save();
   ctx.translate(cx, cy);
   for (let r = innerR; r < outerR; r += 1.5) {
-    const grainAlpha = 0.04 + Math.random() * 0.09;
-    const isBright = Math.random() > 0.7; // fewer bright strokes on black
-    ctx.strokeStyle = isBright ? `rgba(180, 200, 220, ${grainAlpha})` : `rgba(8, 10, 14, ${grainAlpha})`;
+    const grainAlpha = 0.03 + Math.random() * 0.08;
+    const isBright = Math.random() > 0.5;
+    ctx.strokeStyle = isBright ? `rgba(255, 255, 255, ${grainAlpha * 1.5})` : `rgba(0, 0, 0, ${grainAlpha * 0.9})`;
     ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.arc(0, 0, r, 0, Math.PI * 2);
@@ -558,16 +559,16 @@ export function createBezelTexture() {
     ctx.translate(sx, sy);
 
     // Recessed circular counter-bore shadow
-    ctx.fillStyle = '#222730';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
     ctx.beginPath();
     ctx.arc(0, 0, 18, 0, Math.PI * 2);
     ctx.fill();
 
-    // Polished screw head bevel (dark chrome on black bezel)
+    // Polished screw head bevel
     const screwGrad = ctx.createLinearGradient(-12, -12, 12, 12);
-    screwGrad.addColorStop(0, '#4A5160');
-    screwGrad.addColorStop(0.5, '#1E2330');
-    screwGrad.addColorStop(1, '#0D0F14');
+    screwGrad.addColorStop(0, '#FFFFFF');
+    screwGrad.addColorStop(0.5, '#CBD5E1');
+    screwGrad.addColorStop(1, '#64748B');
     ctx.fillStyle = screwGrad;
     ctx.beginPath();
     ctx.arc(0, 0, 15, 0, Math.PI * 2);
@@ -684,73 +685,11 @@ export function createMovementTexture() {
 }
 
 export function createRotorTexture() {
+  // Semicircular rotor plate and text removed per request
   const canvas = document.createElement('canvas');
-  canvas.width = 1024;
-  canvas.height = 1024;
-  const ctx = canvas.getContext('2d');
-
-  const cx = 512;
-  const cy = 512;
-
-  // Semicircular skeletonized rotor weight
-  ctx.save();
-  ctx.translate(cx, cy);
-
-  // Rotor arc path (half circle from 0 to PI)
-  ctx.beginPath();
-  ctx.arc(0, 0, 480, 0, Math.PI, false);
-  ctx.arc(0, 0, 160, Math.PI, 0, true);
-  ctx.closePath();
-
-  // Heavy 21K Tungsten / Rhodium gradient
-  const rotorGrad = ctx.createLinearGradient(-480, 0, 480, 300);
-  rotorGrad.addColorStop(0, '#B0B8C5');
-  rotorGrad.addColorStop(0.3, '#E2E8F0');
-  rotorGrad.addColorStop(0.7, '#94A3B8');
-  rotorGrad.addColorStop(1, '#475569');
-  ctx.fillStyle = rotorGrad;
-  ctx.fill();
-
-  // Heavy outer rim segment
-  ctx.beginPath();
-  ctx.arc(0, 0, 480, 0, Math.PI, false);
-  ctx.arc(0, 0, 390, Math.PI, 0, true);
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(212, 175, 55, 0.4)'; // Gold weight segment
-  ctx.fill();
-
-  // Radial skeleton cutouts
-  ctx.fillStyle = '#000000';
-  ctx.globalCompositeOperation = 'destination-out';
-  for (let a = 35; a < 155; a += 38) {
-    const rad = (a * Math.PI) / 180;
-    ctx.save();
-    ctx.rotate(rad);
-    ctx.beginPath();
-    ctx.arc(0, 270, 45, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-  ctx.globalCompositeOperation = 'source-over';
-
-  // Swiss engraved branding on rotor weight
-  ctx.rotate(Math.PI / 2);
-  ctx.font = 'bold 24px "Space Mono", monospace';
-  ctx.fillStyle = '#D4AF37';
-  ctx.textAlign = 'center';
-  ctx.shadowColor = 'rgba(0,0,0,0.8)';
-  ctx.shadowBlur = 6;
-  ctx.fillText('60FPS  •  CALIBRE 60P', 0, -290);
-
-  ctx.font = '600 16px "Space Mono", monospace';
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-  ctx.fillText('TWENTY-SIX (26) JEWELS  •  SWISS MADE', 0, -260);
-
-  ctx.restore();
-
+  canvas.width = 16;
+  canvas.height = 16;
   const texture = new THREE.CanvasTexture(canvas);
-  texture.anisotropy = 16;
-  texture.needsUpdate = true;
   return texture;
 }
 

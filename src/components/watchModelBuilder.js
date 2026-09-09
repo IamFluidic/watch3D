@@ -25,10 +25,10 @@ export function create3DWatch(edition) {
       envMapIntensity: 1.8
     }),
     bezelInsert: new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color(edition.bezelColor),
-      map: createBezelTexture(),
-      roughness: 0.18,
-      metalness: 0.9,
+      color: 0xffffff,
+      map: createBezelTexture(edition),
+      roughness: edition.caseRoughness ?? 0.18,
+      metalness: edition.caseMetalness ?? 0.95,
       envMapIntensity: 1.6
     }),
     dial: new THREE.MeshStandardMaterial({
@@ -423,10 +423,9 @@ export function create3DWatch(edition) {
   layerCaseback.position.z = 0;
 
   // -------------------------------------------------------------
-  // 8. OSCILLATING ROTOR LAYER
+  // 8. OSCILLATING ROTOR LAYER (Plate removed per design)
   // -------------------------------------------------------------
-  const rotorMesh = new THREE.Mesh(new THREE.CircleGeometry(2.1, 64), materials.rotor);
-  layerRotor.add(rotorMesh);
+  // Keep layerRotor as an empty group so external references stay safe
   layerRotor.position.z = -0.28;
 
   // Assemble all layers into watch root
@@ -457,9 +456,11 @@ export function create3DWatch(edition) {
       materials.case.roughness = newEdition.caseRoughness;
 
       // Update outer bezel ring color to match edition
-      materials.bezelInsert.color.set(newEdition.bezelColor);
-      materials.bezelInsert.map = createBezelTexture();
+      materials.bezelInsert.color.set(0xffffff);
+      materials.bezelInsert.map = createBezelTexture(newEdition);
       materials.bezelInsert.map.needsUpdate = true;
+      materials.bezelInsert.roughness = newEdition.caseRoughness ?? 0.18;
+      materials.bezelInsert.metalness = newEdition.caseMetalness ?? 0.95;
 
       materials.caseback.map = createFlatCasebackTexture(newEdition);
       materials.caseback.map.needsUpdate = true;
