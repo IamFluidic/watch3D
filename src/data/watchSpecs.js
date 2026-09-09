@@ -8,7 +8,7 @@ export const WATCH_EDITIONS = [
     caseColor: "#E2E8F0",
     caseMetalness: 0.95,
     caseRoughness: 0.22,
-    bezelColor: "#0F172A",
+    bezelColor: "#E2E8F0",
     strapType: "metal",
     strapColor: "#CBD5E1",
     handsColor: "#F8FAFC",
@@ -83,10 +83,10 @@ export const EXPLODED_LAYERS = [
   },
   {
     id: "bezel",
-    name: "Ceramic Tachymeter Bezel",
-    metric: "120-click unidirectional • Zirconia (ZrO2)",
+    name: "Brushed Steel Bezel Ring",
+    metric: "6 Recessed Hex Screws • 316L Surgical Steel",
     offsetZ: 2.3,
-    description: "High-density ceramic bezel insert impervious to UV discoloration, laser-engraved with silver platinum markings."
+    description: "Cold-forged steel bezel insert with concentric satin grain and mirror-polished chamfers matching the case."
   },
   {
     id: "dial",
@@ -104,8 +104,8 @@ export const EXPLODED_LAYERS = [
   },
   {
     id: "movement",
-    name: "Calibre 60P Automatic Engine",
-    metric: "28,800 vph (4Hz) • 26 Jewels • 42h Reserve",
+    name: "Calibre A3016 Nepal Automatic Engine",
+    metric: "28,800 vph (4Hz) • 26 Jewels • 48h Reserve",
     offsetZ: -0.6,
     description: "In-house mechanical movement with Glucydur balance wheel, perlage circular graining, and Incabloc shock protection."
   },
@@ -126,16 +126,18 @@ export const EXPLODED_LAYERS = [
 ];
 
 export const TECHNICAL_SPECIFICATIONS = [
-  { label: "Calibre", value: "60P In-House Automatic" },
-  { label: "Frequency", value: "28,800 A/h (4 Hz)" },
-  { label: "Power Reserve", value: "42 Hours" },
+  { label: "Manufacture & Calibre", value: "ALUNA Calibre A3016 In-House Automatic" },
+  { label: "Origin", value: "Handcrafted & Regulated in Nepal" },
+  { label: "Frequency", value: "28,800 A/h (4 Hz / 8 Beats per Second)" },
+  { label: "Power Reserve", value: "48 Hours Extended Reserve" },
   { label: "Jewels", value: "26 Synthetic Rubies" },
-  { label: "Case Diameter", value: "40.0 mm" },
-  { label: "Case Thickness", value: "10.8 mm" },
-  { label: "Lug to Lug", value: "47.2 mm" },
-  { label: "Lug Width", value: "20.0 mm" },
-  { label: "Water Resistance", value: "10 ATM / 100 Meters" },
-  { label: "Crystal", value: "Dual-Domed Anti-Reflective Sapphire" },
-  { label: "Luminescence", value: "Swiss Super-LumiNova® Grade X1" },
-  { label: "Accuracy", value: "-2 / +4 sec / day (COSC Standard)" }
+  { label: "Case Dimensions", value: "40.0 mm Diameter • 10.8 mm Profile • 47.2 mm Lug-to-Lug" },
+  { label: "Lug Width", value: "20.0 mm (Tapered to 16.0 mm Deployant)" },
+  { label: "Case Material", value: "Cold-Forged 316L Surgical Steel (1.4404)" },
+  { label: "Water Resistance", value: "10 ATM / 100 Meters / 330 Feet (Dual O-Ring Hermetic)" },
+  { label: "Crystal", value: "Dual-Domed Anti-Reflective Synthetic Sapphire" },
+  { label: "Luminescence", value: "Nepal Super-LumiNova® Grade X1 Glow" },
+  { label: "Chronometer Precision", value: "-2 / +4 sec / day (Kathmandu Observatory Standard)" },
+  { label: "Bracelet", value: "Solid 316L 3-Link Steel with Micro-Adjust Deployant" },
+  { label: "Warranty", value: "5-Year International Manufacture Warranty" }
 ];

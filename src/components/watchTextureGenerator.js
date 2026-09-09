@@ -1,14 +1,13 @@
 import * as THREE from 'three';
 
 /**
- * Photorealistic Luxury Dial Texture Generator
- * Inspired by the authentic FS 60P at thewatch.60fps.fr:
+ * Photorealistic Luxury Dial Texture Generator — ALUNA A3016 Nepal
  * - Anthracite/deep charcoal guilloché sunburst dial with radial engraved lines
- * - Hour numerals (12, 1, 2, 4, 5, 6, 7, 8, 10, 11) seated COMFORTABLY INSIDE the circle
+ * - Hour numerals seated comfortably inside the circle
  * - 12 o'clock: Moonphase complication subdial with silver rim, 60/40/20 markings & moon/stars disc
- * - 3 o'clock: Precision beveled date window displaying '9' flanked by 'AUTOMATIC CHRONOGRAPH'
+ * - 3 o'clock: Precision beveled date window displaying '9' flanked by 'AUTOMATIC CHRONOMETER'
  * - 6 o'clock: Open-Heart mechanical aperture revealing balance wheel with gold spokes & ruby jewel
- * - 9 o'clock: '01' sub-marker with 'FS 60P' insignia
+ * - 9 o'clock: '01' sub-marker with 'A3016' insignia
  * - Perimeter: Fine railroad minute/second track with crisp tick marks
  */
 export function createDialTexture(edition) {
@@ -377,7 +376,7 @@ export function createDialTexture(edition) {
 
   ctx.font = '600 11px "Space Mono", monospace';
   ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-  ctx.fillText('ALUNA • SWISS', nineX + 30, nineY + 14);
+  ctx.fillText('ALUNA • NEPAL', nineX + 30, nineY + 14);
   ctx.restore();
 
   // ALUNA Brand Inscription above Moonphase at 12 o'clock
@@ -390,12 +389,12 @@ export function createDialTexture(edition) {
   ctx.fillText('ALUNA', moonX, moonY - moonR - 16);
   ctx.restore();
 
-  // 9. SWISS MADE LABEL AT BOTTOM
+  // 9. NEPAL MADE LABEL AT BOTTOM
   ctx.save();
   ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
   ctx.font = '600 11px "Space Mono", monospace';
   ctx.textAlign = 'center';
-  ctx.fillText('SWISS   MADE', cx, cy + dialRadius - 52);
+  ctx.fillText('NEPAL   MADE', cx, cy + dialRadius - 52);
   ctx.restore();
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -499,7 +498,7 @@ export function createFlatCasebackTexture(edition) {
   ctx.font = '500 13px "Space Mono", monospace';
   ctx.fillStyle = edition?.id === 'dlc' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.55)';
   ctx.shadowBlur = 0;
-  ctx.fillText('ALL STAINLESS STEEL  •  SWISS MOVEMENT  •  100M WATER RESISTANT', cx, cy + radius - 70);
+  ctx.fillText('ALL STAINLESS STEEL  •  NEPAL AUTOMATIC  •  100M WATER RESISTANT', cx, cy + radius - 70);
   ctx.restore();
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -510,10 +509,8 @@ export function createFlatCasebackTexture(edition) {
 
 /**
  * Brushed Surgical Steel Bezel Texture
- * Matches thewatch.60fps.fr:
  * - Circular satin-brushed finish
- * - 6 recessed screw holes with dark slotted screw heads
- * - NO numbers on the bezel!
+ * - 6 recessed screw holes with slotted screw heads
  */
 export function createBezelTexture(edition) {
   const canvas = document.createElement('canvas');

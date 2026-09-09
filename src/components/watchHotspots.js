@@ -42,7 +42,7 @@ export const HOTSPOT_DATA = [
     id: 'dial',
     badge: 'DIAL',
     label: 'Applied Dial & Hands',
-    metric: 'Swiss Super-LumiNova® X1',
+    metric: 'Nepal Super-LumiNova® X1',
     desc: 'Sunburst guilloché dial with hand-applied faceted hour markers and luminescent hands.',
     localPos: new THREE.Vector3(-0.8, -0.6, 0.2),
     normal: new THREE.Vector3(0, 0, 1),
