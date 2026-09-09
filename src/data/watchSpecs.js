@@ -89,18 +89,18 @@ export const EXPLODED_LAYERS = [
     description: "Cold-forged steel bezel insert with concentric satin grain and mirror-polished chamfers matching the case."
   },
   {
-    id: "dial",
-    name: "Dial & Applied Baton Indices",
-    metric: "Sunray radial grain • Grade X1 Super-LumiNova",
-    offsetZ: 1.2,
-    description: "Individually hand-applied faceted markers with chamfered edges and photoluminescent compound reservoirs."
-  },
-  {
     id: "hands",
     name: "Diamond-Cut Dauphine Hands",
     metric: "Rhomboid profile • Continuous sweep seconds",
-    offsetZ: 0.6,
+    offsetZ: 1.4,
     description: "Balanced diamond-cut hour and minute hands paired with a needle-thin central seconds hand counterweighted for 4Hz sweep."
+  },
+  {
+    id: "dial",
+    name: "Dial & Applied Baton Indices",
+    metric: "Sunray radial grain • Grade X1 Super-LumiNova",
+    offsetZ: 0.5,
+    description: "Individually hand-applied faceted markers with chamfered edges and photoluminescent compound reservoirs."
   },
   {
     id: "movement",
