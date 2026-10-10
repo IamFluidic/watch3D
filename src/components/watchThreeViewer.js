@@ -463,6 +463,11 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     const balanceBeat = Math.sin(now * 0.025) * 0.55;
     watchInstance.balanceWheel.rotation.z = balanceBeat;
 
+    // 2B. Jacob & Co Flying Tourbillon Carriage Continuous 3D Mechanical Rotation
+    if (watchInstance.tourbillon) {
+      watchInstance.tourbillon.rotation.z = -secondAngle * 2.5;
+    }
+
     // 3. Dynamic Oscillating Rotor inertia
     rotorVelocity *= 0.94;
     rotorAngle += rotorVelocity;

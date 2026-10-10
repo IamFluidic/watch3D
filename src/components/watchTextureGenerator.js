@@ -18,34 +18,139 @@ export function createDialTexture(edition) {
 
   const cx = 512;
   const cy = 512;
-  const dialRadius = 470;
+  const dialRadius = 512;
 
-  // 1. BASE DIAL BACKGROUND (Anthracite / Charcoal / Edition Tone)
-  let baseColor = edition.id === 'dlc' ? '#0D0F12' : (edition.id === 'rose' ? '#1A1412' : (edition.id === 'gold' ? '#161410' : '#14171D'));
-  let centerGlow = edition.id === 'dlc' ? '#20242C' : (edition.id === 'rose' ? '#2A221D' : (edition.id === 'gold' ? '#242018' : '#2A303C'));
+  // 1. DYNAMIC HAUTE-HORLOGERIE COLOR PALETTE
+  let edgeColor, baseColor, centerGlow, rayHighlight, textColor, trackColor, giltAccent;
 
-  // Solid background fill across entire canvas — prevents transparent margin sampling and mipmap flicker
-  ctx.fillStyle = '#080A0D';
+  if (edition?.id === 'steel') {
+    edgeColor = '#030D1E';
+    baseColor = '#0C234E';
+    centerGlow = '#1D4ED8';
+    rayHighlight = 'rgba(147, 197, 253, 0.15)';
+    textColor = '#FFFFFF';
+    trackColor = 'rgba(255, 255, 255, 0.45)';
+    giltAccent = '#38BDF8';
+  } else if (edition?.id === 'dlc') {
+    edgeColor = '#020205';
+    baseColor = '#090814';
+    centerGlow = '#2E1065';
+    rayHighlight = 'rgba(192, 132, 252, 0.14)';
+    textColor = '#E2E8F0';
+    trackColor = 'rgba(34, 211, 238, 0.45)';
+    giltAccent = '#C084FC';
+  } else if (edition?.id === 'rose') {
+    edgeColor = '#D4C4B0';
+    baseColor = '#F2E9DE';
+    centerGlow = '#FFFDF9';
+    rayHighlight = 'rgba(180, 101, 74, 0.08)';
+    textColor = '#2E1A12';
+    trackColor = 'rgba(58, 32, 22, 0.60)';
+    giltAccent = '#B4654A';
+  } else if (edition?.id === 'titanium') {
+    edgeColor = '#01180A';
+    baseColor = '#05381A';
+    centerGlow = '#059669';
+    rayHighlight = 'rgba(245, 158, 11, 0.16)';
+    textColor = '#F8FAFC';
+    trackColor = 'rgba(245, 158, 11, 0.65)';
+    giltAccent = '#F59E0B';
+  } else {
+    edgeColor = '#04060A';
+    baseColor = edition?.dialColor || '#14171D';
+    centerGlow = '#2A303C';
+    rayHighlight = 'rgba(255, 255, 255, 0.08)';
+    textColor = '#FFFFFF';
+    trackColor = 'rgba(255, 255, 255, 0.4)';
+    giltAccent = '#38BDF8';
+  }
+
+  // Solid background fill across entire canvas — prevents transparent margin sampling
+  ctx.fillStyle = edgeColor;
   ctx.fillRect(0, 0, 1024, 1024);
 
-  const bgGrad = ctx.createRadialGradient(cx, cy, 30, cx, cy, dialRadius);
+  // Fumé Sunray Gradient
+  const bgGrad = ctx.createRadialGradient(cx, cy, 25, cx, cy, dialRadius);
   bgGrad.addColorStop(0, centerGlow);
-  bgGrad.addColorStop(0.65, baseColor);
-  bgGrad.addColorStop(1, '#080A0D');
+  bgGrad.addColorStop(0.35, baseColor);
+  bgGrad.addColorStop(0.85, edgeColor);
+  bgGrad.addColorStop(1, '#000000');
   ctx.fillStyle = bgGrad;
   ctx.beginPath();
   ctx.arc(cx, cy, dialRadius, 0, Math.PI * 2);
   ctx.fill();
 
-  // 2. RADIAL SUNBURST GUILLOCHÉ RAYS (Fine engraved dark/light grooves)
+  // 2. AUDEMARS PIGUET SIGNATURE "GRANDE TAPISSERIE" WAFFLE GUILLOCHÉ
+  // High-precision raised micro-pyramid squares with specular highlights and bevel shadows
+  const tapSize = 15;
+  const tapStep = 18;
+  const tapLimit = dialRadius - 62;
+
+  ctx.save();
+  for (let gx = -tapLimit; gx <= tapLimit; gx += tapStep) {
+    for (let gy = -tapLimit; gy <= tapLimit; gy += tapStep) {
+      const dist = Math.sqrt(gx * gx + gy * gy);
+      if (dist > tapLimit) continue;
+      // Skip subdial windows so complications stay ultra-clean
+      if (Math.abs(gx) < 85 && Math.abs(gy - 155) < 78) continue; // 6 o'clock tourbillon
+      if (Math.abs(gx) < 88 && Math.abs(gy + 145) < 85) continue; // 12 o'clock celestial
+      if (gx < -160 && Math.abs(gy) < 38) continue; // 9 o'clock subdial
+
+      const px = cx + gx;
+      const py = cy + gy;
+
+      // Base tapisserie square with subtle fill
+      ctx.fillStyle = (edition?.id === 'rose') ? 'rgba(180, 140, 110, 0.18)' : 'rgba(255, 255, 255, 0.04)';
+      ctx.fillRect(px, py, tapSize, tapSize);
+
+      // Top & Left beveled specular edge (light source from top-left)
+      ctx.strokeStyle = (edition?.id === 'rose') ? 'rgba(255, 255, 255, 0.40)' : 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(px, py + tapSize);
+      ctx.lineTo(px, py);
+      ctx.lineTo(px + tapSize, py);
+      ctx.stroke();
+
+      // Bottom & Right beveled shadow edge
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.beginPath();
+      ctx.moveTo(px + tapSize, py);
+      ctx.lineTo(px + tapSize, py + tapSize);
+      ctx.lineTo(px, py + tapSize);
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+
+  // 2B. JACOB & CO ASTRONOMIA CELESTIAL STARDUST DUSTING
+  // Glittering micro-glints across the aventurine dial background
+  ctx.save();
+  for (let s = 0; s < 110; s++) {
+    const sAngle = (s * 137.5 * Math.PI) / 180; // Golden ratio spiral distribution
+    const sDist = 60 + ((s * 3.8) % (dialRadius - 130));
+    const sx = cx + Math.cos(sAngle) * sDist;
+    const sy = cy + Math.sin(sAngle) * sDist;
+    const sSize = (s % 3 === 0) ? 1.4 : 0.8;
+    const isGold = (s % 2 === 0);
+    ctx.fillStyle = isGold ? 'rgba(253, 224, 71, 0.85)' : 'rgba(255, 255, 255, 0.90)';
+    ctx.shadowColor = isGold ? '#FBBF24' : '#FFFFFF';
+    ctx.shadowBlur = (s % 5 === 0) ? 4 : 0;
+    ctx.beginPath();
+    ctx.arc(sx, sy, sSize, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  // 2C. RADIAL SUNBURST GUILLOCHÉ RAYS
   ctx.save();
   ctx.translate(cx, cy);
-  const numRays = 720;
+  const numRays = 480;
   for (let i = 0; i < numRays; i++) {
     const angle = (i * (360 / numRays) * Math.PI) / 180;
     const isDark = (i % 2 === 0);
-    ctx.strokeStyle = isDark ? 'rgba(0, 0, 0, 0.35)' : 'rgba(255, 255, 255, 0.06)';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = isDark ? 'rgba(0, 0, 0, 0.28)' : rayHighlight;
+    ctx.lineWidth = 0.8;
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.lineTo(Math.cos(angle) * dialRadius, Math.sin(angle) * dialRadius);
@@ -53,11 +158,11 @@ export function createDialTexture(edition) {
   }
   ctx.restore();
 
-  // Subtle concentric micro-grooves (vinyl/lathe finish)
+  // Subtle concentric micro-grooves
   ctx.save();
   ctx.translate(cx, cy);
-  for (let r = 70; r < dialRadius; r += 14) {
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.025)';
+  for (let r = 70; r < dialRadius; r += 16) {
+    ctx.strokeStyle = (edition?.id === 'rose') ? 'rgba(180, 101, 74, 0.035)' : 'rgba(255, 255, 255, 0.025)';
     ctx.lineWidth = 0.75;
     ctx.beginPath();
     ctx.arc(0, 0, r, 0, Math.PI * 2);
@@ -70,16 +175,15 @@ export function createDialTexture(edition) {
   ctx.translate(cx, cy);
 
   // Outer and Inner Hairline rings
-  const outerTrackR = dialRadius - 16;
-  const innerTrackR = dialRadius - 38;
+  const outerTrackR = dialRadius - 32;
+  const innerTrackR = dialRadius - 56;
 
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = trackColor;
+  ctx.lineWidth = 1.4;
   ctx.beginPath();
   ctx.arc(0, 0, outerTrackR, 0, Math.PI * 2);
   ctx.stroke();
 
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
   ctx.beginPath();
   ctx.arc(0, 0, innerTrackR, 0, Math.PI * 2);
   ctx.stroke();
@@ -93,21 +197,21 @@ export function createDialTexture(edition) {
     ctx.rotate(angle);
 
     if (isHour) {
-      ctx.strokeStyle = '#FFFFFF';
+      ctx.strokeStyle = textColor;
       ctx.lineWidth = 3.0;
       ctx.beginPath();
       ctx.moveTo(0, -innerTrackR + 2);
       ctx.lineTo(0, -outerTrackR);
       ctx.stroke();
     } else if (isMinute) {
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = trackColor;
+      ctx.lineWidth = 1.6;
       ctx.beginPath();
       ctx.moveTo(0, -innerTrackR + 6);
       ctx.lineTo(0, -outerTrackR);
       ctx.stroke();
     } else {
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.strokeStyle = (edition?.id === 'rose') ? 'rgba(58, 32, 22, 0.20)' : 'rgba(255, 255, 255, 0.20)';
       ctx.lineWidth = 0.8;
       ctx.beginPath();
       ctx.moveTo(0, -innerTrackR + 10);
@@ -119,16 +223,15 @@ export function createDialTexture(edition) {
   }
   ctx.restore();
 
-  // 4. ARABIC NUMERALS INSIDE THE CIRCLE (12, 1, 2, 4, 5, 7, 8, 10, 11)
-  // Seated comfortably at numeralRadius = 310px (plenty of margin from outer edge!)
+  // 4. ARABIC NUMERALS INSIDE THE CIRCLE
   const numeralRadius = 308;
 
   ctx.save();
-  ctx.fillStyle = '#FFFFFF';
+  ctx.fillStyle = textColor;
   ctx.font = '600 48px "Inter", "Syne", -apple-system, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+  ctx.shadowColor = (edition?.id === 'rose') ? 'rgba(0, 0, 0, 0.15)' : 'rgba(0, 0, 0, 0.9)';
   ctx.shadowBlur = 8;
   ctx.shadowOffsetY = 2;
 
@@ -237,40 +340,6 @@ export function createDialTexture(edition) {
   ctx.fill();
   ctx.restore();
 
-  // 6. COMPLICATION 2: DATE WINDOW AT 3 O'CLOCK WITH TYPOGRAPHY
-  const dateX = cx + 250;
-  const dateY = cy;
-
-  ctx.save();
-  // Beveled outer metallic frame
-  ctx.fillStyle = '#C5CCD6';
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-  ctx.shadowBlur = 8;
-  ctx.fillRect(dateX - 32, dateY - 24, 64, 48);
-
-  // Inset aperture
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = '#0E1117';
-  ctx.fillRect(dateX - 28, dateY - 20, 56, 40);
-
-  // Crisp White Date Numeral '9'
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = 'bold 26px "Space Mono", monospace';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('9', dateX, dateY + 2);
-
-  // Accompanying typography to the left of date window
-  ctx.fillStyle = '#E2E8F0';
-  ctx.font = '600 13px "Space Mono", monospace';
-  ctx.textAlign = 'right';
-  ctx.shadowColor = 'rgba(0,0,0,0.8)';
-  ctx.shadowBlur = 4;
-  ctx.fillText('AUTOMATIC', dateX - 44, dateY - 6);
-  ctx.font = '500 11px "Space Mono", monospace';
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-  ctx.fillText('CHRONOGRAPH', dateX - 44, dateY + 10);
-  ctx.restore();
 
   // 7. COMPLICATION 3: OPEN-HEART MECHANICAL BALANCE WHEEL AT 6 O'CLOCK
   const openHeartX = cx;
@@ -358,47 +427,47 @@ export function createDialTexture(edition) {
 
   ctx.save();
   // Small circular '01' sub-marker
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+  ctx.strokeStyle = (edition?.id === 'rose') ? 'rgba(46, 26, 18, 0.4)' : 'rgba(255, 255, 255, 0.4)';
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.arc(nineX, nineY, 18, 0, Math.PI * 2);
   ctx.stroke();
 
-  ctx.fillStyle = '#FFFFFF';
+  ctx.fillStyle = textColor;
   ctx.font = 'bold 14px "Space Mono", monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('01', nineX, nineY);
 
   // "A3016" Model Title to the right of the 01 marker
-  ctx.fillStyle = '#FFFFFF';
+  ctx.fillStyle = textColor;
   ctx.font = '800 24px "Inter", "Syne", sans-serif';
   ctx.textAlign = 'left';
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+  ctx.shadowColor = (edition?.id === 'rose') ? 'rgba(0, 0, 0, 0.15)' : 'rgba(0, 0, 0, 0.8)';
   ctx.shadowBlur = 6;
   ctx.fillText('A3016', nineX + 30, nineY - 4);
 
   ctx.font = '600 11px "Space Mono", monospace';
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+  ctx.fillStyle = (edition?.id === 'rose') ? 'rgba(46, 26, 18, 0.7)' : 'rgba(255, 255, 255, 0.7)';
   ctx.fillText('ALUNA • NEPAL', nineX + 30, nineY + 14);
   ctx.restore();
 
   // ALUNA Brand Inscription above Moonphase at 12 o'clock
   ctx.save();
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = 'italic 700 26px "Cormorant Garamond", Georgia, serif';
+  ctx.fillStyle = textColor;
+  ctx.font = 'italic 700 28px "Cormorant Garamond", Georgia, serif';
   ctx.textAlign = 'center';
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+  ctx.shadowColor = (edition?.id === 'rose') ? 'rgba(0, 0, 0, 0.15)' : 'rgba(0, 0, 0, 0.85)';
   ctx.shadowBlur = 8;
   ctx.fillText('ALUNA', moonX, moonY - moonR - 16);
   ctx.restore();
 
   // 9. NEPAL MADE LABEL AT BOTTOM
   ctx.save();
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+  ctx.fillStyle = (edition?.id === 'rose') ? 'rgba(46, 26, 18, 0.6)' : 'rgba(255, 255, 255, 0.6)';
   ctx.font = '600 11px "Space Mono", monospace';
   ctx.textAlign = 'center';
-  ctx.fillText('NEPAL   MADE', cx, cy + dialRadius - 52);
+  ctx.fillText('NEPAL   MADE', cx, cy + dialRadius - 40);
   ctx.restore();
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -557,10 +626,10 @@ export function createBezelTexture(edition) {
   }
   ctx.restore();
 
-  // 6 Authentic Recessed Bezel Screws (at 1, 3, 5, 7, 9, 11 o'clock)
-  const screwR = (innerR + outerR) / 2;
-  for (let i = 0; i < 6; i++) {
-    const angle = ((i * 60 + 30) * Math.PI) / 180;
+  // 8 Authentic Audemars Piguet Hexagonal Bezel Screws (at the 8 octagonal vertices)
+  const screwR = 484;
+  for (let i = 0; i < 8; i++) {
+    const angle = ((i * 45 + 22.5) * Math.PI) / 180;
     const sx = cx + Math.cos(angle) * screwR;
     const sy = cy + Math.sin(angle) * screwR;
 
@@ -568,24 +637,31 @@ export function createBezelTexture(edition) {
     ctx.translate(sx, sy);
 
     // Recessed circular counter-bore shadow
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
     ctx.beginPath();
-    ctx.arc(0, 0, 18, 0, Math.PI * 2);
+    ctx.arc(0, 0, 20, 0, Math.PI * 2);
     ctx.fill();
 
-    // Polished screw head bevel
-    const screwGrad = ctx.createLinearGradient(-12, -12, 12, 12);
+    // Polished hexagonal screw head
+    const screwGrad = ctx.createLinearGradient(-14, -14, 14, 14);
     screwGrad.addColorStop(0, '#FFFFFF');
     screwGrad.addColorStop(0.5, '#CBD5E1');
     screwGrad.addColorStop(1, '#64748B');
     ctx.fillStyle = screwGrad;
     ctx.beginPath();
-    ctx.arc(0, 0, 15, 0, Math.PI * 2);
+    for (let h = 0; h < 6; h++) {
+      const hAngle = (h * 60 * Math.PI) / 180;
+      const hx = Math.cos(hAngle) * 16;
+      const hy = Math.sin(hAngle) * 16;
+      if (h === 0) ctx.moveTo(hx, hy);
+      else ctx.lineTo(hx, hy);
+    }
+    ctx.closePath();
     ctx.fill();
 
-    // Slotted screw head groove (subtly rotated along tangent)
-    ctx.rotate(angle + Math.PI / 4);
-    ctx.fillStyle = '#1A1E24';
+    // AP Tangential screw slot groove (aligned along perimeter tangent)
+    ctx.rotate(angle + Math.PI / 2);
+    ctx.fillStyle = '#0F131A';
     ctx.fillRect(-12, -2.5, 24, 5);
 
     ctx.restore();

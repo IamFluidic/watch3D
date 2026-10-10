@@ -63,14 +63,16 @@ export function create3DWatch(edition) {
       roughness: 0.4
     }),
     sapphire: new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
+      color: 0xf0f6ff,
       transparent: true,
       opacity: 0.12,
-      roughness: 0.02,
+      roughness: 0.015,
       metalness: 0.05,
-      reflectivity: 0.9,
+      reflectivity: 0.95,
       clearcoat: 1.0,
-      clearcoatRoughness: 0.01,
+      clearcoatRoughness: 0.02,
+      ior: 1.77,
+      transmission: 0.92,
       depthWrite: false, // Critical: never obscure hands or dial in depth buffer
       side: THREE.FrontSide
     }),
@@ -164,7 +166,7 @@ export function create3DWatch(edition) {
   };
 
   // -------------------------------------------------------------
-  // 1. SAPPHIRE CRYSTAL LAYER (Ultra-Clear Dual Domed)
+  // 1. SAPPHIRE CRYSTAL LAYER (Ultra-Clear Dual Domed Synthetic Sapphire)
   // -------------------------------------------------------------
   const sapphireGeom = new THREE.CircleGeometry(2.35, 64);
   const sapphireMesh = new THREE.Mesh(sapphireGeom, materials.sapphire);
@@ -177,12 +179,24 @@ export function create3DWatch(edition) {
   rimMesh.position.z = 0.28;
   layerSapphire.add(rimMesh);
 
+
   // -------------------------------------------------------------
-  // 2. CERAMIC & STEEL BEZEL LAYER (With 6 Authentic Slotted Screws)
+  // 2. SCULPTED OCTAGONAL BEZEL (Audemars Piguet Royal Oak Architecture)
+  // 8-sided geometric bezel with 8 perimeter hexagonal screws & Rolex fluted inner ring
   // -------------------------------------------------------------
-  // Bezel steel outer ring (HOLLOW ring with radius 2.36 cutout in middle)
+  // 8-sided Octagon Outer Profile (Audemars Piguet signature geometry)
   const bezelShape = new THREE.Shape();
-  bezelShape.absarc(0, 0, 2.65, 0, Math.PI * 2, false);
+  const octR = 2.68;
+  for (let i = 0; i < 8; i++) {
+    const angle = ((i * 45 + 22.5) * Math.PI) / 180;
+    const x = Math.cos(angle) * octR;
+    const y = Math.sin(angle) * octR;
+    if (i === 0) bezelShape.moveTo(x, y);
+    else bezelShape.lineTo(x, y);
+  }
+  bezelShape.closePath();
+
+  // Inner circular aperture for the crystal and dial
   const bezelHole = new THREE.Path();
   bezelHole.absarc(0, 0, 2.36, 0, Math.PI * 2, true);
   bezelShape.holes.push(bezelHole);
@@ -194,33 +208,54 @@ export function create3DWatch(edition) {
     steps: 1,
     bevelSize: 0.015,
     bevelThickness: 0.015,
-    curveSegments: 64
+    curveSegments: 32
   });
   const bezelSteelMesh = new THREE.Mesh(bezelSteelGeom, materials.case);
   bezelSteelMesh.position.z = -0.08;
   layerBezel.add(bezelSteelMesh);
 
-  // Ceramic / Steel insert ring (HOLLOW ring from 2.37 to 2.63 with satin finish)
-  // Positioned proud at z = 0.122 above bezelSteelMesh top face (0.115) to prevent coplanar z-fighting
-  const ceramicGeom = new THREE.RingGeometry(2.37, 2.63, 64);
+  // Octagonal Top Insert Ring (ceramic / satin steel)
+  const ceramicShape = new THREE.Shape();
+  const octInsertR = 2.64;
+  for (let i = 0; i < 8; i++) {
+    const angle = ((i * 45 + 22.5) * Math.PI) / 180;
+    const x = Math.cos(angle) * octInsertR;
+    const y = Math.sin(angle) * octInsertR;
+    if (i === 0) ceramicShape.moveTo(x, y);
+    else ceramicShape.lineTo(x, y);
+  }
+  ceramicShape.closePath();
+  const ceramicHole = new THREE.Path();
+  ceramicHole.absarc(0, 0, 2.38, 0, Math.PI * 2, true);
+  ceramicShape.holes.push(ceramicHole);
+
+  const ceramicGeom = new THREE.ShapeGeometry(ceramicShape);
   const ceramicMesh = new THREE.Mesh(ceramicGeom, materials.bezelInsert);
   ceramicMesh.position.z = 0.122;
   layerBezel.add(ceramicMesh);
 
-  // 6 Authentic Slotted Bezel Screws (matching Royal Oak / 60fps design)
-  const screwGeom = new THREE.CylinderGeometry(0.045, 0.045, 0.03, 16);
-  const slotGeom = new THREE.BoxGeometry(0.07, 0.012, 0.035);
-  const slotMat = new THREE.MeshBasicMaterial({ color: 0x11161F });
+  // Rolex-Inspired Fluted Faceted Ring Accent (sparkling inner rehaut frame)
+  const flutedRingGeom = new THREE.TorusGeometry(2.365, 0.014, 12, 64);
+  const flutedRingMesh = new THREE.Mesh(flutedRingGeom, materials.hands);
+  flutedRingMesh.position.z = 0.118;
+  layerBezel.add(flutedRingMesh);
 
-  for (let i = 0; i < 6; i++) {
-    const angle = ((i * 60 + 30) * Math.PI) / 180;
+  // 8 Audemars Piguet Hexagonal Screws (at the 8 vertices of the octagon)
+  // In AP watches, all 8 hexagonal screws have slots aligned tangentially to form a concentric circle!
+  const screwGeom = new THREE.CylinderGeometry(0.052, 0.052, 0.035, 6); // 6-sided hexagon!
+  const slotGeom = new THREE.BoxGeometry(0.080, 0.012, 0.040);
+  const slotMat = new THREE.MeshBasicMaterial({ color: 0x0A0D14 });
+
+  for (let i = 0; i < 8; i++) {
+    const angle = ((i * 45 + 22.5) * Math.PI) / 180;
     const sr = 2.505;
     const sx = Math.cos(angle) * sr;
     const sy = Math.sin(angle) * sr;
 
     const screwGroup = new THREE.Group();
-    screwGroup.position.set(sx, sy, 0.130);
-    screwGroup.rotation.z = angle + Math.PI / 4;
+    screwGroup.position.set(sx, sy, 0.128);
+    // Tangential slot alignment tracing a concentric circle (AP signature hallmark)
+    screwGroup.rotation.z = angle + Math.PI / 2;
 
     const sMesh = new THREE.Mesh(screwGeom, materials.case);
     sMesh.rotation.x = Math.PI / 2;
@@ -236,11 +271,18 @@ export function create3DWatch(edition) {
   layerBezel.position.z = 0.24;
 
   // -------------------------------------------------------------
-  // 3. DIAL LAYER (Clean high-resolution guilloché dial)
+  // 3. DIAL LAYER (Haute-Horlogerie Guilloché & 3D Applied Indices)
   // -------------------------------------------------------------
   const dialGeom = new THREE.CircleGeometry(2.35, 64);
   const dialMesh = new THREE.Mesh(dialGeom, materials.dial);
   layerDial.add(dialMesh);
+
+  // 3D Angled Mirror-Polished Rehaut Flange (Inner chapter ring tension well)
+  const rehautGeom = new THREE.CylinderGeometry(2.36, 2.33, 0.05, 64, 1, true);
+  const rehautMesh = new THREE.Mesh(rehautGeom, materials.case);
+  rehautMesh.rotation.x = Math.PI / 2;
+  rehautMesh.position.z = 0.025;
+  layerDial.add(rehautMesh);
 
   // Central axle collar
   const dialCollarGeom = new THREE.CylinderGeometry(0.18, 0.18, 0.02, 32);
@@ -248,6 +290,103 @@ export function create3DWatch(edition) {
   dialCollarMesh.rotation.x = Math.PI / 2;
   dialCollarMesh.position.z = 0.01;
   layerDial.add(dialCollarMesh);
+
+  // 3D Applied Faceted Hour Batons with Super-LumiNova Reservoirs
+  // (Signature Grand Seiko / Royal Oak 3D diamond-cut indices catching real light)
+  const batonGeom = new THREE.BoxGeometry(0.075, 0.28, 0.035);
+  const batonLumeGeom = new THREE.BoxGeometry(0.032, 0.18, 0.040);
+
+  for (let h = 1; h <= 12; h++) {
+    const angle = (h * 30 * Math.PI) / 180;
+    const r = 2.05; // Seated proudly inside the railroad minute track
+
+    // Skip 6 (open-heart tourbillon aperture), 12 has iconic double baton
+    if (h === 6) continue;
+
+    if (h === 12) {
+      // Iconic Dual Parallel Batons at 12 o'clock
+      for (let offset of [-0.055, 0.055]) {
+        const markerGroup = new THREE.Group();
+        const bx = Math.sin(angle) * r + offset;
+        const by = Math.cos(angle) * r;
+        markerGroup.position.set(bx, by, 0.018);
+        markerGroup.rotation.z = -angle;
+
+        const batonMesh = new THREE.Mesh(batonGeom, materials.hands);
+        markerGroup.add(batonMesh);
+
+        const lumeMesh = new THREE.Mesh(batonLumeGeom, materials.lume);
+        lumeMesh.position.z = 0.005;
+        markerGroup.add(lumeMesh);
+
+        layerDial.add(markerGroup);
+      }
+    } else {
+      // Single Faceted Baton at 1, 2, 3, 4, 5, 7, 8, 9, 10, 11
+      const markerGroup = new THREE.Group();
+      const bx = Math.sin(angle) * r;
+      const by = Math.cos(angle) * r;
+      markerGroup.position.set(bx, by, 0.018);
+      markerGroup.rotation.z = -angle;
+
+      const batonMesh = new THREE.Mesh(batonGeom, materials.hands);
+      markerGroup.add(batonMesh);
+
+      const lumeMesh = new THREE.Mesh(batonLumeGeom, materials.lume);
+      lumeMesh.position.z = 0.005;
+      markerGroup.add(lumeMesh);
+
+      layerDial.add(markerGroup);
+    }
+  }
+
+  // -------------------------------------------------------------
+  // JACOB & CO FLYING TOURBILLON MECHANICAL CARRIAGE (6 O'CLOCK)
+  // Real 3D openwork skeletonized tourbillon cage with ruby jewel
+  // -------------------------------------------------------------
+  const tourbillonGroup = new THREE.Group();
+  tourbillonGroup.position.set(0, -0.71, 0.022);
+
+  // Outer Tourbillon Retention Ring
+  const tourbillonRimGeom = new THREE.TorusGeometry(0.28, 0.018, 16, 32);
+  const tourbillonRim = new THREE.Mesh(tourbillonRimGeom, materials.chatonGold);
+  tourbillonGroup.add(tourbillonRim);
+
+  // 3 Curved Aerodynamic Carriage Arms (Tri-blade skeleton cage)
+  for (let a = 0; a < 3; a++) {
+    const armAngle = (a * Math.PI * 2) / 3;
+    const armGeom = new THREE.BoxGeometry(0.035, 0.26, 0.025);
+    const armMesh = new THREE.Mesh(armGeom, materials.hands);
+    armMesh.rotation.z = armAngle;
+    armMesh.position.set(Math.sin(armAngle) * 0.10, Math.cos(armAngle) * 0.10, 0.005);
+    tourbillonGroup.add(armMesh);
+  }
+
+  // Center Gold Chaton with Synthetic Pigeon-Blood Ruby Bearing
+  const chatonGeom = new THREE.CylinderGeometry(0.08, 0.08, 0.03, 16);
+  const chaton = new THREE.Mesh(chatonGeom, materials.chatonGold);
+  chaton.rotation.x = Math.PI / 2;
+  tourbillonGroup.add(chaton);
+
+  const rubyGeom = new THREE.CylinderGeometry(0.05, 0.05, 0.035, 16);
+  const ruby = new THREE.Mesh(rubyGeom, materials.gearRuby);
+  ruby.rotation.x = Math.PI / 2;
+  ruby.position.z = 0.005;
+  tourbillonGroup.add(ruby);
+
+  // Two micro blued adjustment balance screws
+  const bScrewGeom = new THREE.CylinderGeometry(0.025, 0.025, 0.02, 12);
+  const bScrew1 = new THREE.Mesh(bScrewGeom, materials.bluedScrew);
+  bScrew1.rotation.x = Math.PI / 2;
+  bScrew1.position.set(-0.22, 0, 0.008);
+  tourbillonGroup.add(bScrew1);
+
+  const bScrew2 = new THREE.Mesh(bScrewGeom, materials.bluedScrew);
+  bScrew2.rotation.x = Math.PI / 2;
+  bScrew2.position.set(0.22, 0, 0.008);
+  tourbillonGroup.add(bScrew2);
+
+  layerDial.add(tourbillonGroup);
 
   layerDial.position.z = 0.10;
 
@@ -834,20 +973,58 @@ export function create3DWatch(edition) {
     caseGroup.add(lugMesh);
   });
 
-  // Fluted Winding Crown at 3 o'clock
-  const crownGeom = new THREE.CylinderGeometry(0.32, 0.32, 0.35, 24);
+  // Haute-Horlogerie Fluted Winding Crown at 3 o'clock
+  const crownGroup = new THREE.Group();
+  crownGroup.position.set(2.82, 0, 0);
+
+  // Crown stem tube collar
+  const stemGeom = new THREE.CylinderGeometry(0.22, 0.22, 0.12, 24);
+  const stemMesh = new THREE.Mesh(stemGeom, materials.case);
+  stemMesh.rotation.z = Math.PI / 2;
+  stemMesh.position.x = -0.12;
+  crownGroup.add(stemMesh);
+
+  // Main Fluted Crown Body with 24 knurled teeth
+  const crownGeom = new THREE.CylinderGeometry(0.33, 0.33, 0.28, 24);
   const crownMesh = new THREE.Mesh(crownGeom, materials.case);
   crownMesh.rotation.z = Math.PI / 2;
-  crownMesh.position.set(2.82, 0, 0);
-  caseGroup.add(crownMesh);
+  crownGroup.add(crownMesh);
 
-  // Crown Guards
-  const guardGeom = new THREE.BoxGeometry(0.3, 0.45, 0.35);
+  // 12 Micro-machined fluted rib inserts for tactile grip texture
+  for (let f = 0; f < 12; f++) {
+    const fAngle = (f * Math.PI * 2) / 12;
+    const ribGeom = new THREE.BoxGeometry(0.24, 0.04, 0.05);
+    const ribMesh = new THREE.Mesh(ribGeom, materials.case);
+    ribMesh.position.set(0, Math.cos(fAngle) * 0.32, Math.sin(fAngle) * 0.32);
+    crownGroup.add(ribMesh);
+  }
+
+  // Polished Domed Outer Cap
+  const crownCapGeom = new THREE.SphereGeometry(0.28, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+  const crownCapMesh = new THREE.Mesh(crownCapGeom, materials.case);
+  crownCapMesh.rotation.z = -Math.PI / 2;
+  crownCapMesh.position.x = 0.14;
+  crownGroup.add(crownCapMesh);
+
+  // Embossed ALUNA Seal Disc on crown tip
+  const crownSealGeom = new THREE.CircleGeometry(0.16, 24);
+  const crownSealMesh = new THREE.Mesh(crownSealGeom, materials.hands);
+  crownSealMesh.rotation.y = Math.PI / 2;
+  crownSealMesh.position.x = 0.24;
+  crownGroup.add(crownSealMesh);
+
+  caseGroup.add(crownGroup);
+
+  // Ergonomic Chamfered Crown Guards
+  const guardGeom = new THREE.BoxGeometry(0.32, 0.42, 0.35);
   const guardTop = new THREE.Mesh(guardGeom, materials.case);
-  guardTop.position.set(2.62, 0.4, 0);
+  guardTop.position.set(2.62, 0.38, 0);
+  guardTop.rotation.z = -0.22;
   caseGroup.add(guardTop);
+
   const guardBottom = new THREE.Mesh(guardGeom, materials.case);
-  guardBottom.position.set(2.62, -0.4, 0);
+  guardBottom.position.set(2.62, -0.38, 0);
+  guardBottom.rotation.z = 0.22;
   caseGroup.add(guardBottom);
 
   // Metallic Oyster Bracelet or Leather Strap
@@ -914,6 +1091,7 @@ export function create3DWatch(edition) {
       palletFork: palletGroup
     },
     balanceWheel: balanceWheelGroup,
+    tourbillon: tourbillonGroup,
     rotor: layerRotor,
     updateEdition(newEdition) {
       materials.case.color.set(newEdition.caseColor);

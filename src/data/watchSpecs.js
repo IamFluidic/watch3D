@@ -1,75 +1,75 @@
 export const WATCH_EDITIONS = [
   {
     id: "steel",
-    name: "01. Steel Classic",
-    subtitle: "316L Surgical Stainless Steel",
-    dialColor: "#1B2A4A",
-    dialName: "Cobalt Sunray",
+    name: "01. Celestial Glacier",
+    subtitle: "316L Surgical Steel & Glacier Blue",
+    dialColor: "#0A1B38",
+    dialName: "Glacier Sunray Fumé",
     caseColor: "#E2E8F0",
-    caseMetalness: 0.95,
-    caseRoughness: 0.22,
-    bezelColor: "#E2E8F0",
+    caseMetalness: 0.96,
+    caseRoughness: 0.18,
+    bezelColor: "#1A2538",
     strapType: "metal",
     strapColor: "#CBD5E1",
     handsColor: "#F8FAFC",
     lumeColor: "#38BDF8",
     accentColor: "#38BDF8",
-    price: "$2,450",
-    description: "Cold-forged from marine-grade 316L stainless steel with vertical satin brushing, polished chamfered bevels, and a deep cobalt sunray dial."
+    price: "$2,650",
+    description: "Cold-forged from marine-grade 316L surgical stainless steel with vertical satin brushing and mirror chamfers, paired with an ethereal ice-glacier sunray dial and electric cyan Super-LumiNova."
   },
   {
     id: "dlc",
-    name: "02. Midnight Phantom",
-    subtitle: "Metallic Black DLC Coated",
-    dialColor: "#09090B", // Deep obsidian black
-    dialName: "Obsidian Black",
-    caseColor: "#111318",   // Gun-metal deep black
-    caseMetalness: 0.96,
-    caseRoughness: 0.14,    // Semi-gloss — metallic sheen
+    name: "02. Obsidian Nebula",
+    subtitle: "Metallic DLC & Cosmic Violet",
+    dialColor: "#06060B",
+    dialName: "Astral Violet Fumé",
+    caseColor: "#101217",   // Gun-metal deep black with mirror metallic sheen
+    caseMetalness: 0.98,
+    caseRoughness: 0.12,    // Semi-gloss mirror-metallic finish
     bezelColor: "#0A0B0E",
     strapType: "metal",
-    strapColor: "#0F1115",  // Matching black link bracelet
-    handsColor: "#CBD5E1",  // Cool silver-grey hands for contrast
-    lumeColor: "#38BDF8",   // Cyan lume
-    accentColor: "#38BDF8", // Cyan seconds hand
-    price: "$2,850",
-    description: "Vapor-deposited DLC coating bonds to the surgical steel core at the atomic level, creating an obsidian-black surface with 3,500 Vickers hardness and mirror-metallic sheen."
+    strapColor: "#0F1115",  // Matching DLC black link bracelet
+    handsColor: "#E2E8F0",  // Mirror-polished rhodium hands
+    lumeColor: "#22D3EE",   // Electric cyan lume
+    accentColor: "#C084FC", // Ultraviolet second hand
+    price: "$2,950",
+    description: "Vapor-deposited diamond-like carbon coating over surgical steel, creating an obsidian-black exterior with 3,500 Vickers hardness, paired with a cosmic violet fumé dial and electric cyan luminescence."
   },
   {
     id: "rose",
-    name: "03. Champagne 18K",
-    subtitle: "18K Rose Gold & Opaline",
-    dialColor: "#FBF6EE",
-    dialName: "Ivory Opaline",
+    name: "03. Champagne Imperial 18K",
+    subtitle: "18K Rose Gold & Ivory Opaline",
+    dialColor: "#FAF6F0",
+    dialName: "Ivory Opaline Gilt",
     caseColor: "#E6B89C",
     caseMetalness: 0.92,
-    caseRoughness: 0.2,
-    bezelColor: "#C99276",
+    caseRoughness: 0.18,
+    bezelColor: "#D4987A",
     strapType: "leather",
-    strapColor: "#3A2118",
+    strapColor: "#3B1E15",
     handsColor: "#B4654A",
-    lumeColor: "#FDE047",
-    accentColor: "#B4654A",
-    price: "$4,200",
-    description: "Cast in proprietary 18-karat rose gold alloy enriched with copper and platinum for lasting lustre, paired with an opaline dial and French calfskin."
+    lumeColor: "#FEF08A",
+    accentColor: "#1E40AF", // Classic heated flame-blued second hand
+    price: "$4,450",
+    description: "Cast in proprietary 18-karat rose gold enriched with platinum, paired with an ivory opaline dial, faceted rose gold batons, heat-treated flame-blued seconds hand, and hand-stitched French calfskin."
   },
   {
     id: "titanium",
-    name: "04. Racing Titanium",
-    subtitle: "Grade 5 Satin Titanium",
-    dialColor: "#0D2818",
-    dialName: "Racing Emerald",
+    name: "04. Racing Emerald",
+    subtitle: "Grade 5 Titanium & Racing Green",
+    dialColor: "#032814",
+    dialName: "Malachite Emerald Sunray",
     caseColor: "#94A3B8",
     caseMetalness: 0.88,
-    caseRoughness: 0.42,
-    bezelColor: "#041B0E",
+    caseRoughness: 0.38,
+    bezelColor: "#052613",
     strapType: "leather",
-    strapColor: "#1E2228",
+    strapColor: "#1C1D21",
     handsColor: "#F8FAFC",
     lumeColor: "#4ADE80",
-    accentColor: "#22C55E",
-    price: "$3,150",
-    description: "Ultra-light Grade 5 aerospace titanium bead-blasted to a satin sheen, boasting 40% less weight than steel with double the tensile resistance."
+    accentColor: "#F59E0B", // Gilt gold racing seconds hand
+    price: "$3,350",
+    description: "Aerospace Grade 5 titanium bead-blasted to a silky satin sheen, paired with a British racing emerald sunburst dial, gilt gold railway track, and vivid C3 Super-LumiNova."
   }
 ];
 
@@ -83,10 +83,10 @@ export const EXPLODED_LAYERS = [
   },
   {
     id: "bezel",
-    name: "Brushed Steel Bezel Ring",
-    metric: "6 Recessed Hex Screws • 316L Surgical Steel",
+    name: "Sculpted Octagonal Bezel",
+    metric: "8 Hexagonal Screws • Mirror Chamfers • Fluted Ring",
     offsetZ: 2.3,
-    description: "Cold-forged steel bezel insert with concentric satin grain and mirror-polished chamfers matching the case."
+    description: "Iconic 8-sided geometric bezel inspired by Audemars Piguet Royal Oak with vertical satin grain, hand-polished chamfers, 8 perimeter hexagonal screws, and an inner Rolex fluted accent."
   },
   {
     id: "hands",
@@ -97,10 +97,10 @@ export const EXPLODED_LAYERS = [
   },
   {
     id: "dial",
-    name: "Dial & Applied Baton Indices",
-    metric: "Sunray radial grain • Grade X1 Super-LumiNova",
+    name: "Tapisserie & Flying Tourbillon Dial",
+    metric: "Audemars Piguet Waffle • Jacob & Co Stardust • Applied 3D Batons",
     offsetZ: 0.5,
-    description: "Individually hand-applied faceted markers with chamfered edges and photoluminescent compound reservoirs."
+    description: "Signature 'Grande Tapisserie' waffle guilloché dial with Jacob & Co celestial stardust dusting, 12 o'clock astronomical moonphase, and 6 o'clock exposed flying tourbillon."
   },
   {
     id: "movement",
@@ -135,9 +135,9 @@ export const TECHNICAL_SPECIFICATIONS = [
   { label: "Lug Width", value: "20.0 mm (Tapered to 16.0 mm Deployant)" },
   { label: "Case Material", value: "Cold-Forged 316L Surgical Steel (1.4404)" },
   { label: "Water Resistance", value: "10 ATM / 100 Meters / 330 Feet (Dual O-Ring Hermetic)" },
-  { label: "Crystal", value: "Dual-Domed Anti-Reflective Synthetic Sapphire" },
+  { label: "Crystal", value: "Dual-Domed Anti-Reflective Synthetic Sapphire Crystal" },
   { label: "Luminescence", value: "Nepal Super-LumiNova® Grade X1 Glow" },
-  { label: "Chronometer Precision", value: "-2 / +4 sec / day (Kathmandu Observatory Standard)" },
+  { label: "Tourbillon Regulation", value: "60-Second Flying Tourbillon Carriage (-2 / +4 sec / day)" },
   { label: "Bracelet", value: "Solid 316L 3-Link Steel with Micro-Adjust Deployant" },
   { label: "Warranty", value: "5-Year International Manufacture Warranty" }
 ];
