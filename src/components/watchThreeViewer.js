@@ -4,6 +4,15 @@ import { WatchExplodedController } from './watchExplodedController.js';
 import { WATCH_EDITIONS } from '../data/watchSpecs.js';
 import { WatchHotspotsManager } from './watchHotspots.js';
 
+// =========================================================================
+// 🔍 3D WATCH SIZE & SCALE CONFIGURATION
+// Adjust this single number to make the watch larger or smaller across the entire site:
+// - 1.00 = 100% (Original default size)
+// - 0.85 = 85%  (Refined, a bit smaller — gives more breathing room)
+// - 0.78 = 78%  (Compact sizing)
+// =========================================================================
+export const WATCH_GLOBAL_SCALE = 0.85;
+
 function createStudioEnvironment(renderer) {
   const pmremGenerator = new THREE.PMREMGenerator(renderer);
   pmremGenerator.compileEquirectangularShader();
@@ -171,7 +180,16 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
   let currentEdition = WATCH_EDITIONS[0];
   let previewActive = false;
   const watchAnchor = new THREE.Group();
+  watchAnchor.scale.set(WATCH_GLOBAL_SCALE, WATCH_GLOBAL_SCALE, WATCH_GLOBAL_SCALE);
   scene.add(watchAnchor);
+
+  // Live scale tester in browser console: run `setWatchScale(0.8)` in DevTools to preview any scale instantly!
+  if (typeof window !== 'undefined') {
+    window.setWatchScale = (scale) => {
+      watchAnchor.scale.set(scale, scale, scale);
+      console.log(`[Watch Scale] Updated to: ${scale} (e.g., 0.85 = 85%, 1.0 = 100%)`);
+    };
+  }
 
   // Build Initial 3D Watch (Steel Edition default)
   const watchInstance = create3DWatch(currentEdition);
@@ -483,20 +501,22 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     let watermarkOpacity = 0;
 
     if (currentChapter) {
-      // Moves smoothly from right top (0vw) towards center top (-38vw) behind watch
-      watermarkX = -Math.sin(chapterP * Math.PI * 0.5) * 38;
-      watermarkY = chapterP * 6.0;
+      // Option 1: Dedicated Right Horizon
+      // Anchored permanently on the right flank (watermarkX = 0, no movement toward center).
+      // Glides gently vertically (+4vh -> 0vh -> -4vh) on the right side as user scrolls.
+      watermarkX = 0;
+      watermarkY = (0.5 - chapterP) * 8.0;
 
       // Slow, luxurious fade in, wide plateau hold, slow fade out
-      if (chapterP < 0.28) {
-        // Slow fade in (0 -> 0.95 over first 28% of chapter scroll)
-        watermarkOpacity = Math.sin((chapterP / 0.28) * Math.PI * 0.5) * 0.95;
-      } else if (chapterP <= 0.65) {
-        // Generous plateau: stationary high visibility while traveling and reading
+      if (chapterP < 0.20) {
+        // Smooth sine ease-in over first 20%
+        watermarkOpacity = Math.sin((chapterP / 0.20) * Math.PI * 0.5) * 0.95;
+      } else if (chapterP <= 0.75) {
+        // Generous plateau: stationary high visibility on right flank
         watermarkOpacity = 0.95;
       } else {
-        // Slow fade out (0.95 -> 0 over the final 35% of chapter scroll)
-        const fadeP = (chapterP - 0.65) / 0.35;
+        // Slow fade out over final 25% of chapter scroll
+        const fadeP = (chapterP - 0.75) / 0.25;
         watermarkOpacity = 0.95 * Math.cos(fadeP * Math.PI * 0.5);
       }
 
