@@ -1027,8 +1027,8 @@ export function create3DWatch(edition) {
   guardBottom.rotation.z = 0.22;
   caseGroup.add(guardBottom);
 
-  // Metallic Oyster Bracelet or Leather Strap
-  buildBracelet(caseGroup, materials.strap, edition.strapType);
+  // Complete Full-Loop Wrist Bracelet / Strap with Deployant Clasp
+  const braceletController = buildBracelet(caseGroup, materials, edition);
 
   layerCase.add(caseGroup);
   layerCase.position.z = -0.05;
@@ -1117,8 +1117,12 @@ export function create3DWatch(edition) {
       materials.lume.emissive.set(newEdition.lumeColor);
 
       materials.strap.color.set(newEdition.strapColor);
-      materials.strap.metalness = newEdition.strapType === 'metal' ? newEdition.caseMetalness : 0.05;
-      materials.strap.roughness = newEdition.strapType === 'metal' ? 0.3 : 0.8;
+      materials.strap.metalness = newEdition.strapType === 'metal' ? (newEdition.caseMetalness ?? 0.95) : 0.05;
+      materials.strap.roughness = newEdition.strapType === 'metal' ? (newEdition.caseRoughness ?? 0.22) : 0.75;
+
+      if (braceletController) {
+        braceletController.update(newEdition);
+      }
     },
     setNightLume(enabled) {
       materials.lume.emissiveIntensity = enabled ? 2.5 : 0.0;
@@ -1127,42 +1131,243 @@ export function create3DWatch(edition) {
   };
 }
 
-function buildBracelet(parentGroup, material, type) {
-  // Generates 8 top links and 8 bottom links
-  const linkCount = 7;
-  for (let dir of [1, -1]) {
-    for (let i = 0; i < linkCount; i++) {
-      const dist = 2.45 + i * 0.72;
-      const angle = dir * (0.05 + i * 0.14);
-      const zOffset = -Math.pow(i * 0.28, 1.8);
+/**
+ * Builds the complete 360° ergonomic watch strap wrapping fully around the wrist,
+ * complete with solid lug end-links, 3-piece articulated links, micro-pins,
+ * and a sculpted folding deployant clasp with twin side pushers at the back.
+ */
+function buildBracelet(parentGroup, materials, edition) {
+  const braceletContainer = new THREE.Group();
+  parentGroup.add(braceletContainer);
 
-      if (type === 'metal') {
-        // 3-Piece Oyster Links (Left, Center, Right)
-        const outerLinkGeom = new THREE.BoxGeometry(0.7, 0.65, 0.22);
-        const centerLinkGeom = new THREE.BoxGeometry(0.85, 0.65, 0.24);
+  const metalGroup = new THREE.Group();
+  const leatherGroup = new THREE.Group();
+  braceletContainer.add(metalGroup);
+  braceletContainer.add(leatherGroup);
 
-        const linkCenter = new THREE.Mesh(centerLinkGeom, material);
-        linkCenter.position.set(0, dir * dist, zOffset);
-        linkCenter.rotation.x = -dir * (i * 0.18);
-        parentGroup.add(linkCenter);
+  metalGroup.visible = (edition.strapType === 'metal');
+  leatherGroup.visible = (edition.strapType !== 'metal');
 
-        const linkLeft = new THREE.Mesh(outerLinkGeom, material);
-        linkLeft.position.set(-0.85, dir * dist, zOffset);
-        linkLeft.rotation.x = -dir * (i * 0.18);
-        parentGroup.add(linkLeft);
+  // Ergonomic Wrist Spline: Natural wrist oval in Y-Z plane
+  // Top curve runs from top lug (Y=+2.46, Z=-0.16) around the upper wrist to clasp receiver (Y=+0.75, Z=-3.82)
+  const topPts = [
+    new THREE.Vector3(0, 2.46, -0.16),
+    new THREE.Vector3(0, 2.82, -0.28),
+    new THREE.Vector3(0, 3.16, -0.52),
+    new THREE.Vector3(0, 3.38, -0.92),
+    new THREE.Vector3(0, 3.42, -1.45),
+    new THREE.Vector3(0, 3.25, -2.05),
+    new THREE.Vector3(0, 2.88, -2.68),
+    new THREE.Vector3(0, 2.32, -3.22),
+    new THREE.Vector3(0, 1.58, -3.62),
+    new THREE.Vector3(0, 0.75, -3.82)
+  ];
+  const topCurve = new THREE.CatmullRomCurve3(topPts, false, 'centripetal');
 
-        const linkRight = new THREE.Mesh(outerLinkGeom, material);
-        linkRight.position.set(0.85, dir * dist, zOffset);
-        linkRight.rotation.x = -dir * (i * 0.18);
-        parentGroup.add(linkRight);
-      } else {
-        // Continuous stitched leather band segment
-        const leatherGeom = new THREE.BoxGeometry(2.35 - i * 0.08, 0.7, 0.2);
-        const leatherMesh = new THREE.Mesh(leatherGeom, material);
-        leatherMesh.position.set(0, dir * dist, zOffset);
-        leatherMesh.rotation.x = -dir * (i * 0.18);
-        parentGroup.add(leatherMesh);
+  // Bottom curve (symmetrical mirror along Y)
+  const botPts = topPts.map(p => new THREE.Vector3(0, -p.y, p.z));
+  const botCurve = new THREE.CatmullRomCurve3(botPts, false, 'centripetal');
+
+  const rightVec = new THREE.Vector3(1, 0, 0);
+  const basisMatrix = new THREE.Matrix4();
+  const numLinks = 13;
+
+  // =========================================================
+  // 1. METAL BRACELET (AP Royal Oak / Rolex Oyster 3-Piece Luxury Links)
+  // =========================================================
+  for (let half of ['top', 'bot']) {
+    const isTop = half === 'top';
+    const curve = isTop ? topCurve : botCurve;
+
+    for (let i = 0; i < numLinks; i++) {
+      const t = (i + 0.5) / numLinks;
+      const pt = curve.getPointAt(t);
+      const tangent = curve.getTangentAt(t).normalize();
+      const normal = isTop
+        ? new THREE.Vector3(0, -tangent.z, tangent.y).normalize()
+        : new THREE.Vector3(0, tangent.z, -tangent.y).normalize();
+
+      basisMatrix.makeBasis(rightVec, tangent, normal);
+
+      // Smooth taper: from 2.42 at the lugs down to 1.72 at the clasp
+      const totalWidth = 2.42 - t * 0.70;
+      const centerWidth = totalWidth * 0.44;
+      const outerWidth = (totalWidth - centerWidth) * 0.48;
+      const linkLen = 0.38;
+      const linkThick = 0.22;
+
+      const rowGroup = new THREE.Group();
+      rowGroup.position.copy(pt);
+      rowGroup.setRotationFromMatrix(basisMatrix);
+
+      // Center Link: slightly raised for luxury 3D texture
+      const centerGeom = new THREE.BoxGeometry(centerWidth, linkLen, linkThick + 0.02);
+      const centerMesh = new THREE.Mesh(centerGeom, materials.strap);
+      rowGroup.add(centerMesh);
+
+      // Left Outer Link
+      const outerGeom = new THREE.BoxGeometry(outerWidth, linkLen, linkThick);
+      const leftMesh = new THREE.Mesh(outerGeom, materials.strap);
+      leftMesh.position.set(-totalWidth / 2 + outerWidth / 2, 0, -0.01);
+      rowGroup.add(leftMesh);
+
+      // Right Outer Link
+      const rightMesh = new THREE.Mesh(outerGeom, materials.strap);
+      rightMesh.position.set(totalWidth / 2 - outerWidth / 2, 0, -0.01);
+      rowGroup.add(rightMesh);
+
+      // Articulated Steel Connecting Hinge Pin (in joint between links)
+      const pinGeom = new THREE.CylinderGeometry(0.04, 0.04, totalWidth * 0.94, 8);
+      const pinMesh = new THREE.Mesh(pinGeom, materials.case);
+      pinMesh.rotation.z = Math.PI / 2;
+      pinMesh.position.set(0, linkLen / 2, 0);
+      rowGroup.add(pinMesh);
+
+      // Solid machined end-link integration flush with watch lugs (at i=0)
+      if (i === 0) {
+        const endLinkGeom = new THREE.BoxGeometry(2.44, 0.52, 0.26);
+        const endLinkMesh = new THREE.Mesh(endLinkGeom, materials.strap);
+        endLinkMesh.position.set(0, -0.10, 0);
+        rowGroup.add(endLinkMesh);
       }
+
+      metalGroup.add(rowGroup);
     }
   }
+
+  // =========================================================
+  // 2. SCULPTED DEPLOYANT CLASP (Back of Wrist at Y=0, Z=-3.85)
+  // =========================================================
+  const claspGroup = new THREE.Group();
+  claspGroup.position.set(0, 0, -3.85);
+
+  // Outer curved clasp cover shell
+  const claspShellGeom = new THREE.BoxGeometry(1.74, 1.48, 0.28);
+  const claspShell = new THREE.Mesh(claspShellGeom, materials.strap);
+  claspGroup.add(claspShell);
+
+  // Raised center medallion with chamfered edge
+  const claspMedallionGeom = new THREE.BoxGeometry(1.24, 0.96, 0.04);
+  const claspMedallion = new THREE.Mesh(claspMedallionGeom, materials.case);
+  claspMedallion.position.set(0, 0, -0.15);
+  claspGroup.add(claspMedallion);
+
+  // Embossed ALUNA Signature Inscription Plaque on Clasp
+  const claspBrandGeom = new THREE.BoxGeometry(0.85, 0.22, 0.03);
+  const claspBrand = new THREE.Mesh(claspBrandGeom, materials.hands);
+  claspBrand.position.set(0, 0, -0.18);
+  claspGroup.add(claspBrand);
+
+  // Ergonomic Twin Lateral Release Pushers (left & right buttons)
+  const pusherGeom = new THREE.BoxGeometry(0.18, 0.36, 0.18);
+  const leftPusher = new THREE.Mesh(pusherGeom, materials.case);
+  leftPusher.position.set(-0.92, 0, -0.02);
+  claspGroup.add(leftPusher);
+
+  const rightPusher = new THREE.Mesh(pusherGeom, materials.case);
+  rightPusher.position.set(0.92, 0, -0.02);
+  claspGroup.add(rightPusher);
+
+  // Under-Clasp Folding Scissor Blades
+  const scissorGeom = new THREE.BoxGeometry(0.48, 1.28, 0.06);
+  const scissorBlade1 = new THREE.Mesh(scissorGeom, materials.case);
+  scissorBlade1.position.set(0, 0, 0.16);
+  claspGroup.add(scissorBlade1);
+
+  // Scissor Hinge Barrel Rivets
+  for (let hy of [-0.64, 0, 0.64]) {
+    const rivetGeom = new THREE.CylinderGeometry(0.045, 0.045, 0.60, 10);
+    const rivetMesh = new THREE.Mesh(rivetGeom, materials.case);
+    rivetMesh.rotation.z = Math.PI / 2;
+    rivetMesh.position.set(0, hy, 0.16);
+    claspGroup.add(rivetMesh);
+  }
+
+  metalGroup.add(claspGroup);
+
+  // =========================================================
+  // 3. LEATHER STRAP (Hand-Stitched French Calfskin & Deployant Buckle)
+  // =========================================================
+  const stitchMat = new THREE.MeshStandardMaterial({
+    color: 0xF8FAFC,
+    roughness: 0.9,
+    metalness: 0.02
+  });
+
+  for (let half of ['top', 'bot']) {
+    const isTop = half === 'top';
+    const curve = isTop ? topCurve : botCurve;
+
+    for (let i = 0; i < numLinks; i++) {
+      const t = (i + 0.5) / numLinks;
+      const pt = curve.getPointAt(t);
+      const tangent = curve.getTangentAt(t).normalize();
+      const normal = isTop
+        ? new THREE.Vector3(0, -tangent.z, tangent.y).normalize()
+        : new THREE.Vector3(0, tangent.z, -tangent.y).normalize();
+
+      basisMatrix.makeBasis(rightVec, tangent, normal);
+
+      const totalWidth = 2.40 - t * 0.68;
+      const linkLen = 0.39;
+
+      const leatherRow = new THREE.Group();
+      leatherRow.position.copy(pt);
+      leatherRow.setRotationFromMatrix(basisMatrix);
+
+      // Padded leather base
+      const padGeom = new THREE.BoxGeometry(totalWidth, linkLen, 0.22);
+      const padMesh = new THREE.Mesh(padGeom, materials.strap);
+      leatherRow.add(padMesh);
+
+      // Raised bombé center ridge
+      const ridgeGeom = new THREE.BoxGeometry(totalWidth * 0.86, linkLen, 0.04);
+      const ridgeMesh = new THREE.Mesh(ridgeGeom, materials.strap);
+      ridgeMesh.position.set(0, 0, 0.12);
+      leatherRow.add(ridgeMesh);
+
+      // Left & Right Contrast Perimeter Stitches
+      const stitchGeom = new THREE.BoxGeometry(0.04, linkLen * 0.75, 0.03);
+      const leftStitch = new THREE.Mesh(stitchGeom, stitchMat);
+      leftStitch.position.set(-totalWidth / 2 + 0.10, 0, 0.12);
+      leatherRow.add(leftStitch);
+
+      const rightStitch = new THREE.Mesh(stitchGeom, stitchMat);
+      rightStitch.position.set(totalWidth / 2 - 0.10, 0, 0.12);
+      leatherRow.add(rightStitch);
+
+      // Adjustment sizing punch holes along center on bottom tail strap
+      if (!isTop && i >= 6 && i <= 11) {
+        const holeGeom = new THREE.CylinderGeometry(0.04, 0.04, 0.06, 8);
+        const holeMesh = new THREE.Mesh(holeGeom, new THREE.MeshBasicMaterial({ color: 0x05070A }));
+        holeMesh.rotation.x = Math.PI / 2;
+        holeMesh.position.set(0, 0, 0.12);
+        leatherRow.add(holeMesh);
+      }
+
+      // Fixed & Floating Leather Keepers
+      if (!isTop && (i === 10 || i === 11)) {
+        const keeperGeom = new THREE.BoxGeometry(totalWidth + 0.12, 0.14, 0.32);
+        const keeperMesh = new THREE.Mesh(keeperGeom, materials.strap);
+        leatherRow.add(keeperMesh);
+      }
+
+      leatherGroup.add(leatherRow);
+    }
+  }
+
+  // Deployant buckle for leather strap at the back
+  const leatherBuckleGroup = new THREE.Group();
+  leatherBuckleGroup.position.set(0, 0, -3.85);
+  const buckleGeom = new THREE.BoxGeometry(1.80, 0.85, 0.30);
+  const buckleMesh = new THREE.Mesh(buckleGeom, materials.case);
+  leatherBuckleGroup.add(buckleMesh);
+  leatherGroup.add(leatherBuckleGroup);
+
+  return {
+    update(newEdition) {
+      metalGroup.visible = (newEdition.strapType === 'metal');
+      leatherGroup.visible = (newEdition.strapType !== 'metal');
+    }
+  };
 }
