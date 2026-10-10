@@ -821,7 +821,8 @@ export function create3DWatch(edition) {
   powerReserveGroup.add(prHandGroup);
 
   addRubyChaton(powerReserveGroup, 0, 0, 0.020, 0.045, 0.028);
-  dialGroup.add(powerReserveGroup);
+  // Power Reserve indicator is intentionally hidden — it cluttered the dial
+  // dialGroup.add(powerReserveGroup);
 
   // =========================================================
   // BOTTOM CENTER MECHANICAL SHOWCASE (6 O'CLOCK)
@@ -927,34 +928,7 @@ export function create3DWatch(edition) {
 
   dialGroup.add(tourbillonGroup);
 
-  // Sweeping Rose-Gold Interconnecting Bridges between complications (framing the distinct subdials)
-  const leftBridgeCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-1.22, -0.62, 0.038),
-    new THREE.Vector3(-0.75, -0.42, 0.048),
-    new THREE.Vector3(-0.45, -0.15, 0.046)
-  ]);
-  const leftBridgeMesh = new THREE.Mesh(new THREE.TubeGeometry(leftBridgeCurve, 24, 0.042, 12, false), materials.roseBridge);
-  dialGroup.add(leftBridgeMesh);
-
-  const rightBridgeCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0.45, -0.15, 0.046),
-    new THREE.Vector3(0.75, -0.42, 0.048),
-    new THREE.Vector3(1.22, -0.62, 0.038)
-  ]);
-  const rightBridgeMesh = new THREE.Mesh(new THREE.TubeGeometry(rightBridgeCurve, 24, 0.042, 12, false), materials.roseBridge);
-  dialGroup.add(rightBridgeMesh);
-
-  // Top Blued Steel Bridge Arch across 11 o'clock to 1 o'clock
-  const topBlueBridgeCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.65, 1.48, 0.04),
-    new THREE.Vector3(0.08, 1.72, 0.05),
-    new THREE.Vector3(0.85, 1.42, 0.04)
-  ]);
-  const topBlueBridgeGeom = new THREE.TubeGeometry(topBlueBridgeCurve, 24, 0.044, 12, false);
-  const topBlueBridgeMesh = new THREE.Mesh(topBlueBridgeGeom, materials.blueBridge);
-  dialGroup.add(topBlueBridgeMesh);
-  addBluedScrew(dialGroup, -0.65, 1.48, 0.06);
-  addBluedScrew(dialGroup, 0.85, 1.42, 0.06);
+  // Sweeping interconnecting bridge rods removed per user request for cleaner skeletonized dial view
 
   layerDial.add(dialGroup);
   layerDial.position.z = 0.10;
@@ -1638,14 +1612,16 @@ export function create3DWatch(edition) {
   // =========================================================
   const explodableItems = [
     // ---- DIAL LAYER: 4 clock circles radially fan out ----
-    // Lapis Hours (left 9 o'clock) → explodes further left + up in Z
-    { obj: lapisGroup,             offsetX: -1.0,  offsetY:  0.0,  offsetZ: 1.2 },
-    // Minutes Ring (top 12 o'clock) → explodes upward + up in Z
-    { obj: minuteGroup,            offsetX:  0.0,  offsetY:  1.1,  offsetZ: 1.4 },
+    // Offsets kept modest (0.42–0.48 units) so circles stay within the bezel rim.
+    // The Z lift separates them visually without bursting through the case edge.
+    // Lapis Hours (left 9 o'clock) → explodes further left + forward in Z
+    { obj: lapisGroup,             offsetX: -0.44, offsetY:  0.0,   offsetZ: 0.9 },
+    // Minutes Ring (top 12 o'clock) → explodes upward + forward in Z
+    { obj: minuteGroup,            offsetX:  0.0,  offsetY:  0.46,  offsetZ: 1.0 },
     // Day/Night Moon Disc (right 3 o'clock) → explodes further right + Z
-    { obj: moonGroup,              offsetX:  1.0,  offsetY:  0.0,  offsetZ: 1.2 },
+    { obj: moonGroup,              offsetX:  0.44, offsetY:  0.0,   offsetZ: 0.9 },
     // Tourbillon Showcase (bottom 6 o'clock) → explodes downward + Z
-    { obj: tourbillonGroup,        offsetX:  0.0,  offsetY: -1.0,  offsetZ: 1.0 },
+    { obj: tourbillonGroup,        offsetX:  0.0,  offsetY: -0.44,  offsetZ: 0.75 },
 
     // ---- GEAR LAYER: Front complication gears (in layerGears) ----
     // Hours gear train — fan left with Lapis subdial
