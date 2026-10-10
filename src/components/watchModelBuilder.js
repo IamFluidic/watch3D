@@ -971,20 +971,7 @@ export function create3DWatch(edition) {
   caseBarrelMesh.position.z = -0.28;
   caseGroup.add(caseBarrelMesh);
 
-  // 4 Chamfered Lugs (positioned outside the case and behind bezel)
-  const lugGeom = new THREE.BoxGeometry(0.32, 1.1, 0.35);
-  const lugPositions = [
-    { x: -1.45, y: 2.55, z: -0.15 },
-    { x: 1.45, y: 2.55, z: -0.15 },
-    { x: -1.45, y: -2.55, z: -0.15 },
-    { x: 1.45, y: -2.55, z: -0.15 }
-  ];
-  lugPositions.forEach(pos => {
-    const lugMesh = new THREE.Mesh(lugGeom, materials.case);
-    lugMesh.position.set(pos.x, pos.y, pos.z);
-    lugMesh.rotation.z = (pos.x > 0 ? -1 : 1) * (pos.y > 0 ? 0.18 : -0.18);
-    caseGroup.add(lugMesh);
-  });
+  // Middle case barrel integrates cleanly with the luxury strap (protruding horn lugs removed for sleek integrated architecture)
 
   // Haute-Horlogerie Fluted Winding Crown at 3 o'clock
   const crownGroup = new THREE.Group();
