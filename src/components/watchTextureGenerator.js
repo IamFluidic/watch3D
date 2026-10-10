@@ -24,6 +24,10 @@ export function createDialTexture(edition) {
   let baseColor = edition.id === 'dlc' ? '#0D0F12' : (edition.id === 'rose' ? '#1A1412' : (edition.id === 'gold' ? '#161410' : '#14171D'));
   let centerGlow = edition.id === 'dlc' ? '#20242C' : (edition.id === 'rose' ? '#2A221D' : (edition.id === 'gold' ? '#242018' : '#2A303C'));
 
+  // Solid background fill across entire canvas — prevents transparent margin sampling and mipmap flicker
+  ctx.fillStyle = '#080A0D';
+  ctx.fillRect(0, 0, 1024, 1024);
+
   const bgGrad = ctx.createRadialGradient(cx, cy, 30, cx, cy, dialRadius);
   bgGrad.addColorStop(0, centerGlow);
   bgGrad.addColorStop(0.65, baseColor);
@@ -415,12 +419,16 @@ export function createFlatCasebackTexture(edition) {
 
   const cx = 512;
   const cy = 512;
-  const radius = 480;
+  const radius = 512;
 
   // 1. Clean satin-brushed surgical steel base
   let baseColor = edition?.id === 'dlc' ? '#12151B' : (edition?.id === 'rose' ? '#453830' : (edition?.id === 'gold' ? '#4A422D' : '#8E98A6'));
   let lightColor = edition?.id === 'dlc' ? '#252B35' : (edition?.id === 'rose' ? '#7A6456' : (edition?.id === 'gold' ? '#8C7C58' : '#C4CDD8'));
   let darkColor = edition?.id === 'dlc' ? '#090B0E' : (edition?.id === 'rose' ? '#2A201A' : (edition?.id === 'gold' ? '#2E2718' : '#606976'));
+
+  // Solid background fill across entire canvas — prevents transparent margin sampling and edge flicker
+  ctx.fillStyle = darkColor;
+  ctx.fillRect(0, 0, 1024, 1024);
 
   // Subtle radial gradient across flat disc
   const grad = ctx.createRadialGradient(cx - 100, cy - 100, 50, cx, cy, radius);
@@ -520,12 +528,16 @@ export function createBezelTexture(edition) {
 
   const cx = 512;
   const cy = 512;
-  const outerR = 500;
-  const innerR = 410;
+  const outerR = 512;
+  const innerR = 430;
 
   // Base circular color matching the edition's bezelColor
   const baseColor = edition?.bezelColor || '#E2E8F0';
+
+  // Solid background fill across entire canvas — prevents transparent margin sampling and rim flicker
   ctx.fillStyle = baseColor;
+  ctx.fillRect(0, 0, 1024, 1024);
+
   ctx.beginPath();
   ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
   ctx.arc(cx, cy, innerR, 0, Math.PI * 2, true);

@@ -29,7 +29,10 @@ export function create3DWatch(edition) {
       map: createBezelTexture(edition),
       roughness: edition.caseRoughness ?? 0.18,
       metalness: edition.caseMetalness ?? 0.95,
-      envMapIntensity: 1.6
+      envMapIntensity: 1.6,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1
     }),
     dial: new THREE.MeshStandardMaterial({
       map: createDialTexture(edition),
@@ -163,13 +166,13 @@ export function create3DWatch(edition) {
   // -------------------------------------------------------------
   // 1. SAPPHIRE CRYSTAL LAYER (Ultra-Clear Dual Domed)
   // -------------------------------------------------------------
-  const sapphireGeom = new THREE.CircleGeometry(2.36, 64);
+  const sapphireGeom = new THREE.CircleGeometry(2.35, 64);
   const sapphireMesh = new THREE.Mesh(sapphireGeom, materials.sapphire);
   sapphireMesh.position.z = 0.28;
   layerSapphire.add(sapphireMesh);
 
-  // Subtle steel retention rim
-  const rimGeom = new THREE.TorusGeometry(2.37, 0.03, 16, 64);
+  // Subtle steel retention rim seated neatly on the sapphire edge (never colliding with bezel hole at r=2.36)
+  const rimGeom = new THREE.TorusGeometry(2.345, 0.010, 16, 64);
   const rimMesh = new THREE.Mesh(rimGeom, materials.case);
   rimMesh.position.z = 0.28;
   layerSapphire.add(rimMesh);
@@ -185,22 +188,23 @@ export function create3DWatch(edition) {
   bezelShape.holes.push(bezelHole);
 
   const bezelSteelGeom = new THREE.ExtrudeGeometry(bezelShape, {
-    depth: 0.20,
+    depth: 0.18,
     bevelEnabled: true,
     bevelSegments: 2,
     steps: 1,
-    bevelSize: 0.02,
-    bevelThickness: 0.02,
+    bevelSize: 0.015,
+    bevelThickness: 0.015,
     curveSegments: 64
   });
   const bezelSteelMesh = new THREE.Mesh(bezelSteelGeom, materials.case);
-  bezelSteelMesh.position.z = -0.10;
+  bezelSteelMesh.position.z = -0.08;
   layerBezel.add(bezelSteelMesh);
 
-  // Ceramic / Steel insert ring (HOLLOW ring from 2.37 to 2.64 with satin finish)
-  const ceramicGeom = new THREE.RingGeometry(2.37, 2.64, 64);
+  // Ceramic / Steel insert ring (HOLLOW ring from 2.37 to 2.63 with satin finish)
+  // Positioned proud at z = 0.122 above bezelSteelMesh top face (0.115) to prevent coplanar z-fighting
+  const ceramicGeom = new THREE.RingGeometry(2.37, 2.63, 64);
   const ceramicMesh = new THREE.Mesh(ceramicGeom, materials.bezelInsert);
-  ceramicMesh.position.z = 0.12;
+  ceramicMesh.position.z = 0.122;
   layerBezel.add(ceramicMesh);
 
   // 6 Authentic Slotted Bezel Screws (matching Royal Oak / 60fps design)
@@ -215,7 +219,7 @@ export function create3DWatch(edition) {
     const sy = Math.sin(angle) * sr;
 
     const screwGroup = new THREE.Group();
-    screwGroup.position.set(sx, sy, 0.13);
+    screwGroup.position.set(sx, sy, 0.130);
     screwGroup.rotation.z = angle + Math.PI / 4;
 
     const sMesh = new THREE.Mesh(screwGeom, materials.case);
@@ -803,16 +807,16 @@ export function create3DWatch(edition) {
   caseShape.holes.push(caseHole);
 
   const caseBarrelGeom = new THREE.ExtrudeGeometry(caseShape, {
-    depth: 0.50,
+    depth: 0.46,
     bevelEnabled: true,
     bevelSegments: 2,
     steps: 1,
-    bevelSize: 0.02,
-    bevelThickness: 0.02,
+    bevelSize: 0.015,
+    bevelThickness: 0.015,
     curveSegments: 64
   });
   const caseBarrelMesh = new THREE.Mesh(caseBarrelGeom, materials.case);
-  caseBarrelMesh.position.z = -0.30;
+  caseBarrelMesh.position.z = -0.28;
   caseGroup.add(caseBarrelMesh);
 
   // 4 Chamfered Lugs (positioned outside the case and behind bezel)

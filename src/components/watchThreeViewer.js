@@ -67,7 +67,8 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
   const renderer = new THREE.WebGLRenderer({
     alpha: true,
     antialias: true,
-    powerPreference: "high-performance"
+    powerPreference: "high-performance",
+    logarithmicDepthBuffer: true
   });
   renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
