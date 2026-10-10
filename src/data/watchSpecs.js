@@ -144,3 +144,6 @@ export const TECHNICAL_SPECIFICATIONS = [
   { label: "Strap & Buckle", value: "Hand-Stitched French Calfskin with Deployant Clasp & Point Sellier Saddle Stitching" },
   { label: "Warranty", value: "5-Year International Manufacture Warranty" }
 ];
+
+export const TOTAL_WEIGHT_GRAMS = 146;
+

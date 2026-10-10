@@ -74,19 +74,43 @@
       <!-- STICKY 3D STAGE: Pinned across all story steps -->
       <div class="sticky-3d-stage" id="sticky-3d-stage">
         <!-- Blueprint Reticle Circle & Clear ALUNA A3016 Background -->
+        <!-- Astronomical Astrolabe Projection Reticle & Kinetic Backdrop -->
         <div class="blueprint-reticle-bg" id="blueprint-reticle-bg">
-          <div class="reticle-circle">
-            <div class="reticle-axis-h"></div>
-            <div class="reticle-axis-v"></div>
-            <div class="reticle-crosshair ch-top">+</div>
-            <div class="reticle-crosshair ch-bottom">+</div>
-            <div class="reticle-crosshair ch-left">+</div>
-            <div class="reticle-crosshair ch-right">+</div>
-            <div class="reticle-quadrant q1"></div>
-            <div class="reticle-quadrant q2"></div>
-            <div class="reticle-quadrant q3"></div>
-            <div class="reticle-quadrant q4"></div>
-          </div>
+          <!-- SVG Astrolabe Celestial Coordinate Overlay -->
+          <svg class="astrolabe-svg" viewBox="0 0 900 900" xmlns="http://www.w3.org/2000/svg">
+            <g class="astrolabe-group">
+              <!-- Outer Graduation Degree Circle (0°-360°) -->
+              <circle cx="450" cy="450" r="410" class="ast-ring ast-ring-outer" />
+              <circle cx="450" cy="450" r="392" class="ast-ring ast-ring-ticks" />
+              <!-- Concentric Celestial Spheres -->
+              <circle cx="450" cy="450" r="340" class="ast-ring ast-ring-tropic" />
+              <circle cx="450" cy="450" r="280" class="ast-ring ast-ring-equator" stroke-dasharray="4 6" />
+              <circle cx="450" cy="450" r="210" class="ast-ring ast-ring-horizon" />
+              <!-- Tilted Ecliptic / Zodiac Band -->
+              <ellipse cx="450" cy="425" rx="310" ry="240" class="ast-ring ast-ring-ecliptic"
+                transform="rotate(-23.5 450 425)" stroke-dasharray="8 4" />
+              <!-- Cardinal Coordinate Axes -->
+              <line x1="450" y1="20" x2="450" y2="880" class="ast-axis" />
+              <line x1="20" y1="450" x2="880" y2="450" class="ast-axis" />
+              <!-- 45-degree Celestial Meridian Lines -->
+              <line x1="145" y1="145" x2="755" y2="755" class="ast-axis-diag" stroke-dasharray="2 6" />
+              <line x1="755" y1="145" x2="145" y2="755" class="ast-axis-diag" stroke-dasharray="2 6" />
+              <!-- Cardinal Astrolabe Markers -->
+              <text x="450" y="32" class="ast-label ast-label-n" text-anchor="middle">N · 000° ZENITH</text>
+              <text x="872" y="454" class="ast-label ast-label-e" text-anchor="end">E · 090° EQUINOX</text>
+              <text x="450" y="874" class="ast-label ast-label-s" text-anchor="middle">S · 180° NADIR</text>
+              <text x="28" y="454" class="ast-label ast-label-w" text-anchor="start">W · 270° SOLSTICE</text>
+              <!-- Degree Tick Marks around circumference -->
+              <g class="ast-ticks-group">
+                <!-- Programmatically styled in CSS / SVG marks -->
+                <circle cx="450" cy="40" r="2" class="ast-star-dot" />
+                <circle cx="860" cy="450" r="2" class="ast-star-dot" />
+                <circle cx="450" cy="860" r="2" class="ast-star-dot" />
+                <circle cx="40" cy="450" r="2" class="ast-star-dot" />
+              </g>
+            </g>
+          </svg>
+
           <!-- Clear framing typography that is NEVER hidden behind watch -->
           <!-- LEFT: ALUNA brand — vertical editorial column -->
           <div class="giant-bg-text-brand" id="giant-bg-text-brand">
@@ -96,15 +120,39 @@
             <span class="gbt-rule gbt-rule-bottom"></span>
             <span class="gbt-footer-label">EST. MMXXV</span>
           </div>
+
           <!-- RIGHT: A3016 model — large display serif numeral -->
           <div class="giant-bg-text-model" id="giant-bg-text-model">
             <span class="gbt-model-kicker">CALIBRE · NO.</span>
             <span class="gbt-model-num">A<em>3016</em></span>
             <span class="gbt-model-sub">40MM · DLC STEEL</span>
           </div>
+
           <div class="giant-bg-text-stacked" id="giant-bg-text-stacked">
             <span>ALUNA</span>
             <span>—A3016</span>
+          </div>
+
+          <!-- Dynamic Scrolling Watermark — Glides vertically past upwards like 60fps -->
+          <div class="kinetic-chapter-bg" id="kinetic-chapter-bg" aria-hidden="true">
+            <div class="kcb-vertical-rail">
+              <span class="kcb-vert-pill" id="kcb-vert-pill">CHAPTER 01</span>
+              <span class="kcb-vert-line"></span>
+              <span class="kcb-vert-coord" id="kcb-vert-coord">RA 05h 35m • 40.0 MM</span>
+            </div>
+            <div class="kcb-content-flow">
+              <span class="kcb-ch-num" id="kcb-ch-num">01</span>
+              <div class="kcb-text-block">
+                <span class="kcb-eyebrow" id="kcb-eyebrow">METALLURGIC FORGING</span>
+                <h2 class="kcb-title" id="kcb-title">BRONZE</h2>
+                <span class="kcb-subtitle" id="kcb-subtitle">ANTIQUE SCULPTED FLANKS</span>
+                <div class="kcb-telemetry" id="kcb-telemetry">
+                  <span class="kcb-coord">DAMASCUS STEEL BEZEL</span>
+                  <span class="kcb-sep">•</span>
+                  <span class="kcb-coord">HAND-ENGRAVED CONSTELLATIONS</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -313,7 +361,7 @@
               </h2>
               <p class="editorial-feature-body">
                 The 7 precision horological assemblies separated along the central horizontal axis in dynamic mechanical
-                suspension. Directly beneath the lifted dial, discover the unified Calibre A3016 engine featuring thick, 
+                suspension. Directly beneath the lifted dial, discover the unified Calibre A3016 engine featuring thick,
                 high-precision machined gears rotating continuously with the sweep of the hands.
               </p>
               <div class="editorial-specs-grid">
@@ -328,6 +376,41 @@
                 <div class="ed-spec-item">
                   <span class="ed-val">28,800 vph</span>
                   <span class="ed-lbl">Escapement Beat</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FEATURE 04B: THE CELESTIAL ENGINE (CALIBRE & MOVEMENT ISOLATION) -->
+          <div class="feature-stage-item feat--4b" id="feat-item-4b">
+            <div class="feature-text-block individual-feature left-feature editorial-feature-card">
+              <div class="feature-index-header">
+                <span class="feature-roman-num">04'</span>
+                <div class="feature-category-pill">
+                  <span class="cat-dot"></span>
+                  <span>MECHANICAL HEART</span>
+                </div>
+              </div>
+              <h2 class="editorial-feature-headline">
+                The Celestial <em class="serif-ital">Calibre Engine</em>
+              </h2>
+              <p class="editorial-feature-body">
+                Collapsing seamlessly from exploded suspension, the beating mechanical calibre floats in dark space.
+                A deep midnight sapphire movement mainplate hand-engraved with golden astrolabe coordinates, Keplerian
+                planetary orbits, and 26 synthetic rubies regulating the 4Hz flying tourbillon escapement.
+              </p>
+              <div class="editorial-specs-grid">
+                <div class="ed-spec-item">
+                  <span class="ed-val">4.0 Hz</span>
+                  <span class="ed-lbl">Oscillation Speed</span>
+                </div>
+                <div class="ed-spec-item">
+                  <span class="ed-val">26 Jewels</span>
+                  <span class="ed-lbl">Synthetic Rubies</span>
+                </div>
+                <div class="ed-spec-item">
+                  <span class="ed-val">48 Hours</span>
+                  <span class="ed-lbl">Power Reserve</span>
                 </div>
               </div>
             </div>
@@ -367,8 +450,9 @@
               </div>
             </div>
           </div>
+
+          </div>
         </div>
-      </div>
 
       <!-- STORY TRACK: Transparent spacer sections driving the scrollytelling -->
       <div class="story-track" id="story-track">
@@ -390,11 +474,15 @@
         <!-- STEP 4: HORIZONTAL DECONSTRUCTED ARCHITECTURE -->
         <section id="story-exploded" class="story-step step--feature step--exploded" data-step="4"></section>
 
+        <!-- STEP 4B: THE CELESTIAL ENGINE (Movement & Escapement Isolation) -->
+        <section id="story-engine" class="story-step step--feature step--engine" data-step="4.5"></section>
+
         <!-- STEP 5: INTEGRATED 3-LINK STEEL BRACELET -->
         <section id="story-rotor" class="story-step step--feature step--bracelet" data-step="5"></section>
 
-        <!-- STEP 6: 360° INTERACTIVE STUDIO (Free Orbit & Hotspot Inspection before 04/Metallurgy) -->
-        <section id="story-studio" class="story-step step--studio" data-step="6"></section>
+
+        <!-- STEP 7: 360° INTERACTIVE STUDIO (Free Orbit & Hotspot Inspection before 04/Metallurgy) -->
+        <section id="story-studio" class="story-step step--studio" data-step="7"></section>
       </div>
     </div>
 
@@ -522,7 +610,8 @@
               <div class="reserve-features-list">
                 <div class="reserve-feature">✓ Bespoke sapphire caseback personalized engraving</div>
                 <div class="reserve-feature">✓ Includes both 316L solid link bracelet & Italian calfskin strap</div>
-                <div class="reserve-feature">✓ Individual Flying Tourbillon Certificate & wooden presentation vault</div>
+                <div class="reserve-feature">✓ Individual Flying Tourbillon Certificate & wooden presentation vault
+                </div>
               </div>
             </div>
 
@@ -634,31 +723,31 @@
     </div>
     <div class="timeline-step" data-step="1">
       <span class="timeline-num">01</span>
-      <span class="timeline-label">IDENTITY</span>
+      <span class="timeline-label">FINISHES</span>
     </div>
     <div class="timeline-step" data-step="2">
       <span class="timeline-num">02</span>
-      <span class="timeline-label">SAPPHIRE</span>
+      <span class="timeline-label">QUAD-DIAL</span>
     </div>
     <div class="timeline-step" data-step="3">
       <span class="timeline-num">03</span>
-      <span class="timeline-label">DIAL</span>
+      <span class="timeline-label">CASEBACK</span>
     </div>
     <div class="timeline-step" data-step="4">
       <span class="timeline-num">04</span>
-      <span class="timeline-label">CALIBRE</span>
+      <span class="timeline-label">EXPLODED</span>
     </div>
     <div class="timeline-step" data-step="5">
       <span class="timeline-num">05</span>
-      <span class="timeline-label">ROTOR</span>
+      <span class="timeline-label">ENGINE</span>
     </div>
     <div class="timeline-step" data-step="6">
       <span class="timeline-num">06</span>
-      <span class="timeline-label">ARCH</span>
+      <span class="timeline-label">BRACELET</span>
     </div>
     <div class="timeline-step" data-step="7">
       <span class="timeline-num">07</span>
-      <span class="timeline-label">DOSSIER</span>
+      <span class="timeline-label">STUDIO</span>
     </div>
   </aside>
 

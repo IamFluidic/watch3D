@@ -89,18 +89,38 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 5. Connect Exploded View Toggle
+  // 5. Connect Exploded View Toggle & Layer Shelf
   const explodeBtn = document.getElementById('hud-explode-btn');
   const explodeBtnText = document.getElementById('explode-btn-text');
+  const dossierCard = document.getElementById('layer-dossier-card');
+
   if (explodeBtn && viewer) {
     explodeBtn.addEventListener('click', () => {
       const isExploded = viewer.toggleExploded();
       explodeBtn.classList.toggle('is--active', isExploded);
+      document.body.classList.toggle('is--exploded', isExploded);
       if (explodeBtnText) {
         explodeBtnText.textContent = isExploded ? 'Assemble Watch' : 'Explode Calibre';
       }
+      if (!isExploded && dossierCard) {
+        dossierCard.classList.remove('is--visible');
+      }
     });
   }
+
+
+  // 5C. Quad Complications Quick-Focus Dock (Interactive Macro Zoom)
+  const compButtons = document.querySelectorAll('.cd-btn');
+  compButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      compButtons.forEach(b => b.classList.remove('is--active'));
+      btn.classList.add('is--active');
+      const comp = btn.getAttribute('data-complication');
+      if (viewer && viewer.focusComplication) {
+        viewer.focusComplication(comp);
+      }
+    });
+  });
 
   // 6. Connect Night / Super-LumiNova Lume Toggle
   const hudLumeBtn = document.getElementById('hud-lume-btn');
@@ -181,17 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 10. Render Section 04: Technical Specifications Table with Animation Classes
-  const specsContainer = document.getElementById('specs-table-container');
-  if (specsContainer) {
-    specsContainer.innerHTML = TECHNICAL_SPECIFICATIONS.map((spec, idx) => `
-      <div class="specs-row scroll-reveal stagger-${(idx % 6) + 1}">
-        <span class="specs-label">${spec.label.toUpperCase()}</span>
-        <span class="specs-value">${spec.value}</span>
-      </div>
-    `).join('');
-  }
-
   // 11. Helper: Synchronize Edition Selection Across UI & 3D Model
   function selectEdition(editionId) {
     const found = WATCH_EDITIONS.find(e => e.id === editionId);
@@ -255,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
           origin: { y: 0.6 },
           colors: ['#0A0A0C', '#0284C7', '#E2E8F0', '#38BDF8']
         });
-      } catch {}
+      } catch { }
     });
   }
 
@@ -281,12 +290,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const targetIds = [
         'story-launch',
         'story-identity',
-        'story-sapphire',
         'story-dial',
         'story-movement',
-        'story-rotor',
         'story-exploded',
-        'specs-dossier'
+        'story-engine',
+        'story-rotor',
+        'story-studio'
       ];
       const el = document.getElementById(targetIds[stepIdx]);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -310,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const containerHeight = narrativeEl ? narrativeEl.offsetHeight : document.documentElement.scrollHeight;
     const maxScroll = Math.max(containerHeight - window.innerHeight, 1);
     const scrollProgress = Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
-    const isCompleted = scrollProgress >= 0.82;
+    const isCompleted = scrollProgress >= 0.86;
     document.body.classList.toggle('story-completed', isCompleted);
   }
   window.addEventListener('scroll', handleScrollUI, { passive: true });
@@ -342,7 +351,74 @@ function initScrollAnimations() {
 
   revealElements.forEach(el => observer.observe(el));
 
-  // Story step observer for individual directional animations
+  // Dynamic Kinetic Chapter Content Mapping
+  const CHAPTER_CONTENT = {
+    'story-launch': {
+      num: 'I',
+      eyebrow: 'NEPAL OBSERVATORY HOROLOGY',
+      title: 'ALUNA',
+      subtitle: 'CELESTIAL CHRONOMETER',
+      telemetry: 'RA 05h 35m 17s • DEC -05° 23\' 28" • 40.0 MM CALIBRE'
+    },
+    'story-title': {
+      num: 'I',
+      eyebrow: 'IN-HOUSE AUTOMATIC CALIBRE',
+      title: 'ALUNA',
+      subtitle: 'CALIBRE A3016',
+      telemetry: '28,800 VPH • 4 HZ FREQUENCY • 26 SYNTHETIC RUBIES'
+    },
+    'story-identity': {
+      num: 'II',
+      eyebrow: 'METALLURGIC FORGING',
+      title: 'BRONZE',
+      subtitle: 'ANTIQUE SCULPTED FLANKS',
+      telemetry: 'DAMASCUS STEEL BEZEL • HAND-ENGRAVED CONSTELLATIONS'
+    },
+    'story-dial': {
+      num: 'III',
+      eyebrow: 'QUAD COMPLICATIONS SKELETON',
+      title: 'QUAD-DIAL',
+      subtitle: 'FOUR ASTRONOMICAL CIRCLES',
+      telemetry: 'LAPIS HOURS • MINUTE RING • SUN & MOON • 60s TOURBILLON'
+    },
+    'story-movement': {
+      num: 'IV',
+      eyebrow: 'PLANE BACKPLATE ARCHITECTURE',
+      title: 'CASEBACK',
+      subtitle: 'SOLID HERMETIC SHIELD',
+      telemetry: '10 ATM / 100M WATER RESISTANT • THREADED CASEBACK'
+    },
+    'story-exploded': {
+      num: 'V',
+      eyebrow: 'DECONSTRUCTED CALIBRE A3016',
+      title: 'CALIBRE',
+      subtitle: '7 MODULAR ASSEMBLIES',
+      telemetry: 'EXPANDED SUSPENSION • CASCADING SKELETONIZED GEAR TRAIN'
+    },
+    'story-engine': {
+      num: 'V-B',
+      eyebrow: 'CALIBRE A3016 ISOLATION',
+      title: 'ENGINE',
+      subtitle: 'FLYING TOURBILLON HEART',
+      telemetry: 'SAPPHIRE MAINPLATE • 26 SYNTHETIC RUBIES • 4 HZ ESCAPEMENT'
+    },
+    'story-rotor': {
+      num: 'VI',
+      eyebrow: 'ERGONOMIC COLD-FORGED DRAPE',
+      title: 'BRACELET',
+      subtitle: '3-LINK ARTICULATED STEEL',
+      telemetry: '20MM TAPERED • BUTTERFLY DEPLOYANT MICRO-ADJUST'
+    },
+    'story-studio': {
+      num: 'VII',
+      eyebrow: 'OBSERVATORY STUDIO',
+      title: '360° ORBIT',
+      subtitle: 'FREE TIMEPIECE INSPECTION',
+      telemetry: 'DRAG TO ROTATE • HOVER PINS TO INSPECT'
+    }
+  };
+
+  // Story step observer for individual directional animations & kinetic text
   const stepObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       const stepId = entry.target.id;
@@ -351,15 +427,17 @@ function initScrollAnimations() {
         if (stepId === 'story-identity') document.body.classList.add('step-identity-active');
         if (stepId === 'story-dial') document.body.classList.add('step-dial-active');
         if (stepId === 'story-movement') document.body.classList.add('step-movement-active');
-        if (stepId === 'story-rotor') document.body.classList.add('step-rotor-active');
         if (stepId === 'story-exploded') document.body.classList.add('step-exploded-active');
+        if (stepId === 'story-engine') document.body.classList.add('step-engine-active');
+        if (stepId === 'story-rotor') document.body.classList.add('step-rotor-active');
       } else {
         entry.target.classList.remove('is--active');
         if (stepId === 'story-identity') document.body.classList.remove('step-identity-active');
         if (stepId === 'story-dial') document.body.classList.remove('step-dial-active');
         if (stepId === 'story-movement') document.body.classList.remove('step-movement-active');
-        if (stepId === 'story-rotor') document.body.classList.remove('step-rotor-active');
         if (stepId === 'story-exploded') document.body.classList.remove('step-exploded-active');
+        if (stepId === 'story-engine') document.body.classList.remove('step-engine-active');
+        if (stepId === 'story-rotor') document.body.classList.remove('step-rotor-active');
       }
     });
   }, {
@@ -384,7 +462,7 @@ function animateNumber(el) {
   function updateCount(currentTime) {
     const elapsed = currentTime - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    
+
     // Ease Out Cubic
     const ease = 1 - Math.pow(1 - progress, 3);
     const currentVal = Math.floor(target * ease);
@@ -408,10 +486,13 @@ function animateNumber(el) {
   requestAnimationFrame(updateCount);
 }
 
-// Subtle Hero & HUD Parallax
+// Subtle Astrolabe, Left/Right Framing Typography & HUD Parallax
 function initHeroParallax() {
   const editorial = document.querySelector('.hero-editorial-top');
   const hud = document.querySelector('.watch-hud-toolbar');
+  const astrolabe = document.querySelector('.astrolabe-svg');
+  const brandText = document.getElementById('giant-bg-text-brand');
+  const modelText = document.getElementById('giant-bg-text-model');
 
   window.addEventListener('mousemove', (e) => {
     const normX = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -422,6 +503,15 @@ function initHeroParallax() {
     }
     if (hud) {
       hud.style.transform = `translate3d(calc(-50% + ${normX * 8}px), ${normY * 5}px, 0)`;
+    }
+    if (astrolabe) {
+      astrolabe.style.transform = `translate3d(${normX * 14}px, ${normY * 10}px, 0) rotateX(${-normY * 4}deg) rotateY(${normX * 4}deg)`;
+    }
+    if (brandText) {
+      brandText.style.transform = `translate3d(${normX * 8}px, calc(-50% + ${normY * 6}px), 0)`;
+    }
+    if (modelText) {
+      modelText.style.transform = `translate3d(${normX * -8}px, calc(-50% + ${normY * 6}px), 0)`;
     }
   });
 }

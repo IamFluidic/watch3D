@@ -51,6 +51,51 @@ function createStudioEnvironment(renderer) {
   return envTexture;
 }
 
+const WATERMARK_CHAPTERS = {
+  'story-identity': {
+    num: '01',
+    eyebrow: 'METALLURGIC FORGING',
+    title: 'BRONZE',
+    subtitle: 'ANTIQUE SCULPTED FLANKS',
+    telemetry: 'DAMASCUS STEEL BEZEL • HAND-ENGRAVED CONSTELLATIONS'
+  },
+  'story-dial': {
+    num: '02',
+    eyebrow: 'QUAD COMPLICATIONS SKELETON',
+    title: 'QUAD-DIAL',
+    subtitle: 'FOUR ASTRONOMICAL CIRCLES',
+    telemetry: 'LAPIS HOURS • MINUTE RING • SUN & MOON • 60s TOURBILLON'
+  },
+  'story-movement': {
+    num: '03',
+    eyebrow: 'PLANE BACKPLATE ARCHITECTURE',
+    title: 'CASEBACK',
+    subtitle: 'SOLID HERMETIC SHIELD',
+    telemetry: '10 ATM / 100M WATER RESISTANT • THREADED CASEBACK'
+  },
+  'story-exploded': {
+    num: '04',
+    eyebrow: 'DECONSTRUCTED CALIBRE A3016',
+    title: 'CALIBRE',
+    subtitle: '7 MODULAR ASSEMBLIES',
+    telemetry: 'EXPANDED SUSPENSION • CASCADING SKELETONIZED GEAR TRAIN'
+  },
+  'story-engine': {
+    num: '05',
+    eyebrow: 'CALIBRE A3016 ISOLATION',
+    title: 'ENGINE',
+    subtitle: 'FLYING TOURBILLON HEART',
+    telemetry: 'SAPPHIRE MAINPLATE • 26 SYNTHETIC RUBIES • 4 HZ ESCAPEMENT'
+  },
+  'story-rotor': {
+    num: '06',
+    eyebrow: 'ERGONOMIC COLD-FORGED DRAPE',
+    title: 'BRACELET',
+    subtitle: '3-LINK ARTICULATED STEEL',
+    telemetry: '20MM TAPERED • BUTTERFLY DEPLOYANT MICRO-ADJUST'
+  }
+};
+
 export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspots-overlay') {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -123,14 +168,46 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
   scene.add(shadowPlane);
 
   // Root Watch Anchor
+  let currentEdition = WATCH_EDITIONS[0];
+  let previewActive = false;
   const watchAnchor = new THREE.Group();
   scene.add(watchAnchor);
 
   // Build Initial 3D Watch (Steel Edition default)
-  let currentEdition = WATCH_EDITIONS[0];
-  let previewActive = false;
   const watchInstance = create3DWatch(currentEdition);
   watchAnchor.add(watchInstance.root);
+
+  // Flowing Celestial Stardust Particle Ribbons
+  const particleCount = 280;
+  const particleGeom = new THREE.BufferGeometry();
+  const particlePos = new Float32Array(particleCount * 3);
+  const particleColors = new Float32Array(particleCount * 3);
+
+  for (let i = 0; i < particleCount; i++) {
+    const angle = (i / particleCount) * Math.PI * 6;
+    const radius = 1.4 + (i / particleCount) * 1.8;
+    const z = (Math.random() - 0.5) * 1.6;
+    particlePos[i * 3]     = Math.cos(angle) * radius + (Math.random() - 0.5) * 0.4;
+    particlePos[i * 3 + 1] = Math.sin(angle) * radius + (Math.random() - 0.5) * 0.4;
+    particlePos[i * 3 + 2] = z;
+
+    const isGold = Math.random() > 0.4;
+    particleColors[i * 3]     = isGold ? 0.96 : 0.22;
+    particleColors[i * 3 + 1] = isGold ? 0.72 : 0.74;
+    particleColors[i * 3 + 2] = isGold ? 0.25 : 0.98;
+  }
+  particleGeom.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
+  particleGeom.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
+
+  const particleMat = new THREE.PointsMaterial({
+    size: 0.042,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.38,
+    blending: THREE.AdditiveBlending
+  });
+  const stardustParticles = new THREE.Points(particleGeom, particleMat);
+  watchAnchor.add(stardustParticles);
 
   // Initialize Exploded View Controller — passes layers + all individual explodable items
   // (4 clock circle subdials + every gear in all sub-layers with full 3D X,Y,Z offsets)
@@ -167,6 +244,7 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
   let rotorAngle = 0;
   let rotorVelocity = 0;
   let hasUserRotatedInFinale = false;
+  let activeWatermarkChapter = null;
 
   container.style.cursor = 'grab';
 
@@ -249,14 +327,15 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     scrollProgress = Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
 
     // Active narrative steps for 60fps luxury narrative with dedicated title showcase space
-    const isLaunch = scrollProgress < 0.05;
-    const isTitlePhase = scrollProgress >= 0.05 && scrollProgress < 0.16;
-    const isIdentity = scrollProgress >= 0.16 && scrollProgress < 0.29;
-    const isDial = scrollProgress >= 0.29 && scrollProgress < 0.42;
-    const isMovement = scrollProgress >= 0.42 && scrollProgress < 0.55;
-    const isExploded = scrollProgress >= 0.55 && scrollProgress < 0.68;
-    const isBracelet = scrollProgress >= 0.68 && scrollProgress < 0.82;
-    const isCompleted = scrollProgress >= 0.82;
+    const isLaunch = scrollProgress < 0.04;
+    const isTitlePhase = scrollProgress >= 0.04 && scrollProgress < 0.12;
+    const isIdentity = scrollProgress >= 0.12 && scrollProgress < 0.24;
+    const isDial = scrollProgress >= 0.24 && scrollProgress < 0.36;
+    const isMovement = scrollProgress >= 0.36 && scrollProgress < 0.48;
+    const isExploded = scrollProgress >= 0.48 && scrollProgress < 0.60;
+    const isEngine = scrollProgress >= 0.60 && scrollProgress < 0.72;
+    const isBracelet = scrollProgress >= 0.72 && scrollProgress < 0.86;
+    const isCompleted = scrollProgress >= 0.86;
 
     document.getElementById('story-launch')?.classList.toggle('is--active', isLaunch);
     document.getElementById('story-title')?.classList.toggle('is--active', isTitlePhase);
@@ -264,6 +343,7 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     document.getElementById('story-dial')?.classList.toggle('is--active', isDial);
     document.getElementById('story-movement')?.classList.toggle('is--active', isMovement);
     document.getElementById('story-exploded')?.classList.toggle('is--active', isExploded);
+    document.getElementById('story-engine')?.classList.toggle('is--active', isEngine);
     document.getElementById('story-rotor')?.classList.toggle('is--active', isBracelet);
     document.getElementById('story-studio')?.classList.toggle('is--active', isCompleted);
 
@@ -271,6 +351,7 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     document.body.classList.toggle('step-dial-active', isDial);
     document.body.classList.toggle('step-movement-active', isMovement);
     document.body.classList.toggle('step-exploded-active', isExploded);
+    document.body.classList.toggle('step-engine-active', isEngine);
     document.body.classList.toggle('step-bracelet-active', isBracelet);
     document.body.classList.toggle('story-completed', isCompleted);
 
@@ -323,36 +404,37 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     // ──────────────────────────────────────────────────────────────────────
 
     // Calculate scroll-driven vertical motion for each feature:
-    // Slowly comes from bottom (+65vh -> 0vh), rests at center (0vh), then moves to top (0vh -> -65vh)
+    // Slowly comes from bottom (+28vh -> 0vh), rests comfortably at center (0vh), then slowly moves to top (0vh -> -28vh)
     function calcFeatureMotion(progress, enterStart, enterEnd, exitStart, exitEnd) {
       if (progress < enterStart) {
-        return { y: 65, opacity: 0 };
+        return { y: 28, opacity: 0 };
       } else if (progress >= enterStart && progress < enterEnd) {
         const p = (progress - enterStart) / (enterEnd - enterStart);
-        const ease = 1 - Math.pow(1 - p, 2.5); // Smooth decelerating glide from bottom
+        const ease = Math.sin(p * Math.PI * 0.5); // Smooth sine ease-in: slow and gentle entrance
         return {
-          y: (1 - ease) * 65,
+          y: (1 - ease) * 28,
           opacity: ease
         };
       } else if (progress >= enterEnd && progress < exitStart) {
         return { y: 0, opacity: 1 };
       } else if (progress >= exitStart && progress < exitEnd) {
         const p = (progress - exitStart) / (exitEnd - exitStart);
-        const ease = Math.pow(p, 2.2); // Smooth accelerating glide up into top
+        const ease = Math.sin(p * Math.PI * 0.5); // Smooth sine ease-out: slow and gentle exit
         return {
-          y: -ease * 65,
-          opacity: Math.max(1 - p * 1.5, 0)
+          y: -ease * 28,
+          opacity: Math.max(1 - ease, 0)
         };
       } else {
-        return { y: -65, opacity: 0 };
+        return { y: -28, opacity: 0 };
       }
     }
 
-    const feat1 = calcFeatureMotion(scrollProgress, 0.16, 0.19, 0.26, 0.29);
-    const feat2 = calcFeatureMotion(scrollProgress, 0.29, 0.32, 0.39, 0.42);
-    const feat3 = calcFeatureMotion(scrollProgress, 0.42, 0.45, 0.52, 0.55);
-    const feat4 = calcFeatureMotion(scrollProgress, 0.55, 0.58, 0.65, 0.68);
-    const feat5 = calcFeatureMotion(scrollProgress, 0.68, 0.71, 0.78, 0.82);
+    const feat1 = calcFeatureMotion(scrollProgress, 0.13, 0.16, 0.21, 0.24);
+    const feat2 = calcFeatureMotion(scrollProgress, 0.25, 0.28, 0.33, 0.36);
+    const feat3 = calcFeatureMotion(scrollProgress, 0.37, 0.40, 0.45, 0.48);
+    const feat4 = calcFeatureMotion(scrollProgress, 0.49, 0.52, 0.57, 0.60);
+    const feat4b = calcFeatureMotion(scrollProgress, 0.61, 0.64, 0.69, 0.72);
+    const feat5 = calcFeatureMotion(scrollProgress, 0.73, 0.76, 0.82, 0.86);
 
     document.documentElement.style.setProperty('--feat1-y', `${feat1.y.toFixed(2)}vh`);
     document.documentElement.style.setProperty('--feat1-opacity', `${feat1.opacity.toFixed(3)}`);
@@ -366,8 +448,86 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     document.documentElement.style.setProperty('--feat4-y', `${feat4.y.toFixed(2)}vh`);
     document.documentElement.style.setProperty('--feat4-opacity', `${feat4.opacity.toFixed(3)}`);
 
+    document.documentElement.style.setProperty('--feat4b-y', `${feat4b.y.toFixed(2)}vh`);
+    document.documentElement.style.setProperty('--feat4b-opacity', `${feat4b.opacity.toFixed(3)}`);
+
     document.documentElement.style.setProperty('--feat5-y', `${feat5.y.toFixed(2)}vh`);
     document.documentElement.style.setProperty('--feat5-opacity', `${feat5.opacity.toFixed(3)}`);
+
+    // Dynamic Chapter Watermark Motion (Glides vertically past up like 60fps)
+    let currentChapter = null;
+    let chapterP = 0;
+
+    if (scrollProgress >= 0.12 && scrollProgress < 0.24) {
+      currentChapter = 'story-identity';
+      chapterP = (scrollProgress - 0.12) / 0.12;
+    } else if (scrollProgress >= 0.24 && scrollProgress < 0.36) {
+      currentChapter = 'story-dial';
+      chapterP = (scrollProgress - 0.24) / 0.12;
+    } else if (scrollProgress >= 0.36 && scrollProgress < 0.48) {
+      currentChapter = 'story-movement';
+      chapterP = (scrollProgress - 0.36) / 0.12;
+    } else if (scrollProgress >= 0.48 && scrollProgress < 0.60) {
+      currentChapter = 'story-exploded';
+      chapterP = (scrollProgress - 0.48) / 0.12;
+    } else if (scrollProgress >= 0.60 && scrollProgress < 0.72) {
+      currentChapter = 'story-engine';
+      chapterP = (scrollProgress - 0.60) / 0.12;
+    } else if (scrollProgress >= 0.72 && scrollProgress < 0.86) {
+      currentChapter = 'story-rotor';
+      chapterP = (scrollProgress - 0.72) / 0.14;
+    }
+
+    let watermarkX = 0;
+    let watermarkY = 0;
+    let watermarkOpacity = 0;
+
+    if (currentChapter) {
+      // Moves smoothly from right top (0vw) towards center top (-38vw) behind watch
+      watermarkX = -Math.sin(chapterP * Math.PI * 0.5) * 38;
+      watermarkY = chapterP * 6.0;
+
+      // Slow, luxurious fade in, wide plateau hold, slow fade out
+      if (chapterP < 0.28) {
+        // Slow fade in (0 -> 0.95 over first 28% of chapter scroll)
+        watermarkOpacity = Math.sin((chapterP / 0.28) * Math.PI * 0.5) * 0.95;
+      } else if (chapterP <= 0.65) {
+        // Generous plateau: stationary high visibility while traveling and reading
+        watermarkOpacity = 0.95;
+      } else {
+        // Slow fade out (0.95 -> 0 over the final 35% of chapter scroll)
+        const fadeP = (chapterP - 0.65) / 0.35;
+        watermarkOpacity = 0.95 * Math.cos(fadeP * Math.PI * 0.5);
+      }
+
+      if (activeWatermarkChapter !== currentChapter) {
+        activeWatermarkChapter = currentChapter;
+        const meta = WATERMARK_CHAPTERS[currentChapter];
+        if (meta) {
+          const numEl = document.getElementById('kcb-ch-num');
+          const pillEl = document.getElementById('kcb-vert-pill');
+          const eyeEl = document.getElementById('kcb-eyebrow');
+          const titleEl = document.getElementById('kcb-title');
+          const subEl = document.getElementById('kcb-subtitle');
+          const coordEl = document.getElementById('kcb-vert-coord');
+          const telemEl = document.getElementById('kcb-telemetry');
+
+          if (numEl) numEl.textContent = meta.num;
+          if (pillEl) pillEl.textContent = `CH. ${meta.num}`;
+          if (eyeEl) eyeEl.textContent = meta.eyebrow;
+          if (titleEl) titleEl.textContent = meta.title;
+          if (subEl) subEl.textContent = meta.subtitle;
+          if (coordEl) coordEl.textContent = meta.telemetry.split(' • ')[0];
+          if (telemEl) {
+            telemEl.innerHTML = meta.telemetry.split(' • ').map(t => `<span class="kcb-coord">${t}</span>`).join('<span class="kcb-sep">•</span>');
+          }
+        }
+      }
+    }
+
+    document.documentElement.style.setProperty('--watermark-x', `${watermarkX.toFixed(2)}vw`);
+    document.documentElement.style.setProperty('--watermark-y', `${watermarkY.toFixed(2)}vh`);
+    document.documentElement.style.setProperty('--watermark-opacity', `${watermarkOpacity.toFixed(3)}`);
 
     // Dynamic dark mode during Mechanical Heart movement view
     document.body.classList.toggle('is--night-mode', isMovement);
@@ -591,66 +751,82 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     rotorAngle += rotorVelocity;
     watchInstance.rotor.rotation.z = rotorAngle;
 
-    // 4. Scroll-Driven 3D Choreography (when not manually dragging)
+    // 4. Scroll-Driven 3D Choreography (incorporating full suite of post-exploded stages)
     if (!isDragging) {
-      if (scrollProgress < 0.16) {
-        // Step 0 & 0B: Pristine Watch Launch (Watch faces camera upright during launch, bg fade, and title entrance/exit)
+      if (scrollProgress < 0.12) {
+        // Step 0 & 0B: Pristine Watch Launch
         targetRotX = 0.0;
         targetRotY = 0.0;
         targetZoom = 9.2;
         targetPosX = 0;
         if (!manualExplode) explodedController.setExploded(false);
-      } else if (scrollProgress >= 0.16 && scrollProgress < 0.29) {
+      } else if (scrollProgress >= 0.12 && scrollProgress < 0.24) {
         // Step 1: Case & Finishes (Feature 01)
-        const p = (scrollProgress - 0.16) / 0.13;
-        targetRotX = 0.0 + p * 0.12;
-        targetRotY = 0.0 - 0.58 * p;
-        targetZoom = 9.2 + p * 0.8;
+        const p = (scrollProgress - 0.12) / 0.12;
+        targetRotX = 0.18 * p;
+        targetRotY = -0.65 * p;
+        targetZoom = 9.2 * (1 - p) + 10.0 * p;
         targetPosX = window.innerWidth > 900 ? 1.3 : 0;
         if (!manualExplode) explodedController.setExploded(false);
-      } else if (scrollProgress >= 0.29 && scrollProgress < 0.42) {
-        // Step 2: Refined Dial & Pointers (Feature 02)
-        const p = (scrollProgress - 0.29) / 0.13;
-        targetRotX = 0.12 * (1 - p) + 0.01 * p;
-        targetRotY = -0.58 * (1 - p) + 0.06 * p;
+      } else if (scrollProgress >= 0.24 && scrollProgress < 0.36) {
+        // Step 2: Refined Dial & Quad Complications (Feature 02)
+        const p = (scrollProgress - 0.24) / 0.12;
+        targetRotX = 0.18 * (1 - p) + 0.01 * p;
+        targetRotY = -0.65 * (1 - p) + 0.04 * p;
         targetZoom = 10.0 * (1 - p) + 6.8 * p;
         targetPosX = window.innerWidth > 900 ? 1.3 : 0;
         if (!manualExplode) explodedController.setExploded(false);
-      } else if (scrollProgress >= 0.42 && scrollProgress < 0.55) {
+      } else if (scrollProgress >= 0.36 && scrollProgress < 0.48) {
         // Step 3: Flat Plane Steel Caseback (Feature 03)
-        const p = (scrollProgress - 0.42) / 0.13;
+        const p = (scrollProgress - 0.36) / 0.12;
         targetRotX = 0.01 * (1 - p) + 0.02 * p;
-        targetRotY = 0.06 * (1 - p) + Math.PI * p; // Full 180° rotation
+        targetRotY = 0.04 * (1 - p) + Math.PI * p; // Full 180° rotation
         targetZoom = 6.8 * (1 - p) + 7.6 * p;
         targetPosX = window.innerWidth > 900 ? 1.3 : 0;
         rotorVelocity += 0.02;
         if (!manualExplode) explodedController.setExploded(false);
-      } else if (scrollProgress >= 0.55 && scrollProgress < 0.68) {
-        // Step 4: Deconstructed Architecture (Feature 04) - reveals gears beneath dial face
-        const p = (scrollProgress - 0.55) / 0.13;
-        targetRotX = 0.02 * (1 - p) + 0.32 * p;
-        targetRotY = Math.PI * (1 - p) + (Math.PI * 2 - 0.60) * p;
+      } else if (scrollProgress >= 0.48 && scrollProgress < 0.60) {
+        // Step 4: Deconstructed Calibre Layers (Exploded View)
+        const p = (scrollProgress - 0.48) / 0.12;
+        targetRotX = 0.02 * (1 - p) + 0.30 * p;
+        targetRotY = Math.PI * (1 - p) + (Math.PI * 2 - 0.55) * p;
         targetZoom = 7.6 * (1 - p) + 13.0 * p;
         targetPosX = window.innerWidth > 900 ? 1.3 : 0;
         explodedController.targetProgress = Math.max(p, manualExplode ? 1 : 0);
-      } else if (scrollProgress >= 0.68 && scrollProgress < 0.82) {
-        // Step 5: Sculpted 3-Link Bracelet (Feature 05)
-        const p = (scrollProgress - 0.68) / 0.14;
-        targetRotX = 0.32 * (1 - p) + 0.10 * p;
-        targetRotY = (Math.PI * 2 - 0.60) * (1 - p) + (Math.PI * 2) * p;
-        targetZoom = 13.0 * (1 - p) + 7.8 * p;
+      } else if (scrollProgress >= 0.60 && scrollProgress < 0.72) {
+        // Step 4B: The Celestial Engine (Calibre & Movement Isolation)
+        const p = (scrollProgress - 0.60) / 0.12;
+        targetRotX = 0.30 * (1 - p) + 0.22 * p;
+        targetRotY = (Math.PI * 2 - 0.55) * (1 - p) + (Math.PI * 2 + 0.35) * p;
+        targetZoom = 13.0 * (1 - p) + 6.2 * p;
+        targetPosX = window.innerWidth > 900 ? 1.2 : 0;
+        explodedController.targetProgress = Math.max(1 - p * 0.8, manualExplode ? 1 : 0);
+        if (particleMat) particleMat.opacity = 0.38 + 0.40 * p;
+      } else if (scrollProgress >= 0.72 && scrollProgress < 0.86) {
+        // Step 5: Sculpted 3-Link Bracelet & Slim Profile
+        const p = (scrollProgress - 0.72) / 0.14;
+        targetRotX = 0.22 * (1 - p) + 0.08 * p;
+        targetRotY = (Math.PI * 2 + 0.35) * (1 - p) + (Math.PI * 2.5 - 0.18) * p;
+        targetZoom = 6.2 * (1 - p) + 7.8 * p;
         targetPosX = window.innerWidth > 900 ? 1.3 : 0;
         explodedController.targetProgress = 0;
+        if (particleMat) particleMat.opacity = 0.38;
       } else {
-        // Step 6: Finale / Free Orbit Showcase
+        // Finale: 360° Free Orbit & Four Editions Gallery Showcase
         targetPosX = 0;
         if (!hasUserRotatedInFinale) {
           targetRotX = 0.15;
           targetRotY += delta * 0.25; // Gentle majestic idle spin
-          targetZoom = 10.0;
+          targetZoom = 9.8;
         }
         explodedController.targetProgress = manualExplode ? 1 : 0;
       }
+    }
+
+    // Animate Celestial Stardust Particles
+    if (stardustParticles) {
+      stardustParticles.rotation.z += delta * 0.12;
+      stardustParticles.rotation.y += delta * 0.06;
     }
 
     // Toggle Launch Scroll Cue visibility based on scroll
@@ -667,10 +843,11 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     explodedController.update(delta);
 
     // Smooth inertia camera/rotation damping
-    rotX += (targetRotX - rotX) * 0.08;
-    rotY += (targetRotY - rotY) * 0.08;
-    posX += (targetPosX - posX) * 0.08;
-    currentZoom += (targetZoom - currentZoom) * 0.08;
+    // Adjusted to 0.042 for stately, majestic horological rotation speed matching slow text pacing
+    rotX += (targetRotX - rotX) * 0.042;
+    rotY += (targetRotY - rotY) * 0.042;
+    posX += (targetPosX - posX) * 0.042;
+    currentZoom += (targetZoom - currentZoom) * 0.042;
 
     watchAnchor.rotation.x = rotX;
     watchAnchor.rotation.y = rotY;
@@ -695,13 +872,14 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
   function updateScrollTimeline(progress) {
     const chapters = document.querySelectorAll('.vertical-timeline-tracker .timeline-step');
     let activeIdx = 0;
-    if (progress >= 0.05 && progress < 0.16) activeIdx = 1;
-    else if (progress >= 0.16 && progress < 0.29) activeIdx = 2;
-    else if (progress >= 0.29 && progress < 0.42) activeIdx = 3;
-    else if (progress >= 0.42 && progress < 0.55) activeIdx = 4;
-    else if (progress >= 0.55 && progress < 0.68) activeIdx = 5;
-    else if (progress >= 0.68 && progress < 0.82) activeIdx = 6;
-    else if (progress >= 0.82) activeIdx = 7;
+    if (progress >= 0.04 && progress < 0.12) activeIdx = 0;
+    else if (progress >= 0.12 && progress < 0.24) activeIdx = 1;
+    else if (progress >= 0.24 && progress < 0.36) activeIdx = 2;
+    else if (progress >= 0.36 && progress < 0.48) activeIdx = 3;
+    else if (progress >= 0.48 && progress < 0.60) activeIdx = 4;
+    else if (progress >= 0.60 && progress < 0.72) activeIdx = 5;
+    else if (progress >= 0.72 && progress < 0.86) activeIdx = 6;
+    else if (progress >= 0.86) activeIdx = 7;
 
     chapters.forEach((ch, idx) => {
       ch.classList.toggle('is--active', idx === activeIdx);
@@ -785,6 +963,80 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
       targetRotX = targetX;
       targetRotY = targetY;
       targetZoom = zoom;
+    },
+    focusComplication(complicationId) {
+      hasUserRotatedInFinale = true;
+      if (complicationId === 'hours') {
+        targetRotX = 0.05;
+        targetRotY = 0.32;
+        targetZoom = 5.4;
+        targetPosX = 0.85;
+      } else if (complicationId === 'minutes') {
+        targetRotX = -0.32;
+        targetRotY = 0.0;
+        targetZoom = 5.2;
+        targetPosX = 0.0;
+      } else if (complicationId === 'daynight') {
+        targetRotX = 0.05;
+        targetRotY = -0.32;
+        targetZoom = 5.4;
+        targetPosX = -0.85;
+      } else if (complicationId === 'tourbillon') {
+        targetRotX = 0.32;
+        targetRotY = 0.0;
+        targetZoom = 5.2;
+        targetPosX = 0.0;
+      } else {
+        // 'reset'
+        targetRotX = 0.15;
+        targetRotY = -0.25;
+        targetZoom = 9.2;
+        targetPosX = 0.0;
+      }
+    },
+    focusExplodedLayer(layerId) {
+      hasUserRotatedInFinale = true;
+      if (!explodedController.isExploded) {
+        explodedController.setExploded(true);
+        manualExplode = true;
+      }
+      targetRotX = 0.18;
+      targetRotY = 0.82;
+      targetZoom = 12.0;
+      targetPosX = 0.5;
+
+      const group = watchInstance.layers[layerId];
+      if (group) {
+        const origScale = group.scale.clone();
+        group.scale.multiplyScalar(1.08);
+        setTimeout(() => {
+          group.scale.copy(origScale);
+        }, 350);
+      }
+    },
+    focusComponent(componentId) {
+      hasUserRotatedInFinale = true;
+      if (componentId === 'dial') {
+        targetRotX = 0; targetRotY = 0; targetZoom = 6.2; targetPosX = 0;
+      } else if (componentId === 'hands') {
+        targetRotX = 0.12; targetRotY = 0.15; targetZoom = 5.2; targetPosX = 0;
+      } else if (componentId === 'crystal') {
+        targetRotX = 0.35; targetRotY = -0.4; targetZoom = 7.5; targetPosX = 0;
+      } else if (componentId === 'bezel') {
+        targetRotX = 0.28; targetRotY = 0.3; targetZoom = 6.8; targetPosX = 0;
+      } else if (componentId === 'case') {
+        targetRotX = 0.05; targetRotY = -Math.PI / 2.2; targetZoom = 7.8; targetPosX = 0;
+      } else if (componentId === 'movement') {
+        targetRotX = 0.22; targetRotY = Math.PI * 2 + 0.35; targetZoom = 6.4; targetPosX = 0;
+      } else if (componentId === 'strap') {
+        targetRotX = 0.35; targetRotY = 0; targetZoom = 8.5; targetPosX = 0;
+      } else if (componentId === 'clasp') {
+        targetRotX = 0; targetRotY = Math.PI; targetZoom = 7.2; targetPosX = 0;
+      } else if (componentId === 'crown') {
+        targetRotX = 0.1; targetRotY = -Math.PI / 2.3; targetZoom = 6.0; targetPosX = -0.8;
+      } else {
+        targetRotX = 0.15; targetRotY = -0.25; targetZoom = 9.2; targetPosX = 0;
+      }
     },
     destroy() {
       running = false;

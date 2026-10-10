@@ -50,8 +50,8 @@ export class WatchExplodedController {
   }
 
   update(dt = 0.016) {
-    // Smooth lerp towards target
-    const factor = 0.08;
+    // Smooth lerp towards target with slow, luxurious horological damping
+    const factor = 0.04;
     this.progress += (this.targetProgress - this.progress) * factor;
 
     // 1. LAYER SEPARATION: Move the macro layers (sapphire, bezel, dial, gears…) along Z
