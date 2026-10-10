@@ -16,7 +16,8 @@ import {
   createPowerReserveTexture,
   createMoonPhaseMaskTexture,
   createSkeletonMovementPlateTexture,
-  createAstronomicalMovementTexture
+  createAstronomicalMovementTexture,
+  createSecondsRingTexture
 } from './watchTextureGenerator.js';
 
 export function create3DWatch(edition) {
@@ -64,6 +65,12 @@ export function create3DWatch(edition) {
       roughness: 0.28,
       metalness: 0.30,
       envMapIntensity: 1.0
+    }),
+    secondsRing: new THREE.MeshStandardMaterial({
+      map: createSecondsRingTexture(edition),
+      roughness: 0.28,
+      metalness: 0.32,
+      envMapIntensity: 1.2
     }),
     sunMoon: new THREE.MeshStandardMaterial({
       map: createSunMoonTexture(),
@@ -844,6 +851,19 @@ export function create3DWatch(edition) {
   const tourbillonGoldRim = new THREE.Mesh(new THREE.TorusGeometry(tourbR - 0.07, 0.022, 16, 64), materials.roseBridge);
   tourbillonGroup.add(tourbillonGoldRim);
 
+  // 60-Second Chronometer Chapter Ring (transforms the 4th circle into a meaningful 60s complication)
+  const secOuterR = tourbR - 0.01;
+  const secInnerR = 0.58;
+  const secondsRingGeom = new THREE.RingGeometry(secInnerR, secOuterR, 64);
+  const secondsRingMesh = new THREE.Mesh(secondsRingGeom, materials.secondsRing);
+  secondsRingMesh.position.z = 0.024;
+  tourbillonGroup.add(secondsRingMesh);
+
+  // Inner beveled retaining ring framing the open-heart flying tourbillon aperture
+  const secondsInnerRim = new THREE.Mesh(new THREE.TorusGeometry(secInnerR, 0.018, 16, 64), materials.roseBridge);
+  secondsInnerRim.position.z = 0.026;
+  tourbillonGroup.add(secondsInnerRim);
+
   // --- Active Showcase Interlocking Gears ---
   const showcaseGear1 = makeVisibleGear(-0.28, 0.16, 0.010, 0.28, 20, 3);
   tourbillonGroup.add(showcaseGear1);
@@ -907,24 +927,65 @@ export function create3DWatch(edition) {
   addRubyChaton(tourbillonCageGroup, 0, 0, 0.040, 0.10, 0.060);
   tourbillonGroup.add(tourbillonCageGroup);
 
-  // Fixed Rose-Gold Sweeping Bridges Holding the Tourbillon
-  const roseTourbBridgeCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.72, 0.34, 0.04),
-    new THREE.Vector3(0.0, 0.52, 0.052),
-    new THREE.Vector3(0.72, 0.34, 0.04)
-  ]);
-  const roseTourbBridgeGeom = new THREE.TubeGeometry(roseTourbBridgeCurve, 28, 0.044, 12, false);
-  const roseTourbBridgeMesh = new THREE.Mesh(roseTourbBridgeGeom, materials.roseBridge);
-  tourbillonGroup.add(roseTourbBridgeMesh);
+  // 4. Dedicated 60-Second Real-Time Sweeping Seconds Hand
+  // (Curved rod bridge and screws removed per user request; replaced with precision seconds hand)
+  const tourbillonSecondsHand = new THREE.Group();
+  tourbillonSecondsHand.position.z = 0.046;
 
-  // Curved Lower-Right Bridge Plaque with Inscription: "MANUFACTURE EN SUISSE - GENEVE"
-  const plaqueArcGeom = new THREE.RingGeometry(tourbR - 0.14, tourbR - 0.03, 32, 1, -Math.PI * 0.42, 0.65);
-  const plaqueArcMesh = new THREE.Mesh(plaqueArcGeom, materials.swissPlaque);
-  plaqueArcMesh.position.z = 0.038;
-  tourbillonGroup.add(plaqueArcMesh);
+  // Slender needle reaching to the 60-second perimeter track
+  const secNeedleShape = new THREE.Shape();
+  secNeedleShape.moveTo(-0.014, 0.0);
+  secNeedleShape.lineTo(-0.010, 0.55);
+  secNeedleShape.lineTo(-0.032, 0.58);
+  secNeedleShape.lineTo(0.0, 0.76); // Crisp arrow tip at 60s track
+  secNeedleShape.lineTo(0.032, 0.58);
+  secNeedleShape.lineTo(0.010, 0.55);
+  secNeedleShape.lineTo(0.014, 0.0);
+  secNeedleShape.closePath();
 
-  addBluedScrew(tourbillonGroup, -0.70, 0.34, 0.052);
-  addBluedScrew(tourbillonGroup, 0.70, 0.34, 0.052);
+  const secNeedleGeom = new THREE.ExtrudeGeometry(secNeedleShape, {
+    depth: 0.014,
+    bevelEnabled: true,
+    bevelSegments: 1,
+    steps: 1,
+    bevelSize: 0.003,
+    bevelThickness: 0.003
+  });
+  const secNeedleMesh = new THREE.Mesh(secNeedleGeom, materials.secondsHand);
+  tourbillonSecondsHand.add(secNeedleMesh);
+
+  // Counterbalance tail
+  const secTailShape = new THREE.Shape();
+  secTailShape.moveTo(-0.016, 0.0);
+  secTailShape.lineTo(-0.014, -0.18);
+  secTailShape.lineTo(0.0, -0.24);
+  secTailShape.lineTo(0.014, -0.18);
+  secTailShape.lineTo(0.016, 0.0);
+  secTailShape.closePath();
+  const secTailMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(secTailShape, { depth: 0.014, bevelEnabled: false }), materials.secondsHand);
+  tourbillonSecondsHand.add(secTailMesh);
+
+  // Crescent counterweight ring
+  const crescentGeom = new THREE.TorusGeometry(0.062, 0.014, 16, 32);
+  const crescentMesh = new THREE.Mesh(crescentGeom, materials.hands);
+  crescentMesh.position.set(0, -0.15, 0.007);
+  tourbillonSecondsHand.add(crescentMesh);
+
+  // Center golden chaton cap
+  const secCapGeom = new THREE.CylinderGeometry(0.038, 0.038, 0.022, 16);
+  const secCapMesh = new THREE.Mesh(secCapGeom, materials.chatonGold);
+  secCapMesh.rotation.x = Math.PI / 2;
+  secCapMesh.position.z = 0.012;
+  tourbillonSecondsHand.add(secCapMesh);
+
+  // Center ruby jewel
+  const secRubyGeom = new THREE.CylinderGeometry(0.022, 0.022, 0.026, 16);
+  const secRubyMesh = new THREE.Mesh(secRubyGeom, materials.rubyGem);
+  secRubyMesh.rotation.x = Math.PI / 2;
+  secRubyMesh.position.z = 0.016;
+  tourbillonSecondsHand.add(secRubyMesh);
+
+  tourbillonGroup.add(tourbillonSecondsHand);
 
   dialGroup.add(tourbillonGroup);
 
@@ -1669,6 +1730,7 @@ export function create3DWatch(edition) {
     lapisHourHand: lapisHandGroup,
     minuteRubyIndicator: minuteRubyCarrier,
     sunMoonDisc: moonDiscMesh,
+    tourbillonSecondsHand: tourbillonSecondsHand,
     hourGears: {
       drive: hourDriveGear,
       intermediate: hourIntermediateGear,
@@ -1732,6 +1794,9 @@ export function create3DWatch(edition) {
 
       materials.dial.map = createDialTexture(newEdition);
       materials.dial.map.needsUpdate = true;
+
+      materials.secondsRing.map = createSecondsRingTexture(newEdition);
+      materials.secondsRing.map.needsUpdate = true;
 
       materials.hands.color.set(newEdition.handsColor);
       materials.secondsHand.color.set(newEdition.accentColor || '#38BDF8');

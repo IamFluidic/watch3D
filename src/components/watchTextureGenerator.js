@@ -1141,6 +1141,133 @@ export function createMinuteRingTexture() {
 }
 
 /**
+ * 60-Second Chronometer & Flying Tourbillon Seconds Chapter Ring (6 o'clock position)
+ * - Deep midnight / satin enamel finish with precision 60-second railway track
+ * - Arabic second numerals (60, 05, 10, ... 55) and star markers
+ */
+export function createSecondsRingTexture(edition) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+  const cx = 512, cy = 512;
+  const outerR = 500, innerR = 345;
+
+  // Background ring gradient
+  const ringGrad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
+  if (edition?.id === 'rose') {
+    ringGrad.addColorStop(0, '#E8C5A8');
+    ringGrad.addColorStop(0.5, '#F5DAC0');
+    ringGrad.addColorStop(1, '#D8A783');
+  } else if (edition?.id === 'dlc') {
+    ringGrad.addColorStop(0, '#090B12');
+    ringGrad.addColorStop(0.5, '#141824');
+    ringGrad.addColorStop(1, '#05070B');
+  } else {
+    // Celestial Alchemist deep midnight ultramarine enamel
+    ringGrad.addColorStop(0, '#0A1E44');
+    ringGrad.addColorStop(0.5, '#0E2858');
+    ringGrad.addColorStop(1, '#05112B');
+  }
+  ctx.fillStyle = ringGrad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+  ctx.arc(cx, cy, innerR, 0, Math.PI * 2, true);
+  ctx.fill();
+
+  // Circular satin brushing
+  ctx.save();
+  ctx.translate(cx, cy);
+  for (let r = innerR + 2; r < outerR - 2; r += 2.0) {
+    const alpha = 0.04 + Math.random() * 0.08;
+    ctx.strokeStyle = Math.random() > 0.5 ? `rgba(255, 255, 255, ${alpha})` : `rgba(0, 0, 0, ${alpha * 1.5})`;
+    ctx.lineWidth = 1.0;
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // Dual Railway track borders
+  const trackColor = (edition?.id === 'rose') ? '#050201' : '#F8FAFC';
+  const trackGold = '#F59E0B';
+  ctx.strokeStyle = trackColor;
+  ctx.lineWidth = 3.5;
+  ctx.beginPath();
+  ctx.arc(0, 0, outerR - 8, 0, Math.PI * 2);
+  ctx.arc(0, 0, outerR - 38, 0, Math.PI * 2);
+  ctx.arc(0, 0, innerR + 8, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // 60-Second Ticks
+  for (let s = 0; s < 60; s++) {
+    const rad = (s * Math.PI * 2) / 60;
+    const isFive = s % 5 === 0;
+    const isMajor = s % 15 === 0;
+
+    ctx.strokeStyle = isMajor ? trackGold : (isFive ? trackColor : ((edition?.id === 'rose') ? 'rgba(5,2,1,0.65)' : 'rgba(255,255,255,0.65)'));
+    ctx.lineWidth = isMajor ? 5.0 : (isFive ? 3.5 : 1.8);
+    const r1 = outerR - 8;
+    const r2 = isFive ? outerR - 38 : outerR - 24;
+
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(rad) * r1, Math.sin(rad) * r1);
+    ctx.lineTo(Math.cos(rad) * r2, Math.sin(rad) * r2);
+    ctx.stroke();
+  }
+
+  // Arabic Second Numerals (60, 05, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55)
+  const secondNumbers = ['60', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'];
+  ctx.font = '900 52px "Space Mono", "Arial Black", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  secondNumbers.forEach((num, idx) => {
+    const angle = (idx * 30 * Math.PI) / 180;
+    const nr = (outerR + innerR) / 2 - 8;
+    const nx = Math.cos(angle - Math.PI / 2) * nr;
+    const ny = Math.sin(angle - Math.PI / 2) * nr;
+
+    ctx.save();
+    ctx.translate(nx, ny);
+    let rot = angle;
+    if (rot > Math.PI * 0.55 && rot < Math.PI * 1.45) {
+      rot += Math.PI;
+    }
+    ctx.rotate(rot);
+
+    ctx.fillStyle = (num === '60' || num === '30') ? trackGold : trackColor;
+    ctx.fillText(num, 0, 0);
+    ctx.restore();
+  });
+
+  // Small stars at 15, 30, 45, 60
+  [0, Math.PI / 2, Math.PI, Math.PI * 1.5].forEach(ang => {
+    const starR = innerR + 24;
+    const sx = Math.cos(ang - Math.PI / 2) * starR;
+    const sy = Math.sin(ang - Math.PI / 2) * starR;
+    ctx.fillStyle = '#F59E0B';
+    ctx.beginPath();
+    ctx.arc(sx, sy, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Inner & outer bevel borders
+  ctx.strokeStyle = trackGold;
+  ctx.lineWidth = 2.0;
+  ctx.beginPath();
+  ctx.arc(0, 0, outerR - 4, 0, Math.PI * 2);
+  ctx.arc(0, 0, innerR + 4, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.restore();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 16;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
  * Astronomical Celestial Sun & Moonphase Texture (at 2:30 o'clock position)
  * - Deep starry midnight disc
  * - Blazing golden radiant sun with curved flame rays

@@ -544,6 +544,11 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
       watchInstance.tourbillon.rotation.z = -secondAngle * 2.5;
     }
 
+    // 60-Second Real-Time Chronometer Seconds Hand (Sweeps 0..60s in the 4th complication circle)
+    if (watchInstance.tourbillonSecondsHand) {
+      watchInstance.tourbillonSecondsHand.rotation.z = secondAngle;
+    }
+
     // 5. Back Gear Layer & Motion Works Wheel Synchronization
     if (watchInstance.gears) {
       if (watchInstance.gears.fourthWheel) {
