@@ -75,7 +75,7 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.55; // Higher exposure — lifts metallic specular highlights off the black
+  renderer.toneMappingExposure = 1.20; // Balanced exposure — reveals warm antique bronze, deep lapis, and rich dark slate
 
   // Set Studio Environment Map for Realistic PBR Specular Reflections
   const studioEnv = createStudioEnvironment(renderer);
@@ -84,34 +84,33 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
   container.innerHTML = '';
   container.appendChild(renderer.domElement);
 
-  // Lighting System: Studio Softboxes (tuned for metallic black PBR)
-  // Reduced ambient so the deep black case has real depth and contrast
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+  // Lighting System: Studio Softboxes (tuned for soft diffused macro lighting and deep PBR contrast)
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
   scene.add(ambientLight);
 
-  // Direct front light onto dial face — brighter to separate hands from black dial
-  const dialFaceLight = new THREE.DirectionalLight(0xffffff, 3.2);
+  // Soft diffused front light onto dial face — highlights gold subdials and lapis depth without washing out dark plate
+  const dialFaceLight = new THREE.DirectionalLight(0xfff7ed, 0.85);
   dialFaceLight.position.set(0, 2, 9);
   scene.add(dialFaceLight);
 
-  // Strong top-left key light — creates crisp specular streak on black case bevel
-  const keyLight = new THREE.DirectionalLight(0xffffff, 3.8);
+  // Warm studio key light
+  const keyLight = new THREE.DirectionalLight(0xffedd5, 1.8);
   keyLight.position.set(6, 10, 8);
   keyLight.castShadow = true;
   scene.add(keyLight);
 
-  // Cool blue-tinted fill to give metallic black a multi-tone depth
-  const fillLight = new THREE.DirectionalLight(0xb8ceff, 1.2);
+  // Cool soft fill light to give deep metallic multi-tone depth
+  const fillLight = new THREE.DirectionalLight(0xcfd8e3, 0.75);
   fillLight.position.set(-8, -3, 5);
   scene.add(fillLight);
 
-  // Very strong white rim light — punches out the case silhouette against dark background
-  const rimLight = new THREE.DirectionalLight(0xffffff, 4.8);
+  // Studio rim light — punches out the case silhouette and bezel edges
+  const rimLight = new THREE.DirectionalLight(0xffffff, 2.8);
   rimLight.position.set(0, 10, -7);
   scene.add(rimLight);
 
-  // Secondary low-angle rim to catch bracelet link edges
-  const rimLight2 = new THREE.DirectionalLight(0xd0e4ff, 2.2);
+  // Secondary low-angle rim to catch case and crown chamfers
+  const rimLight2 = new THREE.DirectionalLight(0xd0e4ff, 1.4);
   rimLight2.position.set(-6, -8, -4);
   scene.add(rimLight2);
 
@@ -133,8 +132,9 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
   const watchInstance = create3DWatch(currentEdition);
   watchAnchor.add(watchInstance.root);
 
-  // Initialize Exploded View Controller
-  const explodedController = new WatchExplodedController(watchInstance.layers);
+  // Initialize Exploded View Controller — passes layers + all individual explodable items
+  // (4 clock circle subdials + every gear in all sub-layers with full 3D X,Y,Z offsets)
+  const explodedController = new WatchExplodedController(watchInstance.layers, watchInstance.explodableItems);
   let manualExplode = false;
   
   // Initialize 3D Hotspot Manager
@@ -420,52 +420,165 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     const date = new Date();
     const minutes = date.getMinutes() + secondsFraction / 60;
     const minuteAngle = -(minutes / 60) * Math.PI * 2;
-    watchInstance.hands.minute.rotation.z = minuteAngle;
+    if (watchInstance.hands && watchInstance.hands.minute) {
+      watchInstance.hands.minute.rotation.z = minuteAngle;
+    }
 
     const hours = (date.getHours() % 12) + minutes / 60;
     const hourAngle = -(hours / 12) * Math.PI * 2;
-    watchInstance.hands.hour.rotation.z = hourAngle;
+    if (watchInstance.hands && watchInstance.hands.hour) {
+      watchInstance.hands.hour.rotation.z = hourAngle;
+    }
 
-    // 1B. Synchronize Rotation of the Watch Hands Gears below the clock face:
-    // As the clock hands sweep, all driving gears dynamically and visibly rotate!
-    if (watchInstance.gears) {
-      if (watchInstance.gears.fourthWheel) {
-        // Fourth Wheel directly drives the continuous sweep seconds hand
-        watchInstance.gears.fourthWheel.rotation.z = secondAngle;
+    // =========================================================
+    // CASCADING MECHANICAL GEAR TRAIN (Authentic Horological Reduction Hierarchy)
+    // 1. Seconds gear train runs fastest (escapement / 6 o'clock showcase)
+    // 2. Seconds gear drives Minutes gear train (1/6 reduction ratio)
+    // 3. Minutes gear drives Hours gear train (1/4 reduction ratio)
+    // 4. Hours gear drives Day & Night gear train (1/2 reduction for 24-hr cycle)
+    // Every single gear has its own distinct speed and direction based on tooth pitch!
+    // =========================================================
+    const secVelocity = 1.8;
+    const minVelocity = secVelocity * (1 / 6);       // ~0.30 rad/sec
+    const hourVelocity = minVelocity * (1 / 4);      // ~0.075 rad/sec
+    const dayNightVelocity = hourVelocity * 0.5;     // ~0.0375 rad/sec (24-hr half-speed)
+
+    // 1. SECONDS / SHOWCASE GEAR TRAIN (Fastest - Bottom 6 o'clock)
+    if (watchInstance.showcaseGears) {
+      if (watchInstance.showcaseGears.gear1) {
+        watchInstance.showcaseGears.gear1.rotation.z += delta * secVelocity;
       }
-      if (watchInstance.gears.escapeWheel) {
-        // Escapement wheel high-speed 4Hz spin driven by train
-        watchInstance.gears.escapeWheel.rotation.z = secondAngle * 8.0;
+      if (watchInstance.showcaseGears.gear2) {
+        watchInstance.showcaseGears.gear2.rotation.z -= delta * secVelocity * (20 / 18);
       }
-      if (watchInstance.gears.palletFork) {
-        // Pallet fork lever rocking at 4Hz
-        watchInstance.gears.palletFork.rotation.z = Math.sin(now * 0.025) * 0.35;
-      }
-      if (watchInstance.gears.thirdWheel) {
-        // Third wheel intermediate counter-rotation
-        watchInstance.gears.thirdWheel.rotation.z = -secondAngle * 1.6;
-      }
-      if (watchInstance.gears.minuteWheel) {
-        // Minute wheel motion works reduction gear
-        watchInstance.gears.minuteWheel.rotation.z = -secondAngle * 0.45;
-      }
-      if (watchInstance.gears.cannonPinion) {
-        // Center cannon pinion driving minute hand
-        watchInstance.gears.cannonPinion.rotation.z = secondAngle * 0.25;
-      }
-      if (watchInstance.gears.hourWheel) {
-        // Hour wheel driving hour hand
-        watchInstance.gears.hourWheel.rotation.z = secondAngle * 0.08;
+      if (watchInstance.showcaseGears.gear3) {
+        watchInstance.showcaseGears.gear3.rotation.z += delta * secVelocity * (20 / 14);
       }
     }
 
-    // 2. High-Frequency Balance Wheel Oscillation (4Hz / 8 beats per second)
-    const balanceBeat = Math.sin(now * 0.025) * 0.55;
-    watchInstance.balanceWheel.rotation.z = balanceBeat;
+    // 2. MINUTES GEAR TRAIN (Driven by Seconds - Top 12 o'clock)
+    if (watchInstance.minuteRubyIndicator) {
+      watchInstance.minuteRubyIndicator.rotation.z = minuteAngle;
+    }
+    if (watchInstance.minuteGears) {
+      if (watchInstance.minuteGears.center) {
+        watchInstance.minuteGears.center.rotation.z += delta * minVelocity;
+      }
+      if (watchInstance.minuteGears.left) {
+        watchInstance.minuteGears.left.rotation.z -= delta * minVelocity * (22 / 18);
+      }
+      if (watchInstance.minuteGears.right) {
+        watchInstance.minuteGears.right.rotation.z -= delta * minVelocity * (22 / 18);
+      }
+      if (watchInstance.minuteGears.intermediate) {
+        watchInstance.minuteGears.intermediate.rotation.z += delta * minVelocity * (22 / 16);
+      }
+    }
 
-    // 2B. Jacob & Co Flying Tourbillon Carriage Continuous 3D Mechanical Rotation
+    // 3. HOURS GEAR TRAIN (Driven by Minutes - Left 9 o'clock)
+    if (watchInstance.lapisHourHand) {
+      watchInstance.lapisHourHand.rotation.z = hourAngle;
+    }
+    if (watchInstance.hourGears) {
+      if (watchInstance.hourGears.drive) {
+        watchInstance.hourGears.drive.rotation.z += delta * hourVelocity;
+      }
+      if (watchInstance.hourGears.intermediate) {
+        watchInstance.hourGears.intermediate.rotation.z -= delta * hourVelocity * (20 / 18);
+      }
+      if (watchInstance.hourGears.pinion) {
+        watchInstance.hourGears.pinion.rotation.z += delta * hourVelocity * (20 / 14);
+      }
+    }
+
+    // 4. DAY AND NIGHT GEAR TRAIN (Driven by Hours - Right 3 o'clock)
+    const daySeconds = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds();
+    const dayAngle = -(daySeconds / 86400) * Math.PI * 2;
+    if (watchInstance.sunMoonDisc) {
+      watchInstance.sunMoonDisc.rotation.z = dayAngle;
+    }
+    if (watchInstance.dayNightGears) {
+      if (watchInstance.dayNightGears.drive) {
+        watchInstance.dayNightGears.drive.rotation.z += delta * dayNightVelocity;
+      }
+      if (watchInstance.dayNightGears.planetary) {
+        watchInstance.dayNightGears.planetary.rotation.z -= delta * dayNightVelocity * (20 / 18);
+      }
+      if (watchInstance.dayNightGears.pinion) {
+        watchInstance.dayNightGears.pinion.rotation.z += delta * dayNightVelocity * (20 / 14);
+      }
+    }
+
+    // Central movement synchronization hub gear (meshing between minute and hour trains)
+    if (watchInstance.centerHubGear) {
+      watchInstance.centerHubGear.rotation.z -= delta * minVelocity * 0.75;
+    }
+
+    // Connecting Arbors (vertical shafts linking front complication gears to the back gear layer at respective speeds)
+    if (watchInstance.connectingArbors) {
+      watchInstance.connectingArbors.forEach((arbor, idx) => {
+        let speed = minVelocity;
+        if (idx <= 3) speed = hourVelocity;           // Hours arbors (0-3)
+        else if (idx <= 7) speed = minVelocity;       // Minutes arbors (4-7)
+        else if (idx <= 11) speed = dayNightVelocity; // Day/Night arbors (8-11)
+        else if (idx <= 14) speed = secVelocity;      // Seconds/Showcase arbors (12-14)
+        else speed = minVelocity * 0.6;               // Center hub arbor (15)
+
+        const dir = (idx % 2 === 0) ? 1 : -1;
+        arbor.rotation.z += delta * speed * dir;
+      });
+    }
+
+    // High-Frequency Balance Wheel Oscillation (4Hz / 8 beats per second) & pulsing hairspring
+    if (watchInstance.balanceWheel) {
+      const balanceBeat = Math.sin(now * 0.025) * 0.55;
+      watchInstance.balanceWheel.rotation.z = balanceBeat;
+    }
+    if (watchInstance.hairspring) {
+      const pulse = 1.0 + Math.sin(now * 0.025) * 0.035;
+      watchInstance.hairspring.scale.set(pulse, pulse, 1.0);
+    }
+
+    // Flying Tourbillon continuous mechanical rotation
     if (watchInstance.tourbillon) {
       watchInstance.tourbillon.rotation.z = -secondAngle * 2.5;
+    }
+
+    // 5. Back Gear Layer & Motion Works Wheel Synchronization
+    if (watchInstance.gears) {
+      if (watchInstance.gears.fourthWheel) {
+        watchInstance.gears.fourthWheel.rotation.z += delta * secVelocity;
+      }
+      if (watchInstance.gears.escapeWheel) {
+        watchInstance.gears.escapeWheel.rotation.z += delta * secVelocity * 5.0;
+      }
+      if (watchInstance.gears.palletFork) {
+        watchInstance.gears.palletFork.rotation.z = Math.sin(now * 0.025) * 0.35;
+      }
+      if (watchInstance.gears.thirdWheel) {
+        watchInstance.gears.thirdWheel.rotation.z -= delta * secVelocity * 0.70;
+      }
+      if (watchInstance.gears.minuteWheel) {
+        watchInstance.gears.minuteWheel.rotation.z -= delta * minVelocity * (26 / 12);
+      }
+      if (watchInstance.gears.cannonPinion) {
+        watchInstance.gears.cannonPinion.rotation.z += delta * minVelocity;
+      }
+      if (watchInstance.gears.hourWheel) {
+        watchInstance.gears.hourWheel.rotation.z += delta * hourVelocity;
+      }
+      if (watchInstance.gears.dayNightWheel) {
+        watchInstance.gears.dayNightWheel.rotation.z += delta * dayNightVelocity;
+      }
+      if (watchInstance.gears.grandCenterWheel) {
+        watchInstance.gears.grandCenterWheel.rotation.z -= delta * minVelocity * 0.75;
+      }
+      if (watchInstance.gears.crownGear) {
+        watchInstance.gears.crownGear.rotation.z += delta * hourVelocity * 1.5;
+      }
+      if (watchInstance.gears.transGear) {
+        watchInstance.gears.transGear.rotation.z -= delta * hourVelocity * 1.2;
+      }
     }
 
     // 3. Dynamic Oscillating Rotor inertia

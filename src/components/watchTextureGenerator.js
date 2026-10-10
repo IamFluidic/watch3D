@@ -585,9 +585,10 @@ export function createFlatCasebackTexture(edition) {
 }
 
 /**
- * Brushed Surgical Steel Bezel Texture
- * - Circular satin-brushed finish
- * - 6 recessed screw holes with slotted screw heads
+ * Celestial Constellation Bezel Texture — Dark Damascus Steel with Laser-Engraved Star Maps
+ * - Dark slate / charcoal titanium & Damascus steel grain
+ * - Laser-engraved star constellations (Ursa Major, Orion, Cassiopeia, Cygnus, Pegasus)
+ * - Delicate connecting lines, astronomical degree arcs, coordinate ticks, and planetary gear glyphs
  */
 export function createBezelTexture(edition) {
   const canvas = document.createElement('canvas');
@@ -598,73 +599,718 @@ export function createBezelTexture(edition) {
   const cx = 512;
   const cy = 512;
   const outerR = 512;
-  const innerR = 430;
+  const innerR = 410;
 
-  // Base circular color matching the edition's bezelColor
-  const baseColor = edition?.bezelColor || '#E2E8F0';
-
-  // Solid background fill across entire canvas — prevents transparent margin sampling and rim flicker
+  // Dark slate/damascus base
+  const baseColor = edition?.bezelColor || '#1E2026';
   ctx.fillStyle = baseColor;
   ctx.fillRect(0, 0, 1024, 1024);
 
+  // Subtle circular satin & damascus gradient
+  const grad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
+  grad.addColorStop(0, '#15171C');
+  grad.addColorStop(0.3, '#22252C');
+  grad.addColorStop(0.7, '#191B21');
+  grad.addColorStop(1, '#0F1014');
+  ctx.fillStyle = grad;
   ctx.beginPath();
   ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
   ctx.arc(cx, cy, innerR, 0, Math.PI * 2, true);
   ctx.fill();
 
-  // Satin-brushed concentric grain
+  // Micro Damascus steel swirling rings & satin brushing
   ctx.save();
   ctx.translate(cx, cy);
-  for (let r = innerR; r < outerR; r += 1.5) {
-    const grainAlpha = 0.03 + Math.random() * 0.08;
-    const isBright = Math.random() > 0.5;
-    ctx.strokeStyle = isBright ? `rgba(255, 255, 255, ${grainAlpha * 1.5})` : `rgba(0, 0, 0, ${grainAlpha * 0.9})`;
-    ctx.lineWidth = 1.2;
+  for (let r = innerR + 2; r < outerR - 2; r += 1.8) {
+    const alpha = 0.04 + Math.random() * 0.08;
+    const isBright = Math.random() > 0.45;
+    ctx.strokeStyle = isBright ? `rgba(200, 215, 235, ${alpha * 1.4})` : `rgba(0, 0, 0, ${alpha * 1.8})`;
+    ctx.lineWidth = 1.0;
     ctx.beginPath();
     ctx.arc(0, 0, r, 0, Math.PI * 2);
     ctx.stroke();
   }
   ctx.restore();
 
-  // 8 Authentic Audemars Piguet Hexagonal Bezel Screws (at the 8 octagonal vertices)
-  const screwR = 484;
-  for (let i = 0; i < 8; i++) {
-    const angle = ((i * 45 + 22.5) * Math.PI) / 180;
-    const sx = cx + Math.cos(angle) * screwR;
-    const sy = cy + Math.sin(angle) * screwR;
+  // Engraved Constellations around the Bezel
+  // Constellation star groups distributed around the circular bezel ring (radius ~ 455 - 475)
+  const constellationGroups = [
+    // 1. Ursa Major / Big Dipper (top right, 25° - 65°)
+    {
+      name: 'URSA MAJOR',
+      nameAngle: 45,
+      stars: [
+        { a: 28, r: 442 }, { a: 34, r: 462 }, { a: 42, r: 472 },
+        { a: 50, r: 454 }, { a: 56, r: 476 }, { a: 64, r: 468 }, { a: 60, r: 446 }
+      ],
+      connections: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 3]]
+    },
+    // 2. Orion (right-center, 80° - 120°)
+    {
+      name: 'ORION',
+      nameAngle: 102,
+      stars: [
+        { a: 82, r: 476 }, { a: 86, r: 438 }, { a: 98, r: 456 },
+        { a: 102, r: 458 }, { a: 106, r: 460 }, { a: 116, r: 478 }, { a: 120, r: 440 }
+      ],
+      connections: [[0, 2], [1, 2], [2, 3], [3, 4], [4, 5], [4, 6], [0, 1], [5, 6]]
+    },
+    // 3. Cassiopeia (bottom right, 140° - 175°)
+    {
+      name: 'CASSIOPEIA',
+      nameAngle: 158,
+      stars: [
+        { a: 142, r: 446 }, { a: 150, r: 472 }, { a: 158, r: 450 },
+        { a: 166, r: 478 }, { a: 174, r: 458 }
+      ],
+      connections: [[0, 1], [1, 2], [2, 3], [3, 4]]
+    },
+    // 4. Cygnus / Northern Cross (bottom, 195° - 235°)
+    {
+      name: 'CYGNUS',
+      nameAngle: 215,
+      stars: [
+        { a: 198, r: 458 }, { a: 214, r: 460 }, { a: 232, r: 462 },
+        { a: 212, r: 436 }, { a: 216, r: 482 }
+      ],
+      connections: [[0, 1], [1, 2], [3, 1], [1, 4]]
+    },
+    // 5. Pegasus (bottom left, 250° - 290°)
+    {
+      name: 'PEGASUS',
+      nameAngle: 270,
+      stars: [
+        { a: 254, r: 444 }, { a: 258, r: 478 }, { a: 284, r: 480 },
+        { a: 282, r: 442 }, { a: 294, r: 460 }
+      ],
+      connections: [[0, 1], [1, 2], [2, 3], [3, 0], [2, 4]]
+    },
+    // 6. Taurus & Pleiades (top left, 310° - 350°)
+    {
+      name: 'TAURUS',
+      nameAngle: 330,
+      stars: [
+        { a: 312, r: 475 }, { a: 322, r: 452 }, { a: 332, r: 446 },
+        { a: 340, r: 464 }, { a: 348, r: 480 }, { a: 326, r: 470 }
+      ],
+      connections: [[0, 1], [1, 2], [2, 3], [3, 4], [1, 5], [5, 3]]
+    }
+  ];
 
+  ctx.save();
+  // Draw connecting constellation lines
+  constellationGroups.forEach(group => {
+    ctx.strokeStyle = 'rgba(215, 228, 245, 0.55)';
+    ctx.lineWidth = 1.2;
+    group.connections.forEach(([s1, s2]) => {
+      const p1 = group.stars[s1];
+      const p2 = group.stars[s2];
+      const rad1 = (p1.a * Math.PI) / 180;
+      const rad2 = (p2.a * Math.PI) / 180;
+      const x1 = cx + Math.cos(rad1) * p1.r;
+      const y1 = cy + Math.sin(rad1) * p1.r;
+      const x2 = cx + Math.cos(rad2) * p2.r;
+      const y2 = cy + Math.sin(rad2) * p2.r;
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    });
+
+    // Draw radiant stars
+    group.stars.forEach(st => {
+      const sRad = (st.a * Math.PI) / 180;
+      const sx = cx + Math.cos(sRad) * st.r;
+      const sy = cy + Math.sin(sRad) * st.r;
+
+      // Glow halo
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.beginPath();
+      ctx.arc(sx, sy, 5.0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bright white star core
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.arc(sx, sy, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Subtle star 4-point sparkle cross
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(sx - 4.5, sy);
+      ctx.lineTo(sx + 4.5, sy);
+      ctx.moveTo(sx, sy - 4.5);
+      ctx.lineTo(sx, sy + 4.5);
+      ctx.stroke();
+    });
+
+    // Miniature engraved constellation name along curve
+    const nRad = (group.nameAngle * Math.PI) / 180;
+    const nx = cx + Math.cos(nRad) * 424;
+    const ny = cy + Math.sin(nRad) * 424;
+    ctx.save();
+    ctx.translate(nx, ny);
+    ctx.rotate(nRad + Math.PI / 2);
+    ctx.fillStyle = 'rgba(220, 230, 245, 0.65)';
+    ctx.font = '600 9px "Space Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(group.name, 0, 0);
+    ctx.restore();
+  });
+  ctx.restore();
+
+  // Astronomical Coordinate Ticks and Degree Arcs around outer rim
+  ctx.save();
+  ctx.translate(cx, cy);
+  for (let deg = 0; deg < 360; deg += 3) {
+    const rad = (deg * Math.PI) / 180;
+    const isMajor = deg % 30 === 0;
+    const isMedium = deg % 15 === 0;
+
+    const tickR1 = outerR - 4;
+    const tickR2 = isMajor ? outerR - 16 : (isMedium ? outerR - 11 : outerR - 7);
+
+    ctx.strokeStyle = isMajor ? 'rgba(255, 255, 255, 0.75)' : 'rgba(200, 215, 235, 0.35)';
+    ctx.lineWidth = isMajor ? 1.5 : 0.9;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(rad) * tickR1, Math.sin(rad) * tickR1);
+    ctx.lineTo(Math.cos(rad) * tickR2, Math.sin(rad) * tickR2);
+    ctx.stroke();
+
+    if (isMajor) {
+      // Degree inscription (0°, 30°, 60°...)
+      const textR = outerR - 24;
+      const tx = Math.cos(rad) * textR;
+      const ty = Math.sin(rad) * textR;
+      ctx.save();
+      ctx.translate(tx, ty);
+      ctx.rotate(rad + Math.PI / 2);
+      ctx.fillStyle = 'rgba(240, 245, 255, 0.65)';
+      ctx.font = '500 8px "Space Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`${deg}°`, 0, 0);
+      ctx.restore();
+    }
+  }
+
+  // Planetary Gear & Astrolabe Glyphs at 4 cardinal points (0°, 90°, 180°, 270°)
+  [0, Math.PI / 2, Math.PI, Math.PI * 1.5].forEach(ang => {
+    const gx = Math.cos(ang) * 458;
+    const gy = Math.sin(ang) * 458;
+    ctx.save();
+    ctx.translate(gx, gy);
+    ctx.rotate(ang);
+
+    // Miniature astrolabe gear wheel
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+    ctx.lineWidth = 1.0;
+    ctx.beginPath();
+    ctx.arc(0, 0, 8, 0, Math.PI * 2);
+    ctx.stroke();
+
+    for (let t = 0; t < 8; t++) {
+      const ta = (t * Math.PI) / 4;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(ta) * 8, Math.sin(ta) * 8);
+      ctx.lineTo(Math.cos(ta) * 11, Math.sin(ta) * 11);
+      ctx.stroke();
+    }
+    ctx.restore();
+  });
+  // Exposed 12 Gold-Toned Flat-Head Screws around Bezel (Countersunk with micro slots)
+  for (let sc = 0; sc < 12; sc++) {
+    const sDeg = sc * 30 + 15;
+    const sRad = (sDeg * Math.PI) / 180;
+    const sR = 468;
+    const sx = cx + Math.cos(sRad) * sR;
+    const sy = cy + Math.sin(sRad) * sR;
+
+    // Recessed dark socket
+    ctx.fillStyle = '#090B0E';
+    ctx.beginPath();
+    ctx.arc(sx, sy, 11, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Gold chamfered collar
+    const goldGrad = ctx.createRadialGradient(sx - 2, sy - 2, 1, sx, sy, 9);
+    goldGrad.addColorStop(0, '#FEF08A');
+    goldGrad.addColorStop(0.5, '#F59E0B');
+    goldGrad.addColorStop(1, '#92400E');
+    ctx.fillStyle = goldGrad;
+    ctx.beginPath();
+    ctx.arc(sx, sy, 8.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Screw slot
     ctx.save();
     ctx.translate(sx, sy);
+    ctx.rotate(sRad + ((sc * 7) % 5) * 0.4);
+    ctx.fillStyle = '#1A0C02';
+    ctx.fillRect(-6.5, -1.4, 13, 2.8);
+    ctx.restore();
+  }
+  ctx.restore();
 
-    // Recessed circular counter-bore shadow
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+  // Subtle bevel rim border
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(cx, cy, outerR - 1, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+  ctx.lineWidth = 2.0;
+  ctx.beginPath();
+  ctx.arc(cx, cy, innerR + 1, 0, Math.PI * 2);
+  ctx.stroke();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 16;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * Lapis Lazuli Subdial Texture (at 9:30 o'clock position)
+ * - Deep royal lapis stone with ultramarine clouds and golden pyrite flecks
+ * - Polished golden Roman numerals: I, II, III, IV, V, VI, VII, VIII, IX, X, XI, XII
+ * - Concentric gold railway minute track
+ */
+export function createLapisSubdialTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+  const cx = 512, cy = 512, R = 496;
+
+  // Rich, vibrant royal Lapis Lazuli stone gradient (deep saturated ultramarine & royal blue)
+  const grad = ctx.createRadialGradient(cx - 80, cy - 80, 50, cx, cy, R);
+  grad.addColorStop(0, '#1E4AD8');    // Saturated royal ultramarine highlight
+  grad.addColorStop(0.35, '#1236A8'); // Deep vibrant lapis lazuli body
+  grad.addColorStop(0.70, '#0A2072'); // Rich deep midnight royal blue
+  grad.addColorStop(1, '#051142');    // Outer perimeter depth
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Natural mineral veining & swirling ultramarine clouds
+  ctx.save();
+  for (let i = 0; i < 75; i++) {
+    const vx = cx + (Math.random() - 0.5) * R * 1.5;
+    const vy = cy + (Math.random() - 0.5) * R * 1.5;
+    const vr = 40 + Math.random() * 110;
+    const vGrad = ctx.createRadialGradient(vx, vy, 0, vx, vy, vr);
+    vGrad.addColorStop(0, Math.random() > 0.4 ? 'rgba(50, 110, 245, 0.28)' : 'rgba(8, 20, 65, 0.40)');
+    vGrad.addColorStop(0.7, 'rgba(15, 45, 130, 0.15)');
+    vGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = vGrad;
     ctx.beginPath();
-    ctx.arc(0, 0, 20, 0, Math.PI * 2);
+    ctx.arc(vx, vy, vr, 0, Math.PI * 2);
     ctx.fill();
+  }
 
-    // Polished hexagonal screw head
-    const screwGrad = ctx.createLinearGradient(-14, -14, 14, 14);
-    screwGrad.addColorStop(0, '#FFFFFF');
-    screwGrad.addColorStop(0.5, '#CBD5E1');
-    screwGrad.addColorStop(1, '#64748B');
-    ctx.fillStyle = screwGrad;
+  // Golden Pyrite flecks (genuine fool's gold dusted star patterns)
+  for (let p = 0; p < 220; p++) {
+    const pa = Math.random() * Math.PI * 2;
+    const pr = Math.random() * (R - 35);
+    const px = cx + Math.cos(pa) * pr;
+    const py = cy + Math.sin(pa) * pr;
+    const pSize = 1.0 + Math.random() * 3.5;
+
+    ctx.fillStyle = Math.random() > 0.35 ? '#F59E0B' : (Math.random() > 0.5 ? '#FEF08A' : '#FDE047');
     ctx.beginPath();
-    for (let h = 0; h < 6; h++) {
-      const hAngle = (h * 60 * Math.PI) / 180;
-      const hx = Math.cos(hAngle) * 16;
-      const hy = Math.sin(hAngle) * 16;
-      if (h === 0) ctx.moveTo(hx, hy);
-      else ctx.lineTo(hx, hy);
+    ctx.arc(px, py, pSize, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Delicate gold constellation lines connecting star clusters
+  const constellations = [
+    [[190, 230], [250, 270], [320, 240], [390, 290], [340, 360]],
+    [[630, 270], [690, 320], [750, 300], [790, 370]],
+    [[230, 670], [290, 710], [350, 680], [410, 750]]
+  ];
+  ctx.strokeStyle = 'rgba(254, 240, 138, 0.55)';
+  ctx.lineWidth = 1.4;
+  constellations.forEach(pts => {
+    ctx.beginPath();
+    pts.forEach(([x, y], idx) => {
+      if (idx === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    pts.forEach(([x, y]) => {
+      ctx.fillStyle = '#FEF08A';
+      ctx.beginPath();
+      ctx.arc(x, y, 3.2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  });
+  ctx.restore();
+
+  // Concentric Gold Railway Track for Minutes/Hours
+  ctx.save();
+  ctx.strokeStyle = '#D4AF37';
+  ctx.lineWidth = 3.5;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R - 22, 0, Math.PI * 2);
+  ctx.arc(cx, cy, R - 46, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Railway ticks
+  ctx.translate(cx, cy);
+  for (let m = 0; m < 60; m++) {
+    const ma = (m * Math.PI * 2) / 60;
+    const isFive = m % 5 === 0;
+    ctx.strokeStyle = isFive ? '#F59E0B' : 'rgba(212, 175, 55, 0.75)';
+    ctx.lineWidth = isFive ? 3.5 : 1.8;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(ma) * (R - 46), Math.sin(ma) * (R - 46));
+    ctx.lineTo(Math.cos(ma) * (R - 22), Math.sin(ma) * (R - 22));
+    ctx.stroke();
+  }
+
+  // Complex Engine-Turned Guilloché Rosette in Center
+  const rosettePetals = 16;
+  const rosetteR = 100;
+  ctx.save();
+  for (let p = 0; p < rosettePetals; p++) {
+    const pa = (p * Math.PI * 2) / rosettePetals;
+    ctx.save();
+    ctx.rotate(pa);
+    ctx.strokeStyle = 'rgba(254, 240, 138, 0.75)';
+    ctx.lineWidth = 2.0;
+    ctx.beginPath();
+    ctx.ellipse(0, rosetteR * 0.45, 16, rosetteR * 0.45, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  // Delicate rosette hub ring
+  ctx.strokeStyle = '#FEF08A';
+  ctx.lineWidth = 3.0;
+  ctx.beginPath();
+  ctx.arc(0, 0, 38, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  // Applied Polished Metallic Gold Roman Numerals (XII at top, I to XI clockwise)
+  const romanNumerals = ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
+  ctx.font = 'bold 54px "Cinzel", "Times New Roman", "Georgia", serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  romanNumerals.forEach((rom, idx) => {
+    const angle = (idx * 30 * Math.PI) / 180;
+    const nr = R - 100;
+    const nx = Math.cos(angle - Math.PI / 2) * nr;
+    const ny = Math.sin(angle - Math.PI / 2) * nr;
+
+    // Deep drop-shadow for 3D applied metal relief
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+    ctx.fillText(rom, nx + 3.0, ny + 3.5);
+
+    // Brilliant metallic gold fill
+    ctx.fillStyle = '#FFE066';
+    ctx.fillText(rom, nx, ny);
+
+    // Subtle bright gold top edge highlight
+    ctx.fillStyle = '#FFF8DB';
+    ctx.fillText(rom, nx - 0.5, ny - 0.8);
+  });
+
+  // Center axle gold ring
+  ctx.strokeStyle = '#D4AF37';
+  ctx.lineWidth = 4.5;
+  ctx.beginPath();
+  ctx.arc(0, 0, 48, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 16;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * Minute Chapter Ring Texture (at 12 o'clock center-top)
+ * - Elevated champagne / rose gold metallic ring
+ * - BOLD, CRISP PURE BLACK Arabic numerals: 60, 05, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55
+ * - Circular brushed satin finish and railway tracks
+ */
+export function createMinuteRingTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+  const cx = 512, cy = 512;
+  const outerR = 500, innerR = 340;
+
+  // Champagne rose-gold gradient
+  const ringGrad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
+  ringGrad.addColorStop(0, '#E8C5A8');
+  ringGrad.addColorStop(0.5, '#F5DAC0');
+  ringGrad.addColorStop(1, '#D8A783');
+  ctx.fillStyle = ringGrad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+  ctx.arc(cx, cy, innerR, 0, Math.PI * 2, true);
+  ctx.fill();
+
+  // Circular satin-brushing
+  ctx.save();
+  ctx.translate(cx, cy);
+  for (let r = innerR + 2; r < outerR - 2; r += 2.0) {
+    const alpha = 0.05 + Math.random() * 0.09;
+    ctx.strokeStyle = Math.random() > 0.5 ? `rgba(255, 255, 255, ${alpha})` : `rgba(70, 35, 15, ${alpha * 1.6})`;
+    ctx.lineWidth = 1.0;
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // Outer & Inner railway tracks in bold jet black
+  ctx.strokeStyle = '#050201';
+  ctx.lineWidth = 4.0;
+  ctx.beginPath();
+  ctx.arc(0, 0, outerR - 6, 0, Math.PI * 2);
+  ctx.arc(0, 0, outerR - 36, 0, Math.PI * 2);
+  ctx.arc(0, 0, innerR + 6, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Minute ticks
+  for (let m = 0; m < 60; m++) {
+    const rad = (m * Math.PI * 2) / 60;
+    const isFive = m % 5 === 0;
+    ctx.strokeStyle = '#050201';
+    ctx.lineWidth = isFive ? 4.5 : 2.2;
+    const r1 = outerR - 6;
+    const r2 = isFive ? outerR - 36 : outerR - 22;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(rad) * r1, Math.sin(rad) * r1);
+    ctx.lineTo(Math.cos(rad) * r2, Math.sin(rad) * r2);
+    ctx.stroke();
+  }
+
+  // Arabic minute numerals in BOLD, PURE BLACK (60, 05, 10, ... 55)
+  const minuteNumbers = ['60', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'];
+  ctx.font = '900 58px "Space Mono", "Arial Black", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  minuteNumbers.forEach((num, idx) => {
+    const angle = (idx * 30 * Math.PI) / 180;
+    const nr = (outerR + innerR) / 2 - 8;
+    const nx = Math.cos(angle - Math.PI / 2) * nr;
+    const ny = Math.sin(angle - Math.PI / 2) * nr;
+
+    ctx.save();
+    ctx.translate(nx, ny);
+    // Keep numbers oriented upright and legible
+    let rot = angle;
+    if (rot > Math.PI * 0.55 && rot < Math.PI * 1.45) {
+      rot += Math.PI; // Flip bottom hemisphere numbers so they are never upside down
     }
+    ctx.rotate(rot);
+
+    // Bold, crisp pure black engraved print matching reference image
+    ctx.fillStyle = '#050201';
+    ctx.fillText(num, 0, 0);
+    ctx.restore();
+  });
+
+  // Inner & outer bevel borders
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.arc(0, 0, outerR - 2, 0, Math.PI * 2);
+  ctx.arc(0, 0, innerR + 2, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 16;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * Astronomical Celestial Sun & Moonphase Texture (at 2:30 o'clock position)
+ * - Deep starry midnight disc
+ * - Blazing golden radiant sun with curved flame rays
+ * - Realistic silver-pearl cratered moon
+ */
+export function createSunMoonTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  const cx = 256, cy = 256, R = 248;
+
+  // Midnight cosmic starfield
+  const skyGrad = ctx.createRadialGradient(cx, cy, 20, cx, cy, R);
+  skyGrad.addColorStop(0, '#0E1726');
+  skyGrad.addColorStop(0.6, '#080E1B');
+  skyGrad.addColorStop(1, '#020612');
+  ctx.fillStyle = skyGrad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Twinkling stars
+  for (let s = 0; s < 60; s++) {
+    const sa = Math.random() * Math.PI * 2;
+    const sr = Math.random() * (R - 20);
+    const sx = cx + Math.cos(sa) * sr;
+    const sy = cy + Math.sin(sa) * sr;
+    ctx.fillStyle = Math.random() > 0.4 ? '#FFFFFF' : '#93C5FD';
+    ctx.beginPath();
+    ctx.arc(sx, sy, 0.8 + Math.random() * 1.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // 1. Radiant Golden Sun (upper hemisphere, ~10 to 2 o'clock)
+  const sunX = cx - 55;
+  const sunY = cy - 40;
+  const sunR = 52;
+
+  // Sun flare glow
+  const sunGlow = ctx.createRadialGradient(sunX, sunY, sunR * 0.4, sunX, sunY, sunR * 1.6);
+  sunGlow.addColorStop(0, 'rgba(251, 191, 36, 0.6)');
+  sunGlow.addColorStop(0.6, 'rgba(245, 158, 11, 0.2)');
+  sunGlow.addColorStop(1, 'transparent');
+  ctx.fillStyle = sunGlow;
+  ctx.beginPath();
+  ctx.arc(sunX, sunY, sunR * 1.6, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Curved undulating flame rays
+  ctx.save();
+  ctx.translate(sunX, sunY);
+  for (let r = 0; r < 16; r++) {
+    const ra = (r * Math.PI * 2) / 16;
+    ctx.rotate(ra);
+    ctx.fillStyle = (r % 2 === 0) ? '#F59E0B' : '#FBBF24';
+    ctx.beginPath();
+    ctx.moveTo(-5, -sunR + 2);
+    ctx.quadraticCurveTo(0, -sunR - 28, 0, -sunR - 36);
+    ctx.quadraticCurveTo(5, -sunR - 28, 5, -sunR + 2);
     ctx.closePath();
     ctx.fill();
+    ctx.rotate(-ra);
+  }
 
-    // AP Tangential screw slot groove (aligned along perimeter tangent)
-    ctx.rotate(angle + Math.PI / 2);
-    ctx.fillStyle = '#0F131A';
-    ctx.fillRect(-12, -2.5, 24, 5);
+  // Golden Sun face disc
+  const sunGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, sunR);
+  sunGrad.addColorStop(0, '#FEF08A');
+  sunGrad.addColorStop(0.5, '#F59E0B');
+  sunGrad.addColorStop(1, '#D97706');
+  ctx.fillStyle = sunGrad;
+  ctx.beginPath();
+  ctx.arc(0, 0, sunR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
 
-    ctx.restore();
+  // 2. Photorealistic Cratered Moon (lower hemisphere, ~4 to 8 o'clock)
+  const moonX = cx + 65;
+  const moonY = cy + 45;
+  const moonR = 64;
+
+  const moonGrad = ctx.createRadialGradient(moonX - 18, moonY - 18, 10, moonX, moonY, moonR);
+  moonGrad.addColorStop(0, '#FFFFFF');
+  moonGrad.addColorStop(0.4, '#E2E8F0');
+  moonGrad.addColorStop(0.8, '#94A3B8');
+  moonGrad.addColorStop(1, '#475569');
+  ctx.fillStyle = moonGrad;
+  ctx.beginPath();
+  ctx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Lunar Maria & Crater shadows
+  ctx.save();
+  const craters = [
+    { x: moonX - 16, y: moonY - 14, r: 16 },
+    { x: moonX + 18, y: moonY - 10, r: 22 },
+    { x: moonX - 8, y: moonY + 22, r: 18 },
+    { x: moonX + 24, y: moonY + 18, r: 14 },
+    { x: moonX - 28, y: moonY + 8, r: 10 }
+  ];
+  craters.forEach(c => {
+    const cGrad = ctx.createRadialGradient(c.x, c.y, c.r * 0.2, c.x, c.y, c.r);
+    cGrad.addColorStop(0, 'rgba(51, 65, 85, 0.45)');
+    cGrad.addColorStop(0.7, 'rgba(71, 85, 105, 0.25)');
+    cGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = cGrad;
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.restore();
+
+  // Perimeter bevel ring
+  ctx.strokeStyle = 'rgba(212, 175, 55, 0.65)';
+  ctx.lineWidth = 2.0;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R - 2, 0, Math.PI * 2);
+  ctx.stroke();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 16;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * Antique Bronze Lug Engraving Texture
+ * - Warm brushed bronze with dark etched constellation star maps and gears
+ */
+export function createBronzeLugEngravingTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  // Antique bronze base
+  ctx.fillStyle = '#B87C58';
+  ctx.fillRect(0, 0, 512, 512);
+
+  // Brushed grain
+  for (let y = 0; y < 512; y += 2) {
+    const alpha = 0.03 + Math.random() * 0.08;
+    ctx.strokeStyle = Math.random() > 0.5 ? `rgba(255, 230, 200, ${alpha})` : `rgba(60, 30, 15, ${alpha * 1.5})`;
+    ctx.lineWidth = 1.0;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(512, y);
+    ctx.stroke();
+  }
+
+  // Constellation engravings
+  ctx.strokeStyle = 'rgba(50, 25, 10, 0.75)';
+  ctx.lineWidth = 1.4;
+  for (let i = 0; i < 8; i++) {
+    const sx1 = 40 + i * 55;
+    const sy1 = 80 + Math.sin(i * 1.2) * 60;
+    const sx2 = sx1 + 45;
+    const sy2 = sy1 + (i % 2 === 0 ? 35 : -35);
+
+    ctx.beginPath();
+    ctx.moveTo(sx1, sy1);
+    ctx.lineTo(sx2, sy2);
+    ctx.stroke();
+
+    // Recessed star dots
+    ctx.fillStyle = 'rgba(30, 15, 5, 0.85)';
+    ctx.beginPath();
+    ctx.arc(sx1, sy1, 3.0, 0, Math.PI * 2);
+    ctx.arc(sx2, sy2, 3.0, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -679,36 +1325,36 @@ export function createMovementTexture() {
   canvas.height = 1024;
   const ctx = canvas.getContext('2d');
 
-  // Rhodium-plated bridge with Perlage (circular graining)
-  ctx.fillStyle = '#D6DCE5';
+  // Deep dark anthracite / blackened titanium bridge
+  ctx.fillStyle = '#0F1217';
   ctx.fillRect(0, 0, 1024, 1024);
 
-  // Perlage circles
-  const step = 35;
+  // Perlage circular graining on anthracite mainplate
+  const step = 38;
   for (let y = 0; y < 1024; y += step) {
     for (let x = 0; x < 1024; x += step) {
-      const grad = ctx.createRadialGradient(x, y, 4, x, y, step * 0.9);
-      grad.addColorStop(0, 'rgba(255,255,255,0.4)');
-      grad.addColorStop(0.7, 'rgba(180,190,205,0.5)');
-      grad.addColorStop(1, 'rgba(120,130,145,0.1)');
+      const grad = ctx.createRadialGradient(x, y, 4, x, y, step * 0.92);
+      grad.addColorStop(0, 'rgba(255,255,255,0.12)');
+      grad.addColorStop(0.7, 'rgba(45,55,70,0.4)');
+      grad.addColorStop(1, 'rgba(10,12,18,0.1)');
       ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.arc(x, y, step * 0.9, 0, Math.PI * 2);
+      ctx.arc(x, y, step * 0.92, 0, Math.PI * 2);
       ctx.fill();
     }
   }
 
-  // Côtes de Genève (Geneva Stripes) on top plate
+  // Côtes de Genève (Geneva Stripes) on anthracite top plate
   ctx.save();
-  ctx.rotate(Math.PI / 6);
-  const stripeWidth = 50;
-  for (let x = -500; x < 1500; x += stripeWidth) {
+  ctx.rotate(Math.PI / 5);
+  const stripeWidth = 52;
+  for (let x = -600; x < 1600; x += stripeWidth) {
     const sGrad = ctx.createLinearGradient(x, 0, x + stripeWidth, 0);
-    sGrad.addColorStop(0, 'rgba(255,255,255,0.15)');
-    sGrad.addColorStop(0.5, 'rgba(0,0,0,0.08)');
-    sGrad.addColorStop(1, 'rgba(255,255,255,0.12)');
+    sGrad.addColorStop(0, 'rgba(255,255,255,0.06)');
+    sGrad.addColorStop(0.5, 'rgba(0,0,0,0.18)');
+    sGrad.addColorStop(1, 'rgba(255,255,255,0.04)');
     ctx.fillStyle = sGrad;
-    ctx.fillRect(x, -500, stripeWidth, 2000);
+    ctx.fillRect(x, -600, stripeWidth, 2400);
   }
   ctx.restore();
 
@@ -989,3 +1635,740 @@ function adjustBrightness(hex, percent) {
   const B = Math.min(255, Math.max(0, (num & 0x0000ff) + amt));
   return `#${((1 << 24) + (R << 16) + (G << 8) + B).toString(16).slice(1)}`;
 }
+
+/**
+ * Swiss Manufacture plaque texture placed along the tourbillon bridge:
+ * "MANUFACTURE EN SUISSE - GENEVE"
+ */
+export function createSwissPlaqueTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 160;
+  const ctx = canvas.getContext('2d');
+
+  // Brushed rose-gold / bronze metallic plaque background
+  const grad = ctx.createLinearGradient(0, 0, 1024, 0);
+  grad.addColorStop(0, '#B87C58');
+  grad.addColorStop(0.2, '#E2BA96');
+  grad.addColorStop(0.5, '#F5DAC0');
+  grad.addColorStop(0.8, '#E2BA96');
+  grad.addColorStop(1, '#B87C58');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 1024, 160);
+
+  // Fine horizontal satin brush marks
+  for (let y = 0; y < 160; y += 2) {
+    const alpha = 0.05 + Math.random() * 0.12;
+    ctx.strokeStyle = Math.random() > 0.5 ? `rgba(255, 255, 255, ${alpha})` : `rgba(40, 20, 10, ${alpha * 1.5})`;
+    ctx.lineWidth = 1.0;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(1024, y);
+    ctx.stroke();
+  }
+
+  // Double chamfered outer frame
+  ctx.strokeStyle = '#3E1F10';
+  ctx.lineWidth = 3.5;
+  ctx.strokeRect(6, 6, 1012, 148);
+
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+  ctx.lineWidth = 2.0;
+  ctx.strokeRect(12, 12, 1000, 136);
+
+  // Micro blued steel mounting screws at ends
+  [40, 984].forEach(sx => {
+    ctx.fillStyle = '#0F172A';
+    ctx.beginPath();
+    ctx.arc(sx, 80, 14, 0, Math.PI * 2);
+    ctx.fill();
+
+    const screwGrad = ctx.createRadialGradient(sx, 80, 2, sx, 80, 12);
+    screwGrad.addColorStop(0, '#38BDF8');
+    screwGrad.addColorStop(0.7, '#1E40AF');
+    screwGrad.addColorStop(1, '#0F172A');
+    ctx.fillStyle = screwGrad;
+    ctx.beginPath();
+    ctx.arc(sx, 80, 12, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#05070B';
+    ctx.fillRect(sx - 9, 78, 18, 3.5);
+  });
+
+  // Deep engraved text: "MANUFACTURE EN SUISSE - GENEVE"
+  ctx.font = '700 42px "Cinzel", "Cormorant Garamond", "Trajan Pro", serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // Drop shadow engrave groove
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+  ctx.fillText('MANUFACTURE EN SUISSE - GENEVE', 512, 82);
+
+  // Dark burnt enamel letter fill
+  ctx.fillStyle = '#1E0D06';
+  ctx.fillText('MANUFACTURE EN SUISSE - GENEVE', 512, 80);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 16;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * Power reserve indicator texture at lower-right:
+ * Applied scales marked exactly "HIGH" and "LOW" with graduated ticks
+ */
+export function createPowerReserveTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  const cx = 256, cy = 256, R = 230;
+
+  // Dark anthracite slate subdial with concentric sunray brushing
+  const bgGrad = ctx.createRadialGradient(cx, cy, 20, cx, cy, R);
+  bgGrad.addColorStop(0, '#1E232E');
+  bgGrad.addColorStop(0.7, '#141822');
+  bgGrad.addColorStop(1, '#0C0E14');
+  ctx.fillStyle = bgGrad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Subtle concentric micro-grooves (snailed finish)
+  for (let r = 30; r < R - 8; r += 3) {
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.035)';
+    ctx.lineWidth = 1.0;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // Rose-gold outer retention bezel
+  ctx.strokeStyle = '#E2BA96';
+  ctx.lineWidth = 4.0;
+  ctx.stroke();
+
+  // Power reserve gauge arc (from ~140° to ~320°)
+  const startAngle = 140 * Math.PI / 180;
+  const endAngle = 320 * Math.PI / 180;
+  const arcR = 175;
+
+  ctx.strokeStyle = 'rgba(226, 186, 150, 0.35)';
+  ctx.lineWidth = 5.0;
+  ctx.beginPath();
+  ctx.arc(cx, cy, arcR, startAngle, endAngle);
+  ctx.stroke();
+
+  // Calibrated ticks
+  const totalTicks = 24;
+  for (let t = 0; t <= totalTicks; t++) {
+    const fraction = t / totalTicks;
+    const ang = startAngle + fraction * (endAngle - startAngle);
+    const isMajor = t % 6 === 0;
+
+    // Color gradient: red near LOW (start), white/gold up to HIGH (end)
+    if (fraction < 0.25) {
+      ctx.strokeStyle = '#EF4444'; // Red reserve warning
+    } else if (fraction > 0.75) {
+      ctx.strokeStyle = '#F59E0B'; // Full reserve amber/gold
+    } else {
+      ctx.strokeStyle = '#E2BA96'; // Rose gold
+    }
+
+    ctx.lineWidth = isMajor ? 3.5 : 1.8;
+    const rIn = arcR - (isMajor ? 24 : 14);
+    const rOut = arcR + 4;
+
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(ang) * rIn, cy + Math.sin(ang) * rIn);
+    ctx.lineTo(cx + Math.cos(ang) * rOut, cy + Math.sin(ang) * rOut);
+    ctx.stroke();
+  }
+
+  // Applied text: "LOW" at start and "HIGH" at end
+  ctx.font = '800 28px "Space Mono", monospace';
+  ctx.textBaseline = 'middle';
+
+  // LOW (red warning)
+  const lowX = cx + Math.cos(startAngle) * (arcR - 58);
+  const lowY = cy + Math.sin(startAngle) * (arcR - 58);
+  ctx.fillStyle = '#EF4444';
+  ctx.textAlign = 'center';
+  ctx.fillText('LOW', lowX, lowY);
+
+  // HIGH (gold)
+  const highX = cx + Math.cos(endAngle) * (arcR - 62);
+  const highY = cy + Math.sin(endAngle) * (arcR - 62);
+  ctx.fillStyle = '#F59E0B';
+  ctx.textAlign = 'center';
+  ctx.fillText('HIGH', highX, highY);
+
+  // Subtitle in center: "RESERVE"
+  ctx.fillStyle = 'rgba(226, 186, 150, 0.75)';
+  ctx.font = '600 16px "Space Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('RESERVE', cx, cy + 42);
+
+  // Center chaton ring
+  ctx.strokeStyle = '#E2BA96';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 28, 0, Math.PI * 2);
+  ctx.stroke();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 16;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * Fixed crescent opening mask for the Moon Phase Subdial:
+ * Displays a fixed curved crescent cutout displaying the rotating sun/moon disc beneath
+ */
+export function createMoonPhaseMaskTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  const cx = 256, cy = 256, R = 248;
+
+  // Clear background
+  ctx.clearRect(0, 0, 512, 512);
+
+  // Outer decorative plate (fills the top semicircle and leaves a bottom curved opening)
+  ctx.fillStyle = '#10141D';
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Create curved crescent opening window (transparent cutout)
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.beginPath();
+  // Dual-lobe traditional horological crescent aperture
+  ctx.arc(cx, cy - 20, 160, 0.15 * Math.PI, 0.85 * Math.PI, false);
+  ctx.arc(cx - 75, cy + 50, 85, 0, Math.PI * 2, true);
+  ctx.arc(cx + 75, cy + 50, 85, 0, Math.PI * 2, true);
+  ctx.fill();
+
+  ctx.globalCompositeOperation = 'source-over';
+
+  // Rose-gold beveled border around the aperture
+  ctx.strokeStyle = '#E2BA96';
+  ctx.lineWidth = 4.0;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R - 2, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Decorative gold stars and astrolabe degree marks on mask
+  ctx.fillStyle = '#F59E0B';
+  [[120, 80], [392, 80], [200, 50], [312, 50], [256, 40]].forEach(([sx, sy]) => {
+    ctx.beginPath();
+    ctx.arc(sx, sy, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 16;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * High-complication skeletonized base plate texture:
+ * Sandblasted frosted dark anthracite/titanium, micro-glints,
+ * skeletal cutouts exposing brass gear trains, blued screws, and ruby bearings.
+ */
+export function createSkeletonMovementPlateTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+  const cx = 512, cy = 512;
+
+  // Deep dark frosted anthracite / titanium movement baseplate
+  const baseGrad = ctx.createRadialGradient(cx, cy, 60, cx, cy, 512);
+  baseGrad.addColorStop(0, '#2D323C');    // Frosted slate anthracite highlight
+  baseGrad.addColorStop(0.4, '#1F232B');  // Satin dark titanium body
+  baseGrad.addColorStop(0.75, '#15181F'); // Deep charcoal shadow
+  baseGrad.addColorStop(1, '#0C0E13');    // Perimeter deep dark edge
+  ctx.fillStyle = baseGrad;
+  ctx.fillRect(0, 0, 1024, 1024);
+
+  // Micro-granular sandblasted frosted noise (metallic micro-sparkle)
+  const imgData = ctx.getImageData(0, 0, 1024, 1024);
+  const data = imgData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const noise = (Math.random() - 0.5) * 24;
+    data[i] = Math.min(255, Math.max(0, data[i] + noise));
+    data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + noise + 1));
+    data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise + 2));
+  }
+  ctx.putImageData(imgData, 0, 0);
+
+  // High-Horology Circular Perlage (overlapping circular pearling across the dark mainplate)
+  ctx.save();
+  const perlageStep = 24;
+  for (let py = 16; py < 1008; py += perlageStep) {
+    const rowOffset = (Math.floor(py / perlageStep) % 2) * (perlageStep * 0.5);
+    for (let px = 16 + rowOffset; px < 1008; px += perlageStep) {
+      const pGrad = ctx.createRadialGradient(px - 3, py - 3, 2, px, py, 20);
+      pGrad.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+      pGrad.addColorStop(0.45, 'rgba(140, 155, 175, 0.08)');
+      pGrad.addColorStop(0.85, 'rgba(10, 15, 25, 0.25)');
+      pGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = pGrad;
+      ctx.beginPath();
+      ctx.arc(px, py, 20, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+
+  // Recessed movement aperture wells with chamfered polished bevels
+  const recesses = [
+    { x: 340, y: 350, r: 120 },
+    { x: 680, y: 380, r: 130 },
+    { x: 512, y: 730, r: 190 },
+    { x: 512, y: 460, r: 90 }
+  ];
+  recesses.forEach(rec => {
+    ctx.save();
+    // Dark recess depth
+    const rGrad = ctx.createRadialGradient(rec.x, rec.y, rec.r * 0.5, rec.x, rec.y, rec.r);
+    rGrad.addColorStop(0, 'rgba(35, 30, 25, 0.55)');
+    rGrad.addColorStop(0.9, 'rgba(15, 12, 10, 0.75)');
+    rGrad.addColorStop(1, 'rgba(5, 4, 3, 0.90)');
+    ctx.fillStyle = rGrad;
+    ctx.beginPath();
+    ctx.arc(rec.x, rec.y, rec.r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Polished angled anglage bevel border
+    ctx.strokeStyle = 'rgba(255, 250, 235, 0.85)';
+    ctx.lineWidth = 3.0;
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // Exposed golden brass gear trains and wheels visible beneath cutouts
+  const gears = [
+    { x: 340, y: 350, r: 95, teeth: 36 },
+    { x: 670, y: 380, r: 105, teeth: 40 },
+    { x: 512, y: 460, r: 75, teeth: 28 },
+    { x: 420, y: 640, r: 85, teeth: 32 },
+    { x: 610, y: 660, r: 90, teeth: 34 }
+  ];
+
+  gears.forEach(g => {
+    ctx.save();
+    ctx.translate(g.x, g.y);
+
+    // Brass gear wheel
+    const gearGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, g.r);
+    gearGrad.addColorStop(0, '#FFF099');
+    gearGrad.addColorStop(0.7, '#D4AF37');
+    gearGrad.addColorStop(1, '#8A6218');
+    ctx.fillStyle = gearGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, g.r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Fine gear teeth
+    ctx.fillStyle = '#E5C04A';
+    for (let t = 0; t < g.teeth; t++) {
+      const ta = (t * Math.PI * 2) / g.teeth;
+      ctx.rotate(ta);
+      ctx.fillRect(-3, -g.r - 8, 6, 10);
+      ctx.rotate(-ta);
+    }
+
+    // Skeletonized wheel spokes (5-arm wheel)
+    ctx.globalCompositeOperation = 'destination-out';
+    for (let sp = 0; sp < 5; sp++) {
+      const spa = (sp * Math.PI * 2) / 5;
+      ctx.beginPath();
+      ctx.arc(Math.cos(spa) * (g.r * 0.55), Math.sin(spa) * (g.r * 0.55), g.r * 0.26, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+
+    // Center pinion & jewel
+    ctx.fillStyle = '#F59E0B';
+    ctx.beginPath();
+    ctx.arc(0, 0, 15, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  });
+
+  // Polished 18K gold chatons with glowing pigeon-blood ruby jewel bearings
+  const rubies = [
+    [340, 350, 18], [670, 380, 20], [512, 460, 16],
+    [380, 520, 15], [640, 530, 17], [420, 640, 16],
+    [610, 660, 18], [512, 270, 15], [260, 480, 14],
+    [760, 480, 14]
+  ];
+
+  rubies.forEach(([rx, ry, rr]) => {
+    // Gold chaton collar
+    ctx.fillStyle = '#E6BE44';
+    ctx.beginPath();
+    ctx.arc(rx, ry, rr + 7, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#996515';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Ruby cabochon
+    const rubyGrad = ctx.createRadialGradient(rx - rr * 0.3, ry - rr * 0.3, 2, rx, ry, rr);
+    rubyGrad.addColorStop(0, '#FF4D6D');
+    rubyGrad.addColorStop(0.5, '#E11D48');
+    rubyGrad.addColorStop(0.9, '#881337');
+    rubyGrad.addColorStop(1, '#4C0519');
+    ctx.fillStyle = rubyGrad;
+    ctx.beginPath();
+    ctx.arc(rx, ry, rr, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Specular reflection glint
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.beginPath();
+    ctx.arc(rx - rr * 0.35, ry - rr * 0.35, rr * 0.3, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Flame-blued steel horology screws with mirror bevels and dark slots
+  const screws = [
+    [240, 320], [780, 320], [450, 260], [580, 260],
+    [220, 600], [800, 600], [330, 780], [690, 780],
+    [480, 560], [540, 560]
+  ];
+
+  screws.forEach(([sx, sy]) => {
+    const screwGrad = ctx.createRadialGradient(sx, sy, 2, sx, sy, 14);
+    screwGrad.addColorStop(0, '#38BDF8');
+    screwGrad.addColorStop(0.6, '#1D4ED8');
+    screwGrad.addColorStop(1, '#0F172A');
+    ctx.fillStyle = screwGrad;
+    ctx.beginPath();
+    ctx.arc(sx, sy, 14, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#60A5FA';
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+
+    // Screwdriver slot
+    ctx.fillStyle = '#020617';
+    ctx.fillRect(sx - 11, sy - 2.5, 22, 5);
+  });
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 16;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * Photorealistic Haute-Horlogerie Astronomical Starmap Movement Plate:
+ * Deep midnight cosmic navy/anthracite, golden constellations (Ursa Major, Orion, Cassiopeia, Cygnus),
+ * astrolabe altazimuth coordinate rings, Keplerian planetary orbital paths, and celestial perlage.
+ */
+export function createAstronomicalMovementTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+  const cx = 512, cy = 512;
+
+  // 1. Rich Deep Royal Celestial Midnight Gradient
+  const bgGrad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 512);
+  bgGrad.addColorStop(0, '#122B56');     // Luminous deep royal sapphire center
+  bgGrad.addColorStop(0.35, '#0B1C3B');  // Deep celestial midnight blue
+  bgGrad.addColorStop(0.70, '#061024');  // Atmospheric cosmic dark blue
+  bgGrad.addColorStop(1, '#02050D');     // Outer space rim
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, 1024, 1024);
+
+  // 2. Luminous Cosmic Nebulae (Stellar nursery dust clouds in cyan & violet)
+  const nebula1 = ctx.createRadialGradient(320, 300, 30, 320, 300, 280);
+  nebula1.addColorStop(0, 'rgba(56, 189, 248, 0.32)');
+  nebula1.addColorStop(0.5, 'rgba(30, 64, 175, 0.16)');
+  nebula1.addColorStop(1, 'transparent');
+  ctx.fillStyle = nebula1;
+  ctx.fillRect(0, 0, 1024, 1024);
+
+  const nebula2 = ctx.createRadialGradient(700, 720, 40, 700, 720, 300);
+  nebula2.addColorStop(0, 'rgba(168, 85, 247, 0.28)');
+  nebula2.addColorStop(0.6, 'rgba(126, 34, 206, 0.12)');
+  nebula2.addColorStop(1, 'transparent');
+  ctx.fillStyle = nebula2;
+  ctx.fillRect(0, 0, 1024, 1024);
+
+  const nebula3 = ctx.createRadialGradient(512, 180, 20, 512, 180, 220);
+  nebula3.addColorStop(0, 'rgba(236, 72, 153, 0.20)');
+  nebula3.addColorStop(0.7, 'rgba(244, 114, 182, 0.05)');
+  nebula3.addColorStop(1, 'transparent');
+  ctx.fillStyle = nebula3;
+  ctx.fillRect(0, 0, 1024, 1024);
+
+  ctx.save();
+  ctx.translate(cx, cy);
+
+  // 3. Engine-Turned Guilloché Sunray Rays (72 fine radiant golden lines)
+  for (let r = 0; r < 72; r++) {
+    const ra = (r * Math.PI * 2) / 72;
+    const isMajor = (r % 6 === 0);
+    ctx.strokeStyle = isMajor ? 'rgba(245, 158, 11, 0.45)' : 'rgba(212, 175, 55, 0.18)';
+    ctx.lineWidth = isMajor ? 1.6 : 0.8;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(ra) * 50, Math.sin(ra) * 50);
+    ctx.lineTo(Math.cos(ra) * 500, Math.sin(ra) * 500);
+    ctx.stroke();
+  }
+
+  // 4. Astrolabe Coordinate Rings & Concentric Altitude Circles
+  const rings = [75, 140, 210, 280, 350, 420, 470, 495];
+  rings.forEach((r, idx) => {
+    ctx.strokeStyle = (idx % 2 === 0) ? 'rgba(245, 158, 11, 0.70)' : 'rgba(253, 224, 71, 0.45)';
+    ctx.lineWidth = (idx === rings.length - 2 || idx === 2) ? 2.8 : 1.4;
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Degree tick marks along major altitude rings
+    if (idx >= 3) {
+      const ticks = (idx === rings.length - 2) ? 360 : 72;
+      for (let t = 0; t < ticks; t++) {
+        const ta = (t * Math.PI * 2) / ticks;
+        const tickLen = (t % 10 === 0) ? 9 : (t % 5 === 0 ? 6 : 3.5);
+        ctx.strokeStyle = (t % 10 === 0) ? 'rgba(245, 158, 11, 0.85)' : 'rgba(212, 175, 55, 0.45)';
+        ctx.lineWidth = (t % 10 === 0) ? 1.5 : 0.8;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(ta) * (r - tickLen), Math.sin(ta) * (r - tickLen));
+        ctx.lineTo(Math.cos(ta) * r, Math.sin(ta) * r);
+        ctx.stroke();
+      }
+    }
+  });
+
+  // 5. Tilted Astrolabe Ecliptic Ring with Zodiac Signs
+  ctx.save();
+  ctx.rotate(-0.42);
+  ctx.strokeStyle = 'rgba(251, 191, 36, 0.65)';
+  ctx.lineWidth = 2.0;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 410, 270, 0, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Ecliptic inner dashed border
+  ctx.strokeStyle = 'rgba(245, 158, 11, 0.40)';
+  ctx.lineWidth = 1.0;
+  ctx.setLineDash([8, 6]);
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 395, 255, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Zodiac Constellation glyph markers along the ecliptic
+  const zodiacSigns = ['♈ ARIES', '♉ TAURUS', '♊ GEMINI', '♋ CANCER', '♌ LEO', '♍ VIRGO', '♎ LIBRA', '♏ SCORPIO', '♐ SAGITTARIUS', '♑ CAPRICORN', '♒ AQUARIUS', '♓ PISCES'];
+  ctx.font = 'bold 11px "Cinzel", Georgia, serif';
+  ctx.fillStyle = 'rgba(253, 224, 71, 0.85)';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  zodiacSigns.forEach((z, i) => {
+    const za = (i * Math.PI * 2) / 12;
+    const zx = Math.cos(za) * 402;
+    const zy = Math.sin(za) * 262;
+    ctx.save();
+    ctx.translate(zx, zy);
+    ctx.rotate(za + Math.PI / 2);
+    ctx.fillText(z, 0, 0);
+    ctx.restore();
+  });
+  ctx.restore();
+
+  // 6. Keplerian Planetary Orbits & Golden Planet Spheres
+  const orbits = [
+    { a: 190, b: 150, angle: 0.25, planetAngle: 1.2, color: '#F59E0B', size: 5.5, label: '☉ SOL' },
+    { a: 260, b: 200, angle: -0.35, planetAngle: 3.8, color: '#E2E8F0', size: 4.0, label: '☿ MERCURY' },
+    { a: 330, b: 250, angle: 0.55, planetAngle: 2.1, color: '#FDE047', size: 5.0, label: '♀ VENUS' },
+    { a: 420, b: 320, angle: -0.15, planetAngle: 5.4, color: '#EF4444', size: 4.5, label: '♂ MARS' }
+  ];
+
+  orbits.forEach(orb => {
+    ctx.save();
+    ctx.rotate(orb.angle);
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.40)';
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, orb.a, orb.b, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Planet sphere
+    const px = Math.cos(orb.planetAngle) * orb.a;
+    const py = Math.sin(orb.planetAngle) * orb.b;
+    const pGrad = ctx.createRadialGradient(px - 1, py - 1, 1, px, py, orb.size);
+    pGrad.addColorStop(0, '#FFFFFF');
+    pGrad.addColorStop(0.5, orb.color);
+    pGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = pGrad;
+    ctx.beginPath();
+    ctx.arc(px, py, orb.size, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Planet orbital ring halo
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.arc(px, py, orb.size + 2.5, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.restore();
+  });
+
+  // 7. Golden Constellations with Polished Starlines & Radiant Multi-Spike Stars
+  const constellations = [
+    // Ursa Major (Big Dipper) - Top Left
+    {
+      stars: [[-320, -380], [-270, -400], [-210, -360], [-150, -370], [-100, -310], [-90, -230], [-160, -220], [-150, -370]],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]],
+      name: 'URSA MAJOR'
+    },
+    // Cassiopeia ("W" Queen) - Top Right
+    {
+      stars: [[200, -410], [270, -430], [320, -380], [380, -410], [430, -380]],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 4]],
+      name: 'CASSIOPEIA'
+    },
+    // Cygnus (Northern Cross) - Upper Center
+    {
+      stars: [[0, -360], [0, -280], [0, -200], [-70, -280], [70, -280]],
+      lines: [[0, 1], [1, 2], [3, 1], [1, 4]],
+      name: 'CYGNUS'
+    },
+    // Orion (The Hunter) - Bottom Left
+    {
+      stars: [[-380, 240], [-300, 290], [-250, 310], [-200, 330], [-140, 260], [-360, 410], [-170, 430]],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [4, 6], [1, 5], [3, 6]],
+      name: 'ORION'
+    },
+    // Pegasus & Andromeda - Bottom Right
+    {
+      stars: [[220, 260], [300, 290], [370, 350], [280, 380], [330, 210], [420, 260]],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 0], [1, 4], [4, 5]],
+      name: 'PEGASUS'
+    }
+  ];
+
+  constellations.forEach(c => {
+    // Golden constellation stick lines
+    ctx.strokeStyle = 'rgba(245, 158, 11, 0.75)';
+    ctx.lineWidth = 1.6;
+    c.lines.forEach(([i, j]) => {
+      ctx.beginPath();
+      ctx.moveTo(c.stars[i][0], c.stars[i][1]);
+      ctx.lineTo(c.stars[j][0], c.stars[j][1]);
+      ctx.stroke();
+    });
+
+    // Glowing constellation stars
+    c.stars.forEach(([sx, sy], idx) => {
+      const mag = (idx % 2 === 0) ? 4.5 : 3.0;
+
+      // Radiant gold aura
+      const sGrad = ctx.createRadialGradient(sx, sy, 0.5, sx, sy, mag * 3.0);
+      sGrad.addColorStop(0, '#FFFFFF');
+      sGrad.addColorStop(0.35, '#FDE047');
+      sGrad.addColorStop(0.70, 'rgba(245, 158, 11, 0.45)');
+      sGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = sGrad;
+      ctx.beginPath();
+      ctx.arc(sx, sy, mag * 3.0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Sharp 8-point bright diffraction spikes for bright stars
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      const spikeLen = mag * 3.2;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy - spikeLen);
+      ctx.lineTo(sx + 1.2, sy);
+      ctx.lineTo(sx, sy + spikeLen);
+      ctx.lineTo(sx - 1.2, sy);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(sx - spikeLen, sy);
+      ctx.lineTo(sx, sy + 1.2);
+      ctx.lineTo(sx + spikeLen, sy);
+      ctx.lineTo(sx, sy - 1.2);
+      ctx.closePath();
+      ctx.fill();
+    });
+  });
+
+  // 8. North Star (Polaris) - Royal Celestial Emblem at (0, -425)
+  const px = 0, py = -425;
+  const polarisGrad = ctx.createRadialGradient(px, py, 2, px, py, 26);
+  polarisGrad.addColorStop(0, '#FFFFFF');
+  polarisGrad.addColorStop(0.3, '#FDE047');
+  polarisGrad.addColorStop(0.6, 'rgba(245, 158, 11, 0.5)');
+  polarisGrad.addColorStop(1, 'transparent');
+  ctx.fillStyle = polarisGrad;
+  ctx.beginPath();
+  ctx.arc(px, py, 26, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Brilliant 8-point compass star for Polaris
+  ctx.fillStyle = '#FFFFFF';
+  [0, Math.PI / 4, Math.PI / 2, 3 * Math.PI / 4].forEach(rot => {
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(rot);
+    const sl = (rot === 0 || rot === Math.PI / 2) ? 22 : 13;
+    ctx.beginPath();
+    ctx.moveTo(0, -sl);
+    ctx.lineTo(2.0, 0);
+    ctx.lineTo(0, sl);
+    ctx.lineTo(-2.0, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  });
+
+  // 9. Dense Celestial Starfield (320 sparkling stars of varying magnitudes)
+  for (let s = 0; s < 320; s++) {
+    const sr = Math.random() * 480 + 15;
+    const sa = Math.random() * Math.PI * 2;
+    const sx = Math.cos(sa) * sr;
+    const sy = Math.sin(sa) * sr;
+    const sz = Math.random() * 2.0 + 0.6;
+    ctx.fillStyle = (s % 4 === 0) ? '#FDE047' : ((s % 6 === 0) ? '#38BDF8' : '#FFFFFF');
+    ctx.beginPath();
+    ctx.arc(sx, sy, sz, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // 10. Outer Rim Astronomical Calibre Inscription in Arch
+  ctx.fillStyle = 'rgba(253, 224, 71, 0.85)';
+  ctx.font = 'bold 13px "Cinzel", Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.letterSpacing = '3px';
+  ctx.fillText('ASTRONOMIA CELESTIS • CALIBRE SQUELETTE A3016 • GENEVE', 0, -478);
+  ctx.fillText('N 27° 42\' 14" • E 85° 18\' 30" • ORBIS CELESTIS', 0, 485);
+
+  ctx.restore();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 16;
+  texture.needsUpdate = true;
+  return texture;
+}
+

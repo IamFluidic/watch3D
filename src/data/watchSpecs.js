@@ -1,22 +1,22 @@
 export const WATCH_EDITIONS = [
   {
     id: "steel",
-    name: "01. Celestial Glacier",
-    subtitle: "316L Surgical Steel & Midnight Navy Calfskin",
-    dialColor: "#0A1B38",
-    dialName: "Glacier Sunray Fumé",
-    caseColor: "#E2E8F0",
-    caseMetalness: 0.96,
-    caseRoughness: 0.18,
-    bezelColor: "#1A2538",
+    name: "01. Celestial Alchemist",
+    subtitle: "Engraved Antique Bronze & Constellation Damascus Steel",
+    dialColor: "#172554",
+    dialName: "Astronomical Lapis & Skeleton Tourbillon",
+    caseColor: "#B87C58", // Antique brushed bronze
+    caseMetalness: 0.88,
+    caseRoughness: 0.28,
+    bezelColor: "#1E2026", // Dark slate Damascus constellation bezel
     strapType: "leather",
-    strapColor: "#121A2B",
-    stitchColor: "#FAF5EE",
-    handsColor: "#F8FAFC",
+    strapColor: "#3D2518", // Distressed vintage espresso leather
+    stitchColor: "#FAF5EE", // Contrast cream saddle stitching
+    handsColor: "#F5DAC0", // Rose gold / champagne
     lumeColor: "#38BDF8",
-    accentColor: "#38BDF8",
-    price: "$2,650",
-    description: "Cold-forged from marine-grade 316L surgical stainless steel with vertical satin brushing and mirror chamfers, paired with an ethereal ice-glacier sunray dial and hand-stitched French calfskin leather with ivory saddle stitching."
+    accentColor: "#9333EA", // Amethyst cabochon purple
+    price: "$6,850",
+    description: "Hand-sculpted antique bronze case with celestial constellation engravings, dark Damascus star-map bezel, royal lapis lazuli Roman subdial, astronomical sun & moon phase, and an openworked cobalt-blue flying tourbillon, crowned with a faceted amethyst cabochon."
   },
   {
     id: "dlc",
@@ -83,49 +83,49 @@ export const EXPLODED_LAYERS = [
     name: "Dual-Domed Sapphire Crystal",
     metric: "2.1mm thickness • 9 Mohs hardness",
     offsetZ: 3.4,
-    description: "Synthetic corundum crystal with five anti-reflective interior vapor layers, virtually scratch-proof."
+    description: "Synthetic corundum crystal with five anti-reflective interior vapor layers, revealing deep three-dimensional astronomical complications."
   },
   {
     id: "bezel",
-    name: "Sculpted Octagonal Bezel",
-    metric: "8 Hexagonal Screws • Mirror Chamfers • Fluted Ring",
+    name: "Constellation Damascus Bezel",
+    metric: "Laser-Engraved Star Maps • Degree Arcs • Astrolabe Glyphs",
     offsetZ: 2.3,
-    description: "Iconic 8-sided geometric bezel inspired by Audemars Piguet Royal Oak with vertical satin grain, hand-polished chamfers, 8 perimeter hexagonal screws, and an inner Rolex fluted accent."
-  },
-  {
-    id: "hands",
-    name: "Diamond-Cut Dauphine Hands",
-    metric: "Rhomboid profile • Continuous sweep seconds",
-    offsetZ: 1.4,
-    description: "Balanced diamond-cut hour and minute hands paired with a needle-thin central seconds hand counterweighted for 4Hz sweep."
+    description: "Dark slate Damascus steel bezel intricately engraved with celestial star charts including Ursa Major, Orion, Cassiopeia, coordinate tick marks, and miniature astrolabe glyphs."
   },
   {
     id: "dial",
-    name: "Tapisserie & Flying Tourbillon Dial",
-    metric: "Audemars Piguet Waffle • Jacob & Co Stardust • Applied 3D Batons",
-    offsetZ: 0.5,
-    description: "Signature 'Grande Tapisserie' waffle guilloché dial with Jacob & Co celestial stardust dusting, 12 o'clock astronomical moonphase, and 6 o'clock exposed flying tourbillon."
+    name: "Four Astronomical Clock Circles Dial",
+    metric: "Lapis Lazuli Hours • Minute Ring • Sun & Moon • Tourbillon Ring",
+    offsetZ: 1.3,
+    description: "The 4 distinctive complication clock circles floating as one unified dial layer: Lapis Lazuli Roman hours, elevated minute ring with orbiting ruby cabochon, 24-hr Sunrise & Sunset disc, and the blued showcase tourbillon ring."
+  },
+  {
+    id: "gears",
+    name: "Complete Skeletonized Gear Train Layer",
+    metric: "26-Jewel Cascading Mechanical Train • Individual Z-Explosion",
+    offsetZ: 0.1,
+    description: "Every driving wheel, transmission pinion, motion works gear, and tourbillon gear floating in its own dedicated layer, with all gears exploding with individual 3D depth separation."
   },
   {
     id: "movement",
-    name: "Calibre A3016 Engine & Hand Gear Train",
-    metric: "28,800 vph (4Hz) • 26 Jewels • Integrated Motion Works",
-    offsetZ: -0.6,
-    description: "In-house automatic movement engine integrated with thick 3D hand-driving gears, central cannon pinion, 12:1 hour wheel, 4Hz fourth wheel, escape wheel, and Glucydur balance wheel."
+    name: "Astronomical Celestial Mainplate & Bridges",
+    metric: "Hand-Guilloché Starmap • Astrolabe Coordinate Grid",
+    offsetZ: -0.9,
+    description: "Deep midnight sapphire movement mainplate engraved with golden astrolabe coordinates, Keplerian planetary orbits, golden constellations, and Geneva rubies."
   },
   {
     id: "case",
-    name: "Monobloc Middle Case",
-    metric: "40.0mm diameter • 10.8mm thin • 100m Water Resistant",
-    offsetZ: -1.6,
-    description: "CNC-milled from a single solid block of 316L alloy with integrated screw-down crown and O-ring twin seal gaskets."
+    name: "Sculpted Antique Bronze Case & Crown",
+    metric: "Constellation-Engraved Lugs • Faceted Amethyst Cabochon",
+    offsetZ: -1.9,
+    description: "Warm antique brushed bronze case with hand-engraved constellation motifs along the flanks, flowing sculpted lugs, and a fluted crown crowned with a royal purple amethyst crystal cabochon."
   },
   {
     id: "caseback",
-    name: "Solid Plane Steel Caseback",
-    metric: "Threaded screw-in • Surgical 316L",
-    offsetZ: -2.6,
-    description: "Solid surgical steel back laser-engraved with the iconic ALUNA italic script and model reference A3016."
+    name: "Solid Engraved Bronze Caseback",
+    metric: "Threaded screw-in • Astronomical Inscriptions",
+    offsetZ: -2.9,
+    description: "Solid caseback laser-engraved with astronomical star coordinates and the iconic ALUNA Celestial Calibre insignia."
   }
 ];
 
