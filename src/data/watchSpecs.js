@@ -104,10 +104,10 @@ export const EXPLODED_LAYERS = [
   },
   {
     id: "movement",
-    name: "Calibre A3016 Nepal Automatic Engine",
-    metric: "28,800 vph (4Hz) • 26 Jewels • 48h Reserve",
+    name: "Calibre A3016 Engine & Hand Gear Train",
+    metric: "28,800 vph (4Hz) • 26 Jewels • Integrated Motion Works",
     offsetZ: -0.6,
-    description: "In-house mechanical movement with Glucydur balance wheel, perlage circular graining, and Incabloc shock protection."
+    description: "In-house automatic movement engine integrated with thick 3D hand-driving gears, central cannon pinion, 12:1 hour wheel, 4Hz fourth wheel, escape wheel, and Glucydur balance wheel."
   },
   {
     id: "case",

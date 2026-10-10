@@ -51,6 +51,18 @@ export const HOTSPOT_DATA = [
     zoom: 8.8
   },
   {
+    id: 'gears',
+    badge: 'MOTION WORKS',
+    label: 'Hand Driving Gear Train',
+    metric: 'Synchronized Hour & Minute Wheels • 4Hz Fourth Wheel',
+    desc: 'Precision micro-gears driving the hands: cannon pinion, 12:1 hour wheel, sweep seconds train, and synthetic ruby jewels.',
+    localPos: new THREE.Vector3(0.65, -0.35, 0.05),
+    normal: new THREE.Vector3(0, 0, 1),
+    targetRotX: 0.25,
+    targetRotY: -0.35,
+    zoom: 9.0
+  },
+  {
     id: 'caseback',
     badge: 'CASEBACK',
     label: 'Solid Engraved Caseback',

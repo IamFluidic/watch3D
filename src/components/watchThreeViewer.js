@@ -425,6 +425,39 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     const hourAngle = -(hours / 12) * Math.PI * 2;
     watchInstance.hands.hour.rotation.z = hourAngle;
 
+    // 1B. Synchronize Rotation of the Watch Hands Gears below the clock face:
+    // As the clock hands sweep, all driving gears dynamically and visibly rotate!
+    if (watchInstance.gears) {
+      if (watchInstance.gears.fourthWheel) {
+        // Fourth Wheel directly drives the continuous sweep seconds hand
+        watchInstance.gears.fourthWheel.rotation.z = secondAngle;
+      }
+      if (watchInstance.gears.escapeWheel) {
+        // Escapement wheel high-speed 4Hz spin driven by train
+        watchInstance.gears.escapeWheel.rotation.z = secondAngle * 8.0;
+      }
+      if (watchInstance.gears.palletFork) {
+        // Pallet fork lever rocking at 4Hz
+        watchInstance.gears.palletFork.rotation.z = Math.sin(now * 0.025) * 0.35;
+      }
+      if (watchInstance.gears.thirdWheel) {
+        // Third wheel intermediate counter-rotation
+        watchInstance.gears.thirdWheel.rotation.z = -secondAngle * 1.6;
+      }
+      if (watchInstance.gears.minuteWheel) {
+        // Minute wheel motion works reduction gear
+        watchInstance.gears.minuteWheel.rotation.z = -secondAngle * 0.45;
+      }
+      if (watchInstance.gears.cannonPinion) {
+        // Center cannon pinion driving minute hand
+        watchInstance.gears.cannonPinion.rotation.z = secondAngle * 0.25;
+      }
+      if (watchInstance.gears.hourWheel) {
+        // Hour wheel driving hour hand
+        watchInstance.gears.hourWheel.rotation.z = secondAngle * 0.08;
+      }
+    }
+
     // 2. High-Frequency Balance Wheel Oscillation (4Hz / 8 beats per second)
     const balanceBeat = Math.sin(now * 0.025) * 0.55;
     watchInstance.balanceWheel.rotation.z = balanceBeat;
@@ -469,18 +502,18 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
         rotorVelocity += 0.02;
         if (!manualExplode) explodedController.setExploded(false);
       } else if (scrollProgress >= 0.55 && scrollProgress < 0.68) {
-        // Step 4: Deconstructed Architecture (Feature 04)
+        // Step 4: Deconstructed Architecture (Feature 04) - reveals gears beneath dial face
         const p = (scrollProgress - 0.55) / 0.13;
-        targetRotX = 0.02 * (1 - p) + 0.28 * p;
-        targetRotY = Math.PI * (1 - p) + (Math.PI + 0.50) * p;
+        targetRotX = 0.02 * (1 - p) + 0.32 * p;
+        targetRotY = Math.PI * (1 - p) + (Math.PI * 2 - 0.60) * p;
         targetZoom = 7.6 * (1 - p) + 13.0 * p;
         targetPosX = window.innerWidth > 900 ? 1.3 : 0;
         explodedController.targetProgress = Math.max(p, manualExplode ? 1 : 0);
       } else if (scrollProgress >= 0.68 && scrollProgress < 0.82) {
         // Step 5: Sculpted 3-Link Bracelet (Feature 05)
         const p = (scrollProgress - 0.68) / 0.14;
-        targetRotX = 0.28 * (1 - p) + 0.10 * p;
-        targetRotY = (Math.PI + 0.50) * (1 - p) + (Math.PI * 2) * p;
+        targetRotX = 0.32 * (1 - p) + 0.10 * p;
+        targetRotY = (Math.PI * 2 - 0.60) * (1 - p) + (Math.PI * 2) * p;
         targetZoom = 13.0 * (1 - p) + 7.8 * p;
         targetPosX = window.innerWidth > 900 ? 1.3 : 0;
         explodedController.targetProgress = 0;
@@ -561,7 +594,15 @@ export function initWatchViewer(containerId, hotspotsContainerId = 'watch-hotspo
     toggleExploded() {
       manualExplode = !manualExplode;
       explodedController.setExploded(manualExplode);
-      targetZoom = manualExplode ? 13 : 11;
+      if (manualExplode) {
+        targetZoom = 13.0;
+        targetRotX = 0.32;
+        targetRotY = -0.55;
+      } else {
+        targetZoom = 9.8;
+        targetRotX = 0.08;
+        targetRotY = 0.04;
+      }
       return manualExplode;
     },
     isExploded() {
