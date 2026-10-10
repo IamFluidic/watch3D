@@ -4,7 +4,10 @@ import {
   createBezelTexture,
   createMovementTexture,
   createRotorTexture,
-  createFlatCasebackTexture
+  createFlatCasebackTexture,
+  createLeatherTexture,
+  createLeatherBumpMap,
+  createLeatherRoughnessMap
 } from './watchTextureGenerator.js';
 
 export function create3DWatch(edition) {
@@ -98,9 +101,19 @@ export function create3DWatch(edition) {
     }),
     strap: new THREE.MeshStandardMaterial({
       color: new THREE.Color(edition.strapColor),
-      metalness: edition.strapType === 'metal' ? (edition.caseMetalness ?? 0.98) : 0.05,
-      roughness: edition.strapType === 'metal' ? 0.22 : 0.75,
-      envMapIntensity: 1.6
+      map: createLeatherTexture(edition),
+      bumpMap: createLeatherBumpMap(),
+      bumpScale: 0.035,
+      roughnessMap: createLeatherRoughnessMap(),
+      metalness: edition.strapType === 'metal' ? (edition.caseMetalness ?? 0.98) : 0.03,
+      roughness: edition.strapType === 'metal' ? 0.22 : 0.65,
+      envMapIntensity: 1.5
+    }),
+    stitch: new THREE.MeshStandardMaterial({
+      color: new THREE.Color(edition.stitchColor || '#FAF5EE'),
+      roughness: 0.38,
+      metalness: 0.02,
+      envMapIntensity: 1.2
     }),
     gearBrass: new THREE.MeshStandardMaterial({
       color: 0xD4AF37,
@@ -1117,8 +1130,21 @@ export function create3DWatch(edition) {
       materials.lume.emissive.set(newEdition.lumeColor);
 
       materials.strap.color.set(newEdition.strapColor);
-      materials.strap.metalness = newEdition.strapType === 'metal' ? (newEdition.caseMetalness ?? 0.95) : 0.05;
-      materials.strap.roughness = newEdition.strapType === 'metal' ? (newEdition.caseRoughness ?? 0.22) : 0.75;
+      materials.strap.map = createLeatherTexture(newEdition);
+      materials.strap.map.needsUpdate = true;
+      if (newEdition.strapType === 'metal') {
+        materials.strap.bumpScale = 0.005;
+        materials.strap.metalness = newEdition.caseMetalness ?? 0.95;
+        materials.strap.roughness = newEdition.caseRoughness ?? 0.22;
+      } else {
+        materials.strap.bumpScale = 0.035;
+        materials.strap.metalness = 0.03;
+        materials.strap.roughness = 0.65;
+      }
+
+      if (materials.stitch) {
+        materials.stitch.color.set(newEdition.stitchColor || '#FAF5EE');
+      }
 
       if (braceletController) {
         braceletController.update(newEdition);
@@ -1286,82 +1312,279 @@ function buildBracelet(parentGroup, materials, edition) {
   metalGroup.add(claspGroup);
 
   // =========================================================
-  // 3. LEATHER STRAP (Hand-Stitched French Calfskin & Deployant Buckle)
+  // 3. ARTISANAL LEATHER STRAP (Thick Padded Solid & French Saddle Stitching)
+  // Continuous smooth organic band with thick luxury padding and zero steps.
   // =========================================================
-  const stitchMat = new THREE.MeshStandardMaterial({
-    color: 0xF8FAFC,
-    roughness: 0.9,
-    metalness: 0.02
-  });
+  function createSmoothLeatherBandGeometry(curve, isTop) {
+    const M = 64; // 64 smooth longitudinal slices
+    const positions = [];
+    const uvs = [];
+    const indices = [];
+
+    const rightVec = new THREE.Vector3(1, 0, 0);
+    const numCross = 14;
+
+    for (let j = 0; j <= M; j++) {
+      const s = j / M;
+      const pt = curve.getPointAt(s);
+      const tan = curve.getTangentAt(s).normalize();
+      const norm = isTop
+        ? new THREE.Vector3(0, -tan.z, tan.y).normalize()
+        : new THREE.Vector3(0, tan.z, -tan.y).normalize();
+
+      // Width tapers smoothly from 2.45 at lugs down to 1.72 at clasp
+      const W = 2.45 - s * 0.73;
+      const halfW = W / 2;
+      // Substantial thick luxury padding: 0.38 at lugs down to 0.26 at clasp
+      const baseThick = 0.38 - s * 0.12;
+      // Raised bombé center dome: 0.10 at lugs down to 0.05 at clasp (total 0.48 thickness at lugs!)
+      const dome = 0.10 - s * 0.05;
+
+      // Top surface vertices (8 points across bombé face with stitch channel groove)
+      for (let p = 0; p <= 7; p++) {
+        const u = -1 + (p / 7) * 2; // -1 to +1
+        const lx = u * halfW;
+        const domeFactor = Math.max(0, 1 - Math.pow(u / 0.76, 2));
+        // Subtle recessed stitch channel groove pressed along margins
+        const stitchDist = Math.abs(Math.abs(u) - 0.86);
+        const stitchDip = Math.exp(-stitchDist * stitchDist * 32) * 0.018;
+
+        const lz = baseThick / 2 + dome * domeFactor - stitchDip;
+
+        const vx = pt.x + lx * rightVec.x + lz * norm.x;
+        const vy = pt.y + lx * rightVec.y + lz * norm.y;
+        const vz = pt.z + lx * rightVec.z + lz * norm.z;
+        positions.push(vx, vy, vz);
+        uvs.push((u + 1) * 0.5, s * 6);
+      }
+
+      // Bottom surface vertices (inner wrist face: 6 points, flat and silky smooth)
+      for (let p = 1; p <= 6; p++) {
+        const u = 1 - (p / 6) * 2; // +1 to -1
+        const lx = u * (halfW - 0.02);
+        const lz = -baseThick / 2;
+
+        const vx = pt.x + lx * rightVec.x + lz * norm.x;
+        const vy = pt.y + lx * rightVec.y + lz * norm.y;
+        const vz = pt.z + lx * rightVec.z + lz * norm.z;
+        positions.push(vx, vy, vz);
+        uvs.push((u + 1) * 0.5, s * 6);
+      }
+    }
+
+    // Connect slices with quad strips
+    for (let j = 0; j < M; j++) {
+      for (let k = 0; k < numCross; k++) {
+        const nextK = (k + 1) % numCross;
+        indices.push(j * numCross + k, (j + 1) * numCross + k, j * numCross + nextK);
+        indices.push(j * numCross + nextK, (j + 1) * numCross + k, (j + 1) * numCross + nextK);
+      }
+    }
+
+    // End cap at start (j = 0, lugs)
+    for (let k = 1; k < numCross - 1; k++) {
+      indices.push(0, k, k + 1);
+    }
+
+    // End cap at end (j = M, clasp)
+    const offsetM = M * numCross;
+    for (let k = 1; k < numCross - 1; k++) {
+      indices.push(offsetM, offsetM + k + 1, offsetM + k);
+    }
+
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geom.setIndex(indices);
+    geom.computeVertexNormals();
+    return geom;
+  }
+
+  // 1. Build Top and Bottom Continuous Thick Solid Leather Straps
+  const topStrapGeom = createSmoothLeatherBandGeometry(topCurve, true);
+  const topStrapMesh = new THREE.Mesh(topStrapGeom, materials.strap);
+  leatherGroup.add(topStrapMesh);
+
+  const botStrapGeom = createSmoothLeatherBandGeometry(botCurve, false);
+  const botStrapMesh = new THREE.Mesh(botStrapGeom, materials.strap);
+  leatherGroup.add(botStrapMesh);
+
+  // Curved Case-Hugging End Fillers (seamless integration between lugs at the 40mm case)
+  for (let half of ['top', 'bot']) {
+    const isTop = half === 'top';
+    const endFillerGeom = new THREE.CylinderGeometry(0.24, 0.24, 2.44, 24);
+    const endFiller = new THREE.Mesh(endFillerGeom, materials.strap);
+    endFiller.rotation.z = Math.PI / 2;
+    endFiller.position.set(0, isTop ? 2.45 : -2.45, -0.16);
+    leatherGroup.add(endFiller);
+  }
+
+  // 2. Continuous French Saddle Stitching along both sides of Top and Bottom Straps
+  const punctureMat = new THREE.MeshBasicMaterial({ color: 0x030508 });
+  const stitchGeom = new THREE.CylinderGeometry(0.021, 0.021, 0.13, 8);
+  const punchGeom = new THREE.CircleGeometry(0.016, 6);
+  const numStitches = 28;
 
   for (let half of ['top', 'bot']) {
     const isTop = half === 'top';
     const curve = isTop ? topCurve : botCurve;
 
-    for (let i = 0; i < numLinks; i++) {
-      const t = (i + 0.5) / numLinks;
-      const pt = curve.getPointAt(t);
-      const tangent = curve.getTangentAt(t).normalize();
-      const normal = isTop
-        ? new THREE.Vector3(0, -tangent.z, tangent.y).normalize()
-        : new THREE.Vector3(0, tangent.z, -tangent.y).normalize();
+    for (let k = 0; k < numStitches; k++) {
+      const s = (k + 0.6) / (numStitches + 0.2);
+      const pt = curve.getPointAt(s);
+      const tan = curve.getTangentAt(s).normalize();
+      const norm = isTop
+        ? new THREE.Vector3(0, -tan.z, tan.y).normalize()
+        : new THREE.Vector3(0, tan.z, -tan.y).normalize();
 
-      basisMatrix.makeBasis(rightVec, tangent, normal);
+      const basis = new THREE.Matrix4();
+      basis.makeBasis(rightVec, tan, norm);
 
-      const totalWidth = 2.40 - t * 0.68;
-      const linkLen = 0.39;
+      const W = 2.45 - s * 0.73;
+      const halfW = W / 2;
+      const baseThick = 0.38 - s * 0.12;
+      const dome = 0.10 - s * 0.05;
 
-      const leatherRow = new THREE.Group();
-      leatherRow.position.copy(pt);
-      leatherRow.setRotationFromMatrix(basisMatrix);
+      for (let side of [-1, 1]) {
+        const lx = side * (halfW - 0.14);
+        const u = lx / halfW;
+        const domeFactor = Math.max(0, 1 - Math.pow(u / 0.76, 2));
+        const lz = baseThick / 2 + dome * domeFactor + 0.016;
 
-      // Padded leather base
-      const padGeom = new THREE.BoxGeometry(totalWidth, linkLen, 0.22);
-      const padMesh = new THREE.Mesh(padGeom, materials.strap);
-      leatherRow.add(padMesh);
+        const stitchGroup = new THREE.Group();
+        stitchGroup.position.copy(pt);
+        stitchGroup.setRotationFromMatrix(basis);
 
-      // Raised bombé center ridge
-      const ridgeGeom = new THREE.BoxGeometry(totalWidth * 0.86, linkLen, 0.04);
-      const ridgeMesh = new THREE.Mesh(ridgeGeom, materials.strap);
-      ridgeMesh.position.set(0, 0, 0.12);
-      leatherRow.add(ridgeMesh);
+        // Slanted 18° French stitch (Point Sellier) with waxed linen thread luster
+        const stitchMesh = new THREE.Mesh(stitchGeom, materials.stitch);
+        stitchMesh.position.set(lx, 0, lz);
+        stitchMesh.rotation.z = side * (isTop ? 0.31 : -0.31);
+        stitchGroup.add(stitchMesh);
 
-      // Left & Right Contrast Perimeter Stitches
-      const stitchGeom = new THREE.BoxGeometry(0.04, linkLen * 0.75, 0.03);
-      const leftStitch = new THREE.Mesh(stitchGeom, stitchMat);
-      leftStitch.position.set(-totalWidth / 2 + 0.10, 0, 0.12);
-      leatherRow.add(leftStitch);
+        // Diamond awl pierced needle puncture dots at ends
+        for (let pOffset of [-0.056, 0.056]) {
+          const dot = new THREE.Mesh(punchGeom, punctureMat);
+          dot.position.set(lx, pOffset, lz - 0.003);
+          stitchGroup.add(dot);
+        }
 
-      const rightStitch = new THREE.Mesh(stitchGeom, stitchMat);
-      rightStitch.position.set(totalWidth / 2 - 0.10, 0, 0.12);
-      leatherRow.add(rightStitch);
-
-      // Adjustment sizing punch holes along center on bottom tail strap
-      if (!isTop && i >= 6 && i <= 11) {
-        const holeGeom = new THREE.CylinderGeometry(0.04, 0.04, 0.06, 8);
-        const holeMesh = new THREE.Mesh(holeGeom, new THREE.MeshBasicMaterial({ color: 0x05070A }));
-        holeMesh.rotation.x = Math.PI / 2;
-        holeMesh.position.set(0, 0, 0.12);
-        leatherRow.add(holeMesh);
+        leatherGroup.add(stitchGroup);
       }
+    }
 
-      // Fixed & Floating Leather Keepers
-      if (!isTop && (i === 10 || i === 11)) {
-        const keeperGeom = new THREE.BoxGeometry(totalWidth + 0.12, 0.14, 0.32);
-        const keeperMesh = new THREE.Mesh(keeperGeom, materials.strap);
-        leatherRow.add(keeperMesh);
+    // Double transverse reinforcement lock-stitches at the watch lugs
+    for (let lockS of [0.025, 0.055]) {
+      const lugPt = curve.getPointAt(lockS);
+      const lugTan = curve.getTangentAt(lockS).normalize();
+      const lugNorm = isTop
+        ? new THREE.Vector3(0, -lugTan.z, lugTan.y).normalize()
+        : new THREE.Vector3(0, lugTan.z, -lugTan.y).normalize();
+      const lugBasis = new THREE.Matrix4();
+      lugBasis.makeBasis(rightVec, lugTan, lugNorm);
+
+      for (let side of [-1, 1]) {
+        const lockGroup = new THREE.Group();
+        lockGroup.position.copy(lugPt);
+        lockGroup.setRotationFromMatrix(lugBasis);
+
+        const lockStitch = new THREE.Mesh(stitchGeom, materials.stitch);
+        lockStitch.position.set(side * 0.58, 0, 0.21);
+        lockStitch.rotation.z = Math.PI / 2;
+        lockGroup.add(lockStitch);
+
+        leatherGroup.add(lockGroup);
       }
-
-      leatherGroup.add(leatherRow);
     }
   }
 
-  // Deployant buckle for leather strap at the back
+  // 3. Perforated sizing punch holes along bottom tail strap
+  const holePositions = [0.44, 0.51, 0.58, 0.65, 0.72, 0.79, 0.86];
+  for (let hs of holePositions) {
+    const pt = botCurve.getPointAt(hs);
+    const tan = botCurve.getTangentAt(hs).normalize();
+    const norm = new THREE.Vector3(0, tan.z, -tan.y).normalize();
+    const basis = new THREE.Matrix4();
+    basis.makeBasis(rightVec, tan, norm);
+
+    const holeGroup = new THREE.Group();
+    holeGroup.position.copy(pt);
+    holeGroup.setRotationFromMatrix(basis);
+
+    const baseThick = 0.38 - hs * 0.12;
+    const dome = 0.10 - hs * 0.05;
+    const totalThick = baseThick + dome;
+
+    // Dark punched hole interior
+    const holeGeom = new THREE.CylinderGeometry(0.048, 0.048, totalThick + 0.04, 12);
+    const holeMesh = new THREE.Mesh(holeGeom, punctureMat);
+    holeMesh.rotation.x = Math.PI / 2;
+    holeGroup.add(holeMesh);
+
+    // Beveled metallic eyelet grommet
+    const grommetGeom = new THREE.TorusGeometry(0.052, 0.013, 8, 16);
+    const grommetMesh = new THREE.Mesh(grommetGeom, materials.case);
+    grommetMesh.position.z = totalThick / 2 + 0.005;
+    holeGroup.add(grommetMesh);
+
+    leatherGroup.add(holeGroup);
+  }
+
+  // 4. Smooth Leather Keepers
+  for (let [ks, isFixed] of [[0.68, true], [0.76, false]]) {
+    const pt = botCurve.getPointAt(ks);
+    const tan = botCurve.getTangentAt(ks).normalize();
+    const norm = new THREE.Vector3(0, tan.z, -tan.y).normalize();
+    const basis = new THREE.Matrix4();
+    basis.makeBasis(rightVec, tan, norm);
+
+    const keeperGroup = new THREE.Group();
+    keeperGroup.position.copy(pt);
+    keeperGroup.setRotationFromMatrix(basis);
+
+    const kW = (2.45 - ks * 0.73) + 0.12;
+    const kThick = (0.38 - ks * 0.12 + 0.08) + 0.14;
+
+    const keeperGeom = new THREE.BoxGeometry(kW, 0.14, kThick);
+    const keeperMesh = new THREE.Mesh(keeperGeom, materials.strap);
+    keeperGroup.add(keeperMesh);
+
+    if (isFixed) {
+      const keeperStitchGeom = new THREE.BoxGeometry(kW - 0.04, 0.025, 0.02);
+      const keeperStitch = new THREE.Mesh(keeperStitchGeom, materials.stitch);
+      keeperStitch.position.set(0, 0, kThick / 2 + 0.008);
+      keeperGroup.add(keeperStitch);
+    }
+
+    leatherGroup.add(keeperGroup);
+  }
+
+  // 5. Sculpted Deployant Butterfly Buckle at the back (Y=0, Z=-3.85)
   const leatherBuckleGroup = new THREE.Group();
   leatherBuckleGroup.position.set(0, 0, -3.85);
-  const buckleGeom = new THREE.BoxGeometry(1.80, 0.85, 0.30);
-  const buckleMesh = new THREE.Mesh(buckleGeom, materials.case);
-  leatherBuckleGroup.add(buckleMesh);
+
+  const buckleBridgeGeom = new THREE.BoxGeometry(1.78, 0.95, 0.24);
+  const buckleBridge = new THREE.Mesh(buckleBridgeGeom, materials.case);
+  leatherBuckleGroup.add(buckleBridge);
+
+  const buckleBrandGeom = new THREE.BoxGeometry(0.85, 0.22, 0.04);
+  const buckleBrand = new THREE.Mesh(buckleBrandGeom, materials.hands);
+  buckleBrand.position.set(0, 0, -0.14);
+  leatherBuckleGroup.add(buckleBrand);
+
+  const bPusherGeom = new THREE.BoxGeometry(0.16, 0.32, 0.16);
+  const bPusherLeft = new THREE.Mesh(bPusherGeom, materials.case);
+  bPusherLeft.position.set(-0.94, 0, -0.02);
+  leatherBuckleGroup.add(bPusherLeft);
+
+  const bPusherRight = new THREE.Mesh(bPusherGeom, materials.case);
+  bPusherRight.position.set(0.94, 0, -0.02);
+  leatherBuckleGroup.add(bPusherRight);
+
+  const bScissorGeom = new THREE.BoxGeometry(0.44, 1.25, 0.05);
+  const bScissor = new THREE.Mesh(bScissorGeom, materials.case);
+  bScissor.position.set(0, 0, 0.14);
+  leatherBuckleGroup.add(bScissor);
+
   leatherGroup.add(leatherBuckleGroup);
 
   return {

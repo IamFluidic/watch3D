@@ -2,20 +2,21 @@ export const WATCH_EDITIONS = [
   {
     id: "steel",
     name: "01. Celestial Glacier",
-    subtitle: "316L Surgical Steel & Glacier Blue",
+    subtitle: "316L Surgical Steel & Midnight Navy Calfskin",
     dialColor: "#0A1B38",
     dialName: "Glacier Sunray Fumé",
     caseColor: "#E2E8F0",
     caseMetalness: 0.96,
     caseRoughness: 0.18,
     bezelColor: "#1A2538",
-    strapType: "metal",
-    strapColor: "#CBD5E1",
+    strapType: "leather",
+    strapColor: "#121A2B",
+    stitchColor: "#FAF5EE",
     handsColor: "#F8FAFC",
     lumeColor: "#38BDF8",
     accentColor: "#38BDF8",
     price: "$2,650",
-    description: "Cold-forged from marine-grade 316L surgical stainless steel with vertical satin brushing and mirror chamfers, paired with an ethereal ice-glacier sunray dial and electric cyan Super-LumiNova."
+    description: "Cold-forged from marine-grade 316L surgical stainless steel with vertical satin brushing and mirror chamfers, paired with an ethereal ice-glacier sunray dial and hand-stitched French calfskin leather with ivory saddle stitching."
   },
   {
     id: "dlc",
@@ -27,13 +28,14 @@ export const WATCH_EDITIONS = [
     caseMetalness: 0.98,
     caseRoughness: 0.12,    // Semi-gloss mirror-metallic finish
     bezelColor: "#0A0B0E",
-    strapType: "metal",
-    strapColor: "#0F1115",  // Matching DLC black link bracelet
+    strapType: "leather",
+    strapColor: "#0C0D11",  // Matching Obsidian black leather
+    stitchColor: "#38BDF8", // Electric cyan accent saddle stitch
     handsColor: "#E2E8F0",  // Mirror-polished rhodium hands
     lumeColor: "#22D3EE",   // Electric cyan lume
     accentColor: "#C084FC", // Ultraviolet second hand
     price: "$2,950",
-    description: "Vapor-deposited diamond-like carbon coating over surgical steel, creating an obsidian-black exterior with 3,500 Vickers hardness, paired with a cosmic violet fumé dial and electric cyan luminescence."
+    description: "Vapor-deposited diamond-like carbon coating over surgical steel, paired with a cosmic violet fumé dial, obsidian leather strap, and cyan hand-stitched accents."
   },
   {
     id: "rose",
@@ -47,6 +49,7 @@ export const WATCH_EDITIONS = [
     bezelColor: "#D4987A",
     strapType: "leather",
     strapColor: "#3B1E15",
+    stitchColor: "#FEF08A",
     handsColor: "#B4654A",
     lumeColor: "#FEF08A",
     accentColor: "#1E40AF", // Classic heated flame-blued second hand
@@ -64,12 +67,13 @@ export const WATCH_EDITIONS = [
     caseRoughness: 0.38,
     bezelColor: "#052613",
     strapType: "leather",
-    strapColor: "#1C1D21",
+    strapColor: "#0A2416",
+    stitchColor: "#86EFAC",
     handsColor: "#F8FAFC",
     lumeColor: "#4ADE80",
     accentColor: "#F59E0B", // Gilt gold racing seconds hand
     price: "$3,350",
-    description: "Aerospace Grade 5 titanium bead-blasted to a silky satin sheen, paired with a British racing emerald sunburst dial, gilt gold railway track, and vivid C3 Super-LumiNova."
+    description: "Aerospace Grade 5 titanium bead-blasted to a silky satin sheen, paired with a British racing emerald sunburst dial, gilt gold railway track, and racing green saddle-stitched leather."
   }
 ];
 
@@ -137,7 +141,6 @@ export const TECHNICAL_SPECIFICATIONS = [
   { label: "Water Resistance", value: "10 ATM / 100 Meters / 330 Feet (Dual O-Ring Hermetic)" },
   { label: "Crystal", value: "Dual-Domed Anti-Reflective Synthetic Sapphire Crystal" },
   { label: "Luminescence", value: "Nepal Super-LumiNova® Grade X1 Glow" },
-  { label: "Tourbillon Regulation", value: "60-Second Flying Tourbillon Carriage (-2 / +4 sec / day)" },
-  { label: "Bracelet", value: "Solid 316L 3-Link Steel with Micro-Adjust Deployant" },
+  { label: "Strap & Buckle", value: "Hand-Stitched French Calfskin with Deployant Clasp & Point Sellier Saddle Stitching" },
   { label: "Warranty", value: "5-Year International Manufacture Warranty" }
 ];

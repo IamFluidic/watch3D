@@ -778,6 +778,208 @@ export function createRotorTexture() {
   return texture;
 }
 
+/**
+ * Generates an ultra-luxurious organic leather grain texture
+ * with micro-pebbled calfskin pores, alligator/croco cell embossing,
+ * and soft longitudinal satin sheen highlights.
+ */
+/**
+ * Generates an ultra-luxurious organic leather color map
+ * featuring true Voronoi cellular alligator/calfskin scale tiles,
+ * aniline dye depth in interstitial valleys, and burnished edge paint.
+ */
+export function createLeatherTexture(edition) {
+  const canvas = document.createElement('canvas');
+  const width = 512, height = 512;
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  const baseHex = edition?.strapColor || '#121A2B';
+  const numHex = parseInt(baseHex.replace('#', ''), 16);
+  const baseR = (numHex >> 16) & 255;
+  const baseG = (numHex >> 8) & 255;
+  const baseB = numHex & 255;
+
+  // Voronoi cell seeds for natural scale lattice
+  const numCellsX = 14, numCellsY = 28;
+  const stepX = width / numCellsX, stepY = height / numCellsY;
+  const grid = Array.from({ length: numCellsY }, () => Array(numCellsX).fill(null));
+
+  for (let cy = 0; cy < numCellsY; cy++) {
+    for (let cx = 0; cx < numCellsX; cx++) {
+      const px = (cx + 0.5 + (Math.random() - 0.5) * 0.72) * stepX;
+      const py = (cy + 0.5 + (Math.random() - 0.5) * 0.72) * stepY;
+      grid[cy][cx] = { x: px, y: py };
+    }
+  }
+
+  const imgData = ctx.createImageData(width, height);
+  const data = imgData.data;
+
+  for (let y = 0; y < height; y++) {
+    const gy = Math.floor(y / stepY);
+    for (let x = 0; x < width; x++) {
+      const gx = Math.floor(x / stepX);
+      let d1 = 999999, d2 = 999999;
+
+      for (let dy = -1; dy <= 1; dy++) {
+        const ny = (gy + dy + numCellsY) % numCellsY;
+        for (let dx = -1; dx <= 1; dx++) {
+          const nx = (gx + dx + numCellsX) % numCellsX;
+          const pt = grid[ny][nx];
+          const distSq = (x - pt.x) * (x - pt.x) + (y - pt.y) * (y - pt.y);
+          if (distSq < d1) { d2 = d1; d1 = distSq; }
+          else if (distSq < d2) { d2 = distSq; }
+        }
+      }
+
+      const diff = Math.sqrt(d2) - Math.sqrt(d1); // Small near valleys, large in cell center
+      const cellFactor = Math.min(1.0, Math.max(0.0, diff / 8.5));
+
+      // Organic micro-pore noise
+      const pore = (Math.random() - 0.5) * 14;
+
+      // Aniline dye modulation: valleys are 40% darker, centers are rich & warm
+      const shade = 0.60 + 0.40 * cellFactor;
+
+      // Edge burnishing (darker lacquer edge paint on left/right borders)
+      const edgeDist = Math.min(x, width - 1 - x);
+      const edgeFactor = Math.min(1.0, Math.max(0.45, edgeDist / 38));
+
+      const finalR = Math.min(255, Math.max(0, Math.round((baseR * shade + pore) * edgeFactor)));
+      const finalG = Math.min(255, Math.max(0, Math.round((baseG * shade + pore) * edgeFactor)));
+      const finalB = Math.min(255, Math.max(0, Math.round((baseB * shade + pore) * edgeFactor)));
+
+      const idx = (y * width + x) * 4;
+      data[idx] = finalR;
+      data[idx + 1] = finalG;
+      data[idx + 2] = finalB;
+      data[idx + 3] = 255;
+    }
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+
+  // Soft longitudinal satin sheen highlight down center
+  const sheenGrad = ctx.createLinearGradient(0, 0, width, 0);
+  sheenGrad.addColorStop(0, 'rgba(0, 0, 0, 0.35)');
+  sheenGrad.addColorStop(0.18, 'rgba(255, 255, 255, 0.0)');
+  sheenGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.10)');
+  sheenGrad.addColorStop(0.82, 'rgba(255, 255, 255, 0.0)');
+  sheenGrad.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+  ctx.fillStyle = sheenGrad;
+  ctx.fillRect(0, 0, width, height);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 4);
+  texture.anisotropy = 16;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * Generates high-contrast procedural Bump Map for physical micro-relief
+ * giving tactile 3D depth to leather scales, pores, and crevices.
+ */
+export function createLeatherBumpMap() {
+  const canvas = document.createElement('canvas');
+  const width = 512, height = 512;
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  const numCellsX = 14, numCellsY = 28;
+  const stepX = width / numCellsX, stepY = height / numCellsY;
+  const grid = Array.from({ length: numCellsY }, () => Array(numCellsX).fill(null));
+
+  for (let cy = 0; cy < numCellsY; cy++) {
+    for (let cx = 0; cx < numCellsX; cx++) {
+      const px = (cx + 0.5 + (Math.random() - 0.5) * 0.72) * stepX;
+      const py = (cy + 0.5 + (Math.random() - 0.5) * 0.72) * stepY;
+      grid[cy][cx] = { x: px, y: py };
+    }
+  }
+
+  const imgData = ctx.createImageData(width, height);
+  const data = imgData.data;
+
+  for (let y = 0; y < height; y++) {
+    const gy = Math.floor(y / stepY);
+    for (let x = 0; x < width; x++) {
+      const gx = Math.floor(x / stepX);
+      let d1 = 999999, d2 = 999999;
+
+      for (let dy = -1; dy <= 1; dy++) {
+        const ny = (gy + dy + numCellsY) % numCellsY;
+        for (let dx = -1; dx <= 1; dx++) {
+          const nx = (gx + dx + numCellsX) % numCellsX;
+          const pt = grid[ny][nx];
+          const distSq = (x - pt.x) * (x - pt.x) + (y - pt.y) * (y - pt.y);
+          if (distSq < d1) { d2 = d1; d1 = distSq; }
+          else if (distSq < d2) { d2 = distSq; }
+        }
+      }
+
+      const diff = Math.sqrt(d2) - Math.sqrt(d1);
+      // Scale center is elevated, valley is recessed
+      const bumpHeight = Math.min(255, Math.max(0, Math.round(diff * 26)));
+      const pore = (Math.random() - 0.5) * 16;
+      const finalBump = Math.min(255, Math.max(0, Math.round(bumpHeight + pore)));
+
+      const idx = (y * width + x) * 4;
+      data[idx] = finalBump;
+      data[idx + 1] = finalBump;
+      data[idx + 2] = finalBump;
+      data[idx + 3] = 255;
+    }
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 4);
+  texture.anisotropy = 16;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * Generates PBR Roughness Map: polished scale domes have lower roughness (0.42),
+ * while interstitial crevice valleys have higher roughness (0.85).
+ */
+export function createLeatherRoughnessMap() {
+  const canvas = document.createElement('canvas');
+  const width = 256, height = 256;
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#999999'; // Base roughness ~0.60
+  ctx.fillRect(0, 0, width, height);
+
+  // Center sheen band has smoother finish
+  const sheenGrad = ctx.createLinearGradient(0, 0, width, 0);
+  sheenGrad.addColorStop(0, '#CCCCCC'); // Matte edges
+  sheenGrad.addColorStop(0.2, '#999999');
+  sheenGrad.addColorStop(0.5, '#666666'); // Satin polished center
+  sheenGrad.addColorStop(0.8, '#999999');
+  sheenGrad.addColorStop(1, '#CCCCCC');
+  ctx.fillStyle = sheenGrad;
+  ctx.fillRect(0, 0, width, height);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 4);
+  texture.needsUpdate = true;
+  return texture;
+}
+
 function adjustBrightness(hex, percent) {
   if (!hex || hex[0] !== '#') return hex;
   const num = parseInt(hex.replace('#', ''), 16);
