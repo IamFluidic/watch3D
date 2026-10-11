@@ -4,6 +4,11 @@ class SoundEngine {
     this.isMuted = true; // User must explicitly enable sound via gesture
     this.tickInterval = null;
     this.tickState = 0; // Alternates tick / tock
+    this.isHeartbeatMode = false;
+  }
+
+  setHeartbeatMode(active) {
+    this.isHeartbeatMode = active;
   }
 
   init() {
@@ -44,25 +49,29 @@ class SoundEngine {
       const gain = this.ctx.createGain();
       const filter = this.ctx.createBiquadFilter();
 
-      // High crisp pallet click (tick: 3800Hz, tock: 3200Hz)
-      const freq = isTick ? 3800 : 3200;
-      osc.type = 'sine';
+      // In Mechanical Heart mode, produce deep organic resonance
+      const freq = this.isHeartbeatMode
+        ? (isTick ? 2400 : 1800)
+        : (isTick ? 3800 : 3200);
+
+      osc.type = this.isHeartbeatMode ? 'triangle' : 'sine';
       osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.015);
+      osc.frequency.exponentialRampToValueAtTime(this.isHeartbeatMode ? 220 : 800, this.ctx.currentTime + 0.02);
 
       filter.type = 'bandpass';
       filter.frequency.setValueAtTime(freq, this.ctx.currentTime);
-      filter.Q.setValueAtTime(3.0, this.ctx.currentTime);
+      filter.Q.setValueAtTime(this.isHeartbeatMode ? 1.8 : 3.0, this.ctx.currentTime);
 
-      gain.gain.setValueAtTime(0.045, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.018);
+      const vol = this.isHeartbeatMode ? 0.08 : 0.045;
+      gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + (this.isHeartbeatMode ? 0.035 : 0.018));
 
       osc.connect(filter);
       filter.connect(gain);
       gain.connect(this.ctx.destination);
 
       osc.start();
-      osc.stop(this.ctx.currentTime + 0.02);
+      osc.stop(this.ctx.currentTime + (this.isHeartbeatMode ? 0.04 : 0.02));
     }, 125);
   }
 

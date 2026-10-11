@@ -48,8 +48,11 @@
           <a href="#story-identity" class="watch-nav-link">Finishes</a>
           <a href="#story-dial" class="watch-nav-link">Dial</a>
           <a href="#story-movement" class="watch-nav-link">Caseback</a>
-          <a href="#story-exploded" class="watch-nav-link">Calibre</a>
-          <a href="#story-rotor" class="watch-nav-link">Bracelet</a>
+          <a href="#story-exploded" class="watch-nav-link">Exploded</a>
+          <a href="#story-heart" class="watch-nav-link">Heart</a>
+          <a href="#story-contours" class="watch-nav-link">Contours</a>
+          <a href="#story-gallery" class="watch-nav-link">Gallery</a>
+          <a href="#story-lineup" class="watch-nav-link">Lineup</a>
           <a href="#specs-dossier" class="watch-nav-link">Dossier</a>
         </nav>
 
@@ -198,6 +201,16 @@
           <circle class="pointer-dot" id="dot-bezel" cx="840" cy="690" r="3.5" />
         </svg>
 
+        <!-- Interactive 3D Studio Top Banner (Appears when story is completed) -->
+        <!-- <div class="interactive-studio-banner" id="interactive-studio-banner">
+          <div class="studio-badge-pill">
+            <span class="cat-dot"></span>
+            <span>INTERACTIVE 3D STUDIO</span>
+          </div>
+          <h2 class="studio-headline">ALUNA A3016 ATELIER</h2>
+          <p class="studio-caption">Explode calibre • Select camera angles &amp; metallurgy editions • Orbit in 360°</p>
+        </div> -->
+
         <!-- Floating Interactive HUD Toolbar -->
         <div class="watch-hud-toolbar" id="watch-hud-toolbar">
           <div class="hud-group">
@@ -290,28 +303,28 @@
               <div class="pointer-callout-item" id="callout-dial">
                 <h3 class="editorial-callout-title">Tapisserie &amp; <em class="serif-ital">Flying Tourbillon</em></h3>
                 <p class="editorial-feature-body">
-                  Audemars Piguet inspired 'Grande Tapisserie' waffle guilloché dial with Jacob &amp; Co stardust,
-                  celestial moonphase at 12, and a live rotating 3D flying tourbillon carriage at 6.
+                  Cobalt sunray dial with grand tapisserie guilloché, celestial moonphase, and live rotating 3D flying
+                  tourbillon carriage.
                 </p>
               </div>
               <div class="pointer-callout-item mt-5" id="callout-hands">
                 <h3 class="editorial-callout-title">Faceted <em class="serif-ital">Dauphine Hands</em></h3>
                 <p class="editorial-feature-body">
-                  Diamond-cut sword hands with split-plane finish, Super-LumiNova® inlays, and an electric accent
-                  continuous sweep seconds needle.
+                  Diamond-cut sword hands with split-plane finish, Super-LumiNova® inlays, and an electric sweep second
+                  needle.
                 </p>
               </div>
               <div class="pointer-callout-item mt-5" id="callout-bezel">
                 <h3 class="editorial-callout-title">Sculpted <em class="serif-ital">Octagonal Bezel</em></h3>
                 <p class="editorial-feature-body">
-                  8-sided geometric bezel with vertical satin grain, hand-finished 45° chamfers, 8 perimeter hexagonal
-                  screws with aligned tangential slots, and Rolex fluted inner ring.
+                  8-sided geometric bezel with vertical satin grain, hand-finished 45° chamfers, and perimeter hexagonal
+                  screws.
                 </p>
               </div>
             </div>
           </div>
 
-          <!-- FEATURE 03: FLAT PLANE CASEBACK (Engraved "ALUNA" in italic & "A3016") -->
+          <!-- FEATURE 03: FLAT PLANE CASEBACK -->
           <div class="feature-stage-item feat--3" id="feat-item-3">
             <div class="feature-text-block individual-feature left-feature editorial-feature-card">
               <div class="feature-index-header">
@@ -325,7 +338,8 @@
                 Flat Plane <em class="serif-ital">Steel Caseback</em>
               </h2>
               <p class="editorial-feature-body">
-                Clean, flat, and completely plane with no design clutter. The solid surgical steel back is hand-finished
+                Clean, flat, and completely plane with zero design clutter. The solid surgical steel back is
+                hand-finished
                 with fine circular graining and laser-engraved with the iconic <strong class="serif-ital">ALUNA</strong>
                 signature in classic italic script and model reference <strong class="mono-code">A3016</strong>.
               </p>
@@ -346,106 +360,134 @@
             </div>
           </div>
 
-          <!-- FEATURE 04: HORIZONTAL DECONSTRUCTED ARCHITECTURE -->
+          <!-- FEATURE 04: HORIZONTAL DECONSTRUCTED CALIBRE -->
           <div class="feature-stage-item feat--4" id="feat-item-4">
-            <div class="feature-text-block individual-feature left-feature editorial-feature-card">
-              <div class="feature-index-header">
-                <span class="feature-roman-num">04</span>
-                <div class="feature-category-pill">
-                  <span class="cat-dot"></span>
-                  <span>KINETIC ARCHITECTURE</span>
-                </div>
+            <!-- Bottom Hairline Labels aligned to exploded 3D layers -->
+            <div class="exploded-labels-bar" id="exploded-labels-bar">
+              <div class="exploded-label-item" data-layer="dial">
+                <span class="ex-hairline"></span>
+                <span class="ex-text">Dial</span>
               </div>
-              <h2 class="editorial-feature-headline">
-                Deconstructed <em class="serif-ital">Calibre Layers</em>
-              </h2>
-              <p class="editorial-feature-body">
-                The 7 precision horological assemblies separated along the central horizontal axis in dynamic mechanical
-                suspension. Directly beneath the lifted dial, discover the unified Calibre A3016 engine featuring thick,
-                high-precision machined gears rotating continuously with the sweep of the hands.
-              </p>
-              <div class="editorial-specs-grid">
-                <div class="ed-spec-item">
-                  <span class="ed-val">7 Layers</span>
-                  <span class="ed-lbl">Modular Assembly</span>
-                </div>
-                <div class="ed-spec-item">
-                  <span class="ed-val">Unified Engine</span>
-                  <span class="ed-lbl">Calibre &amp; Gear Train</span>
-                </div>
-                <div class="ed-spec-item">
-                  <span class="ed-val">28,800 vph</span>
-                  <span class="ed-lbl">Escapement Beat</span>
-                </div>
+              <div class="exploded-label-item" data-layer="tourbillon">
+                <span class="ex-hairline"></span>
+                <span class="ex-text">Tourbillon</span>
+              </div>
+              <div class="exploded-label-item" data-layer="monobloc">
+                <span class="ex-hairline"></span>
+                <span class="ex-text">Monobloc</span>
+              </div>
+              <div class="exploded-label-item" data-layer="barrel">
+                <span class="ex-hairline"></span>
+                <span class="ex-text">Barrel</span>
+              </div>
+              <div class="exploded-label-item" data-layer="baseplate">
+                <span class="ex-hairline"></span>
+                <span class="ex-text">Baseplate</span>
+              </div>
+              <div class="exploded-label-item" data-layer="weight">
+                <span class="ex-hairline"></span>
+                <span class="ex-text">Weight</span>
               </div>
             </div>
           </div>
 
-          <!-- FEATURE 04B: THE CELESTIAL ENGINE (CALIBRE & MOVEMENT ISOLATION) -->
-          <div class="feature-stage-item feat--4b" id="feat-item-4b">
-            <div class="feature-text-block individual-feature left-feature editorial-feature-card">
-              <div class="feature-index-header">
-                <span class="feature-roman-num">04'</span>
-                <div class="feature-category-pill">
+          <!-- FEATURE 05: MECHANICAL HEART (CALIBRE ISOLATION & PARTICLE VORTEX) -->
+          <div class="feature-stage-item feat--heart" id="feat-item-heart">
+            <div class="heart-content-wrapper">
+              <div class="heart-text-col">
+                <span class="feature-category-pill">
                   <span class="cat-dot"></span>
-                  <span>MECHANICAL HEART</span>
-                </div>
+                  <span>ASSOCIATED MOVEMENT</span>
+                </span>
+                <h2 class="heart-title">MECHANICAL<br>HEART</h2>
+                <p class="heart-desc">
+                  The movement regulates the balance wheel for consistent and precise timing.
+                </p>
+                <div class="heart-dim-pill">60mm</div>
               </div>
-              <h2 class="editorial-feature-headline">
-                The Celestial <em class="serif-ital">Calibre Engine</em>
-              </h2>
-              <p class="editorial-feature-body">
-                Collapsing seamlessly from exploded suspension, the beating mechanical calibre floats in dark space.
-                A deep midnight sapphire movement mainplate hand-engraved with golden astrolabe coordinates, Keplerian
-                planetary orbits, and 26 synthetic rubies regulating the 4Hz flying tourbillon escapement.
-              </p>
-              <div class="editorial-specs-grid">
-                <div class="ed-spec-item">
-                  <span class="ed-val">4.0 Hz</span>
-                  <span class="ed-lbl">Oscillation Speed</span>
-                </div>
-                <div class="ed-spec-item">
-                  <span class="ed-val">26 Jewels</span>
-                  <span class="ed-lbl">Synthetic Rubies</span>
-                </div>
-                <div class="ed-spec-item">
-                  <span class="ed-val">48 Hours</span>
-                  <span class="ed-lbl">Power Reserve</span>
-                </div>
+
+              <!-- Kinetic Minute Ticker counting upwards -->
+              <div class="heart-ticker-col">
+                <span class="heart-ticker-num" id="heart-ticker-num">30'</span>
+                <span class="heart-ticker-label">ARC ANGLE / DEGREE</span>
               </div>
             </div>
           </div>
 
-          <!-- FEATURE 05: INTEGRATED 3-LINK STEEL BRACELET -->
-          <div class="feature-stage-item feat--5" id="feat-item-5">
-            <div class="feature-text-block individual-feature left-feature editorial-feature-card">
-              <div class="feature-index-header">
-                <span class="feature-roman-num">05</span>
-                <div class="feature-category-pill">
-                  <span class="cat-dot"></span>
-                  <span>ERGONOMIC FIT</span>
-                </div>
+          <!-- FEATURE 06: THE HIGHLY PRECISE AUTOMATIC MOVEMENT -->
+          <div class="feature-stage-item feat--kinetic" id="feat-item-kinetic">
+            <div class="kinetic-huge-backdrop">
+              <div class="kinetic-huge-watermark">FS-60P</div>
+              <div class="kinetic-huge-words">
+                <div class="kw-row"><span class="kw-slash">/</span> <span class="kw-word">THE</span></div>
+                <div class="kw-row"><span class="kw-word">HIGHLY</span></div>
+                <div class="kw-row"><span class="kw-word">PRECISE</span></div>
+                <div class="kw-row"><span class="kw-word is--accent">AUTOMATIC</span></div>
+                <div class="kw-row"><span class="kw-word">MOVEMENT</span></div>
               </div>
-              <h2 class="editorial-feature-headline">
-                Sculpted <em class="serif-ital">3-Link Bracelet</em>
-              </h2>
-              <p class="editorial-feature-body">
-                Crafted from cold-forged 316L steel links with vertical satin-brushed flanks and mirror-polished
-                chamfers. Features a precision micro-adjusting butterfly deployant clasp for seamless ergonomic wrist
-                drape.
+            </div>
+
+            <div class="kinetic-telemetry-box">
+              <h3 class="telemetry-box-title">Self-Winding Movement</h3>
+              <p class="telemetry-box-body">
+                The movement regulates the balance wheel for consistent and precise timing.
               </p>
-              <div class="editorial-specs-grid">
+              <p class="telemetry-box-body mt-4">
+                Built to withstand steady performance in a variety of conditions.
+              </p>
+              <div class="telemetry-indicator-circle">
+                <span class="tic-num">8</span>
+                <span class="tic-sub">BEATS / SEC</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- FEATURE 07: ELEGANT CONTOURS (MACRO DIAL & BEVELS) -->
+          <div class="feature-stage-item feat--contours" id="feat-item-contours">
+            <div class="contours-center-head">
+              <h2 class="stage-display-title">ELEGANT CONTOURS</h2>
+              <p class="stage-display-sub">
+                The subtly curved dial and beveled edges highlight the craftsmanship and create a refined visual depth
+              </p>
+            </div>
+
+            <div class="contours-callouts-list">
+              <div class="contour-callout-card">
+                <h4 class="cc-title">Refined Dial</h4>
+                <p class="cc-body">A clean, elegant dial designed for readability and timeless appeal.</p>
+              </div>
+              <div class="contour-callout-card">
+                <h4 class="cc-title">Polished Hands</h4>
+                <p class="cc-body">Sleek hour and minute hands glide smoothly, complementing the overall design.</p>
+              </div>
+              <div class="contour-callout-card">
+                <h4 class="cc-title">Premium Bezel</h4>
+                <p class="cc-body">The bezel adds depth and definition, highlighting the watch's contours and finish.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- FEATURE 08: SLIM PROFILE (HORIZONTAL 90° SIDE VIEW) -->
+          <div class="feature-stage-item feat--slim" id="feat-item-slim">
+            <div class="slim-center-head">
+              <span class="feature-category-pill">
+                <span class="cat-dot"></span>
+                <span>HORIZONTAL SILHOUETTE</span>
+              </span>
+              <h2 class="stage-display-title mt-3">SLIM PROFILE</h2>
+              <p class="stage-display-sub">
+                The side view highlights the sleek, refined silhouette of the case, with gently curved edges and a
+                perfectly polished finish.
+              </p>
+              <div class="editorial-specs-grid mt-4">
                 <div class="ed-spec-item">
-                  <span class="ed-val">20.0 mm</span>
-                  <span class="ed-lbl">Tapered Width</span>
+                  <span class="ed-val">10.8 mm</span>
+                  <span class="ed-lbl">Ultra-Thin Case</span>
                 </div>
                 <div class="ed-spec-item">
-                  <span class="ed-val">Solid 316L</span>
-                  <span class="ed-lbl">Cold-Forged Links</span>
-                </div>
-                <div class="ed-spec-item">
-                  <span class="ed-val">Deployant</span>
-                  <span class="ed-lbl">Micro-Adjust Clasp</span>
+                  <span class="ed-val">90°</span>
+                  <span class="ed-lbl">Surgical Profile</span>
                 </div>
               </div>
             </div>
@@ -456,33 +498,38 @@
 
       <!-- STORY TRACK: Transparent spacer sections driving the scrollytelling -->
       <div class="story-track" id="story-track">
-        <!-- STEP 0: PURE LAUNCH (Watch upright + solid ALUNA A3016 background) -->
+        <!-- STEP 0: PURE LAUNCH -->
         <section id="story-launch" class="story-step step--launch" data-step="0"></section>
 
-        <!-- STEP 0B: HERO BRAND TITLE SHOWCASE (Main title appears from bottom to center, then disappears to top) -->
+        <!-- STEP 0B: HERO BRAND TITLE SHOWCASE -->
         <section id="story-title" class="story-step step--title" data-step="0.5"></section>
 
         <!-- STEP 1: CASE & SURGICAL FINISHES -->
         <section id="story-identity" class="story-step step--identity" data-step="1"></section>
 
-        <!-- STEP 2: REFINED DIAL ARCHITECTURE WITH HAIRLINE POINTERS -->
+        <!-- STEP 2: REFINED DIAL ARCHITECTURE -->
         <section id="story-dial" class="story-step step--feature step--dial" data-step="2"></section>
 
-        <!-- STEP 3: FLAT PLANE CASEBACK (Engraved "ALUNA" in italic & "A3016") -->
+        <!-- STEP 3: FLAT PLANE CASEBACK -->
         <section id="story-movement" class="story-step step--feature step--caseback" data-step="3"></section>
 
         <!-- STEP 4: HORIZONTAL DECONSTRUCTED ARCHITECTURE -->
         <section id="story-exploded" class="story-step step--feature step--exploded" data-step="4"></section>
 
-        <!-- STEP 4B: THE CELESTIAL ENGINE (Movement & Escapement Isolation) -->
-        <section id="story-engine" class="story-step step--feature step--engine" data-step="4.5"></section>
+        <!-- STEP 5: MECHANICAL HEART (CALIBRE ISOLATION & PARTICLE VORTEX) -->
+        <section id="story-heart" class="story-step step--feature step--heart" data-step="5"></section>
 
-        <!-- STEP 5: INTEGRATED 3-LINK STEEL BRACELET -->
-        <section id="story-rotor" class="story-step step--feature step--bracelet" data-step="5"></section>
+        <!-- STEP 6: THE HIGHLY PRECISE AUTOMATIC MOVEMENT (KINETIC TEXT) -->
+        <section id="story-kinetic" class="story-step step--feature step--kinetic" data-step="6"></section>
 
+        <!-- STEP 7: ELEGANT CONTOURS (MACRO DIAL & BEVELS) -->
+        <section id="story-contours" class="story-step step--feature step--contours" data-step="7"></section>
 
-        <!-- STEP 7: 360° INTERACTIVE STUDIO (Free Orbit & Hotspot Inspection before 04/Metallurgy) -->
-        <section id="story-studio" class="story-step step--studio" data-step="7"></section>
+        <!-- STEP 8: SLIM PROFILE (90° HORIZONTAL SIDE VIEW) -->
+        <section id="story-slim" class="story-step step--feature step--slim" data-step="8"></section>
+
+        <!-- STEP 9: INTERACTIVE 3D STUDIO & 360° HOROLOGY -->
+        <section id="story-studio" class="story-step step--feature step--studio" data-step="9"></section>
       </div>
     </div>
 
@@ -727,7 +774,7 @@
     </div>
     <div class="timeline-step" data-step="2">
       <span class="timeline-num">02</span>
-      <span class="timeline-label">QUAD-DIAL</span>
+      <span class="timeline-label">DIAL</span>
     </div>
     <div class="timeline-step" data-step="3">
       <span class="timeline-num">03</span>
@@ -739,14 +786,22 @@
     </div>
     <div class="timeline-step" data-step="5">
       <span class="timeline-num">05</span>
-      <span class="timeline-label">ENGINE</span>
+      <span class="timeline-label">HEART</span>
     </div>
     <div class="timeline-step" data-step="6">
       <span class="timeline-num">06</span>
-      <span class="timeline-label">BRACELET</span>
+      <span class="timeline-label">MOVEMENT</span>
     </div>
     <div class="timeline-step" data-step="7">
       <span class="timeline-num">07</span>
+      <span class="timeline-label">CONTOURS</span>
+    </div>
+    <div class="timeline-step" data-step="8">
+      <span class="timeline-num">08</span>
+      <span class="timeline-label">PROFILE</span>
+    </div>
+    <div class="timeline-step" data-step="9">
+      <span class="timeline-num">09</span>
       <span class="timeline-label">STUDIO</span>
     </div>
   </aside>

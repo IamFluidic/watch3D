@@ -673,7 +673,7 @@ body.is--night-mode .ast-label {
   opacity: var(--watermark-opacity, 0);
   max-width: min(500px, 36vw);
   pointer-events: none;
-  z-index: 10;
+  z-index: 4; /* Text strictly behind 3D watch canvas (z-index: 10) */
   display: flex;
   flex-direction: row-reverse;
   align-items: flex-start;
@@ -1261,7 +1261,7 @@ body.is--night-mode .b-tag-model {
   width: 100%;
   height: 100%;
   pointer-events: auto;
-  z-index: 2;
+  z-index: 10; /* 3D Watch sits at z-index 10 in front of background text */
 }
 
 .sticky-3d-stage .watch-hotspots-overlay {
@@ -3040,72 +3040,104 @@ body.is--night-mode .cursor-ring {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 25;
+  z-index: auto; /* NO integer z-index so children participate directly in stage stacking context */
 }
 
 .feature-stage-item {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, calc(-50% + var(--feat-y, 28vh)));
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  transform: translateY(var(--feat-y, 28vh));
   opacity: var(--feat-opacity, 0);
   pointer-events: none;
   transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
-  width: 100%;
-  max-width: var(--container-max);
-  padding: 0 48px;
   box-sizing: border-box;
   display: flex;
+  z-index: 4; /* Behind canvas (z-index: 10) so watch is always in front if any overlap occurs */
 }
 
 .feature-stage-item.feat--1 {
   --feat-y: var(--feat1-y, 65vh);
   --feat-opacity: var(--feat1-opacity, 0);
   justify-content: flex-start;
-  padding-left: clamp(24px, 6vw, 100px);
+  align-items: center;
+  padding-left: clamp(24px, 4vw, 56px);
 }
 
 .feature-stage-item.feat--2 {
   --feat-y: var(--feat2-y, 65vh);
   --feat-opacity: var(--feat2-opacity, 0);
   justify-content: flex-start;
-  padding-left: clamp(24px, 6vw, 100px);
+  align-items: center;
+  padding-left: clamp(24px, 4vw, 56px);
 }
 
 .feature-stage-item.feat--3 {
   --feat-y: var(--feat3-y, 65vh);
   --feat-opacity: var(--feat3-opacity, 0);
   justify-content: flex-start;
-  padding-left: clamp(24px, 6vw, 100px);
+  align-items: center;
+  padding-left: clamp(24px, 4vw, 56px);
 }
 
 .feature-stage-item.feat--4 {
   --feat-y: var(--feat4-y, 65vh);
   --feat-opacity: var(--feat4-opacity, 0);
-  justify-content: flex-start;
-  padding-left: clamp(24px, 6vw, 100px);
+  justify-content: center;
+  align-items: center;
 }
 
-.feature-stage-item.feat--4b {
-  --feat-y: var(--feat4b-y, 65vh);
-  --feat-opacity: var(--feat4b-opacity, 0);
-  justify-content: flex-start;
-  padding-left: clamp(24px, 6vw, 100px);
+.feature-stage-item.feat--heart {
+  --feat-y: var(--feat-heart-y, 65vh);
+  --feat-opacity: var(--feat-heart-opacity, 0);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
 }
 
-.feature-stage-item.feat--5 {
-  --feat-y: var(--feat5-y, 65vh);
-  --feat-opacity: var(--feat5-opacity, 0);
-  justify-content: flex-start;
-  padding-left: clamp(24px, 6vw, 100px);
+.feature-stage-item.feat--kinetic {
+  --feat-y: var(--feat-kinetic-y, 65vh);
+  --feat-opacity: var(--feat-kinetic-opacity, 0);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
 }
 
-.feature-stage-item.feat--6 {
-  --feat-y: var(--feat6-y, 65vh);
-  --feat-opacity: var(--feat6-opacity, 0);
-  justify-content: flex-start;
-  padding-left: clamp(24px, 6vw, 100px);
+.feature-stage-item.feat--contours {
+  --feat-y: var(--feat-contours-y, 65vh);
+  --feat-opacity: var(--feat-contours-opacity, 0);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start; /* Pinned strictly to the far left of the screen */
+  padding-left: clamp(24px, 4vw, 56px);
+  box-sizing: border-box;
+}
+
+.feature-stage-item.feat--slim {
+  --feat-y: var(--feat-slim-y, 65vh);
+  --feat-opacity: var(--feat-slim-opacity, 0);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start; /* Pinned strictly to the far left edge of the screen */
+  padding-left: clamp(24px, 4vw, 56px);
+  box-sizing: border-box;
 }
 
 .feature-text-block.individual-feature,
@@ -3121,7 +3153,7 @@ body.is--night-mode .cursor-ring {
 
 .feature-text-block.individual-feature,
 .editorial-feature-card {
-  max-width: 480px;
+  max-width: clamp(300px, 24vw, 360px);
 }
 
 /* Feature Index Header: Number & Category Pill */
@@ -3457,4 +3489,840 @@ body.story-completed .complications-dock {
 .layer-dossier-card {
   display: none !important;
 }
+
+/* ===============================================================
+   POST-EXPLODED SEQUENCE: 60FPS STAGE STYLING & LUXURY THEMES
+   =============================================================== */
+
+/* DARK VOID SCENE (Mechanical Heart & Kinetic Movement) */
+body.is--dark-void {
+  --bg-base: #060709;
+  --bg-surface: #0E1015;
+  --bg-surface-tint: #14171E;
+  --bg-card: #12141A;
+  --bg-card-glass: rgba(14, 16, 21, 0.75);
+
+  --color-ink: #FFFFFF;
+  --color-ink-muted: #94A3B8;
+  --color-ink-dim: #64748B;
+  --color-border: #232733;
+  --color-border-subtle: #1A1D27;
+}
+
+body.is--dark-void .blueprint-reticle-bg {
+  opacity: 0.12;
+}
+
+body.is--dark-void .watch-header__inner {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 1. HORIZONTAL EXPLODED LABELS */
+.exploded-explore-pill {
+  display: none !important;
+}
+
+.exploded-labels-bar {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding: 0 6vw;
+  pointer-events: auto;
+  z-index: 25; /* Controls on top */
+}
+
+.exploded-label-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.exploded-label-item:hover {
+  transform: translateY(-4px);
+}
+
+.exploded-label-item:hover .ex-hairline {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+.exploded-label-item:hover .ex-text {
+  color: var(--accent-cyan);
+}
+
+.ex-hairline {
+  width: 1px;
+  height: 32px;
+  background: var(--color-border);
+  transition: all 0.25s ease;
+}
+
+.ex-text {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  transition: color 0.25s ease;
+}
+
+/* 2. MECHANICAL HEART (CALIBRE ISOLATION & PARTICLE VORTEX) */
+.heart-content-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.heart-text-col {
+  position: absolute;
+  left: clamp(24px, 4vw, 56px);
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: 310px;
+  text-align: left;
+  z-index: 4; /* Text strictly BEHIND the 3D watch canvas */
+  pointer-events: none;
+}
+
+.heart-title {
+  font-family: var(--font-title);
+  font-size: clamp(2.0rem, 3.2vw, 3.2rem);
+  font-weight: 800;
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+  margin: 14px 0 12px;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
+}
+
+.heart-desc {
+  font-family: var(--font-sans);
+  font-size: clamp(0.85rem, 1.05vw, 0.95rem);
+  color: #94A3B8;
+  line-height: 1.6;
+}
+
+.heart-dim-pill {
+  display: inline-block;
+  margin-top: 14px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: #64748B;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+/* Arc Angle / Degree in Bottom Right Corner */
+.heart-ticker-col {
+  position: absolute;
+  bottom: clamp(28px, 5vh, 48px);
+  right: clamp(24px, 4vw, 56px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  z-index: 4; /* Strictly behind canvas */
+  pointer-events: none;
+}
+
+.heart-ticker-num {
+  font-family: var(--font-title);
+  font-size: clamp(4.0rem, 7.5vw, 6.5rem);
+  font-weight: 800;
+  line-height: 0.85;
+  color: #FFFFFF;
+  letter-spacing: -0.04em;
+  text-shadow: 0 0 60px rgba(255, 255, 255, 0.25);
+}
+
+.heart-ticker-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  color: #64748B;
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+/* 3. THE HIGHLY PRECISE AUTOMATIC MOVEMENT (KINETIC TYPOGRAPHY) */
+.kinetic-huge-backdrop {
+  position: absolute;
+  top: 50%;
+  left: clamp(24px, 4vw, 56px); /* Pinned strictly to the far left screen edge */
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 4; /* Text strictly BEHIND watch */
+  max-width: 300px;
+}
+
+.kinetic-huge-watermark {
+  position: absolute;
+  top: -40px;
+  left: -12px;
+  font-family: var(--font-title);
+  font-size: clamp(4.0rem, 8vw, 8.5rem);
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.03);
+  letter-spacing: -0.04em;
+  pointer-events: none;
+  user-select: none;
+}
+
+.kinetic-huge-words {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.kw-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.kw-slash {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 2.4vw, 2.5rem);
+  color: var(--accent-cyan);
+  font-weight: 300;
+}
+
+.kw-word {
+  font-family: var(--font-title);
+  font-size: clamp(1.6rem, 2.4vw, 2.5rem);
+  font-weight: 900;
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+  color: rgba(255, 255, 255, 0.28);
+  text-transform: uppercase;
+}
+
+.kw-word.is--accent {
+  color: #FFFFFF;
+  text-shadow: 0 0 60px rgba(255, 255, 255, 0.35);
+}
+
+.kinetic-telemetry-box {
+  position: absolute;
+  right: clamp(24px, 4vw, 56px); /* Pinned strictly to the far right screen edge */
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: 250px;
+  text-align: left;
+  z-index: 4; /* Text strictly BEHIND watch */
+  pointer-events: none;
+}
+
+.telemetry-box-title {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  margin-bottom: 8px;
+}
+
+.telemetry-box-body {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  color: #94A3B8;
+  line-height: 1.55;
+}
+
+.telemetry-indicator-circle {
+  margin-top: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14, 16, 21, 0.6);
+}
+
+.tic-num {
+  font-family: var(--font-title);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1;
+}
+
+.tic-sub {
+  font-family: var(--font-mono);
+  font-size: 0.40rem;
+  letter-spacing: 0.12em;
+  color: var(--accent-cyan);
+  margin-top: 2px;
+}
+
+/* 4. ELEGANT CONTOURS & SLIM PROFILE HEADERS */
+.contours-center-head {
+  text-align: left; /* Pinned strictly to the far left of screen */
+  width: 100%;
+  max-width: 330px;
+  margin: 0 0 16px 0;
+}
+
+.slim-center-head {
+  text-align: left;
+  width: 100%;
+  max-width: 320px;
+  margin: 0;
+}
+
+/* 5. INTERACTIVE 3D STUDIO TOP BANNER */
+.interactive-studio-banner {
+  position: absolute;
+  top: clamp(24px, 5vh, 48px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-16px);
+  text-align: center;
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+body.story-completed .interactive-studio-banner {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.studio-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px;
+  background: rgba(2, 132, 199, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+}
+
+.studio-headline {
+  font-family: var(--font-title);
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+  line-height: 1.05;
+}
+
+.studio-caption {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--color-ink-muted);
+  letter-spacing: 0.02em;
+}
+
+.stage-display-title {
+  font-family: var(--font-title);
+  font-size: clamp(1.8rem, 2.8vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+.stage-display-sub {
+  font-family: var(--font-sans);
+  font-size: clamp(0.82rem, 1.05vw, 0.95rem);
+  color: var(--color-ink-muted);
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+.contours-callouts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 310px;
+  pointer-events: auto;
+}
+
+.contour-callout-card {
+  background: var(--bg-card-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--color-border);
+  padding: 12px 16px;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.contour-callout-card:hover {
+  transform: translateX(4px);
+  border-color: var(--accent-cyan);
+}
+
+.cc-title {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  margin-bottom: 4px;
+}
+
+.cc-body {
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  color: var(--color-ink-muted);
+  line-height: 1.5;
+}
+
+/* 5. EDITORIAL GALLERY */
+.editorial-backdrop-title {
+  font-family: var(--font-title);
+  font-size: clamp(1.4rem, 2.6vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.15);
+  text-align: center;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+body.is--night-mode .editorial-backdrop-title {
+  color: rgba(255, 255, 255, 0.15);
+}
+
+.editorial-cards-flow {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+  width: 100%;
+  pointer-events: auto;
+}
+
+.editorial-photo-card {
+  width: 290px;
+  background: var(--bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.editorial-photo-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.12);
+}
+
+.photo-card-media {
+  height: 220px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 16px;
+}
+
+.photo-card-media.media--classic {
+  background: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%);
+}
+
+.photo-card-media.media--sport {
+  background: radial-gradient(circle at center, #0F172A 0%, #020617 100%);
+}
+
+.media-tag {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #38BDF8;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 4px 10px;
+  border-radius: 4px;
+  backdrop-filter: blur(8px);
+}
+
+.photo-card-info {
+  padding: 20px;
+}
+
+.card-info-title {
+  font-family: var(--font-title);
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--color-ink);
+}
+
+.card-info-desc {
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  color: var(--color-ink-muted);
+  line-height: 1.55;
+}
+
+/* 6. MODEL 146GR & COLORWAY RETICLE */
+.colorway-huge-text {
+  font-family: var(--font-title);
+  font-size: clamp(4.5rem, 8.5vw, 8.5rem);
+  font-weight: 900;
+  line-height: 0.88;
+  letter-spacing: -0.03em;
+  color: rgba(0, 0, 0, 0.12);
+  text-transform: uppercase;
+}
+
+body.is--night-mode .colorway-huge-text {
+  color: rgba(255, 255, 255, 0.12);
+}
+
+.colorway-huge-text .cw-line {
+  display: block;
+}
+
+.colorway-index-tag {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--accent-cyan);
+  margin-top: 12px;
+}
+
+.model-146-floating-card {
+  background: var(--bg-card-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  padding: 28px;
+  border-radius: 8px;
+  width: 290px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
+  pointer-events: auto;
+}
+
+.m146-title {
+  font-family: var(--font-title);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--color-ink);
+  margin-top: 4px;
+}
+
+.m146-color-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 18px 0 14px;
+  font-size: 0.88rem;
+}
+
+.m146-color-lbl {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-ink-dim);
+  text-transform: uppercase;
+}
+
+.m146-swatches-bar {
+  display: flex;
+  gap: 12px;
+}
+
+.m146-swatch-btn {
+  padding: 3px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.m146-swatch-btn.is--active {
+  border-color: var(--accent-cyan);
+  transform: scale(1.15);
+}
+
+.m146-pip {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: block;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* 7. COMPONENT WEIGHT ACCORDION BREAKDOWN */
+.weights-modal-container {
+  background: var(--bg-card-glass);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 36px;
+  max-width: 600px;
+  width: 100%;
+  pointer-events: auto;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.1);
+}
+
+.weights-table-title {
+  font-family: var(--font-title);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--color-ink);
+  margin-top: 6px;
+}
+
+.weights-table-sub {
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  color: var(--color-ink-muted);
+  margin-bottom: 22px;
+}
+
+.weights-rows-matrix {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 48vh;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.weight-row-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.weight-row-item:hover,
+.weight-row-item.is--active {
+  background: rgba(2, 132, 199, 0.1);
+  border-bottom-color: transparent;
+  transform: translateX(4px);
+}
+
+.wr-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-ink);
+}
+
+.wr-plus {
+  color: var(--accent-cyan);
+  font-weight: 800;
+}
+
+.wr-mid {
+  display: flex;
+  gap: 20px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-ink-dim);
+}
+
+.wr-right {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--color-ink);
+}
+
+.weights-footer-bar {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 18px;
+  margin-top: 14px;
+  border-top: 2px solid var(--color-ink);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--color-ink);
+}
+
+/* 8. FOUR-MODEL LINEUP SHOWCASE ("FS-60P") */
+.lineup-display-watermark {
+  font-family: var(--font-title);
+  font-size: clamp(8rem, 18vw, 22rem);
+  font-weight: 900;
+  color: rgba(0, 0, 0, 0.05);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+}
+
+body.is--night-mode .lineup-display-watermark {
+  color: rgba(255, 255, 255, 0.05);
+}
+
+.lineup-top-header {
+  margin-bottom: 24px;
+  z-index: 10;
+}
+
+.btn-select-model-pill {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 8px 26px;
+  background: var(--color-ink);
+  color: var(--bg-base);
+  border-radius: 999px;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.btn-select-model-pill:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.lineup-watches-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 1080px;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+.lineup-watch-card {
+  background: var(--bg-card-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.lineup-watch-card:hover,
+.lineup-watch-card.is--selected {
+  transform: translateY(-8px);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
+}
+
+.lw-thumb-stage {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lw-mini-watch-render {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  border: 6px solid #CBD5E1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.lw-mini-dial {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.lw-mini-tourbillon {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #0284C7;
+  position: absolute;
+  bottom: 4px;
+  left: 15px;
+}
+
+.lw-badge {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  color: var(--color-ink-dim);
+  text-transform: uppercase;
+}
+
+.lw-title {
+  font-family: var(--font-title);
+  font-size: 0.98rem;
+  font-weight: 700;
+  margin: 6px 0 4px;
+  color: var(--color-ink);
+}
+
+.lw-price {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+.lw-select-btn {
+  margin-top: 12px;
+  padding: 7px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.70rem;
+  letter-spacing: 0.08em;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  width: 100%;
+  color: var(--color-ink);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.lineup-watch-card.is--selected .lw-select-btn {
+  background: var(--color-ink);
+  color: var(--bg-base);
+  border-color: var(--color-ink);
+}
+
 

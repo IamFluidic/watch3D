@@ -1,4 +1,4 @@
-import { WATCH_EDITIONS, EXPLODED_LAYERS, TECHNICAL_SPECIFICATIONS } from './data/watchSpecs.js';
+import { WATCH_EDITIONS, EXPLODED_LAYERS, TECHNICAL_SPECIFICATIONS, COMPONENT_WEIGHTS, EDITORIAL_CARDS } from './data/watchSpecs.js';
 import { initWatchViewer } from './components/watchThreeViewer.js';
 import { initHoverEffects } from './components/hoverEffects.js';
 import { soundEngine } from './components/soundEngine.js';
@@ -108,19 +108,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-
-  // 5C. Quad Complications Quick-Focus Dock (Interactive Macro Zoom)
-  const compButtons = document.querySelectorAll('.cd-btn');
-  compButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      compButtons.forEach(b => b.classList.remove('is--active'));
-      btn.classList.add('is--active');
-      const comp = btn.getAttribute('data-complication');
-      if (viewer && viewer.focusComplication) {
-        viewer.focusComplication(comp);
+  // 5B. Exploded Labels Bar interactions
+  document.querySelectorAll('.exploded-label-item').forEach(item => {
+    const layerId = item.getAttribute('data-layer');
+    item.addEventListener('click', () => {
+      soundEngine.playClick(720, 0.03);
+      if (viewer && viewer.focusExplodedLayer) {
+        viewer.focusExplodedLayer(layerId);
       }
     });
   });
+
 
   // 6. Connect Night / Super-LumiNova Lume Toggle
   const hudLumeBtn = document.getElementById('hud-lume-btn');
@@ -145,59 +143,122 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.hud-angle-btn').forEach(b => b.classList.remove('is--active'));
       btn.classList.add('is--active');
+      soundEngine?.playClick(620, 0.03);
       const angle = btn.getAttribute('data-angle');
-      if (viewer) viewer.setPresetView(angle);
+      if (viewer && viewer.setPresetView) {
+        viewer.setPresetView(angle);
+      }
     });
   });
 
-  // 8. Render Section 01: Deconstructed Calibre Layers with Animation Classes
-  const layersContainer = document.getElementById('layers-breakdown-container');
-  if (layersContainer) {
-    layersContainer.innerHTML = EXPLODED_LAYERS.map((layer, idx) => `
-      <div class="layer-card scroll-reveal stagger-${(idx % 8) + 1}">
-        <div>
-          <span class="layer-num">LAYER 0${idx + 1}</span>
-          <h3 class="layer-title">${layer.name}</h3>
-          <p class="layer-metric">${layer.metric}</p>
-          <p class="layer-desc">${layer.description}</p>
+  window.addEventListener('watchUserRotated', () => {
+    document.querySelectorAll('.hud-angle-btn').forEach(b => b.classList.remove('is--active'));
+  });
+
+  // 8. Render Component Weights Matrix (Model 146GR Architecture)
+  const weightsMatrix = document.getElementById('weights-rows-matrix');
+  if (weightsMatrix) {
+    weightsMatrix.innerHTML = COMPONENT_WEIGHTS.map(item => `
+      <div class="weight-row-item" data-component-id="${item.id}">
+        <div class="wr-left">
+          <span class="wr-plus">+</span>
+          <span class="wr-name">${item.name}</span>
+        </div>
+        <div class="wr-mid">
+          <span class="wr-index">${item.index}</span>
+          <span class="wr-cat">${item.category}</span>
+        </div>
+        <div class="wr-right">
+          <span class="wr-weight">${item.weight} gr</span>
         </div>
       </div>
     `).join('');
+
+    weightsMatrix.querySelectorAll('.weight-row-item').forEach(row => {
+      const compId = row.getAttribute('data-component-id');
+      row.addEventListener('click', () => {
+        weightsMatrix.querySelectorAll('.weight-row-item').forEach(r => r.classList.remove('is--active'));
+        row.classList.add('is--active');
+        soundEngine.playClick(650, 0.03);
+        if (viewer && viewer.focusComponent) {
+          viewer.focusComponent(compId);
+        }
+      });
+      row.addEventListener('mouseenter', () => {
+        if (viewer && viewer.focusComponent) {
+          viewer.focusComponent(compId);
+        }
+      });
+    });
   }
 
-  // 9. Render Section 03: Four Metallurgy Editions with Hover Preview
-  const editionsCardsContainer = document.getElementById('editions-cards-container');
-  if (editionsCardsContainer) {
-    editionsCardsContainer.innerHTML = WATCH_EDITIONS.map((ed, idx) => `
-      <div class="edition-card scroll-reveal stagger-${(idx % 4) + 1} ${idx === 0 ? 'is--selected' : ''}" data-card-edition="${ed.id}">
-        <div>
-          <div class="edition-badge-bar">
-            <span class="mono-badge">EDITION 0${idx + 1}</span>
-            <span class="edition-color-pip" style="background:${ed.dialColor}; border-color:${ed.caseColor}"></span>
+  // 9. Render Model 146GR Swatches Bar
+  const m146SwatchesBar = document.getElementById('m146-swatches-bar');
+  const m146ActiveColor = document.getElementById('m146-active-color');
+  if (m146SwatchesBar) {
+    m146SwatchesBar.innerHTML = WATCH_EDITIONS.map((ed, idx) => `
+      <button class="m146-swatch-btn ${idx === 0 ? 'is--active' : ''}" data-edition-id="${ed.id}" title="${ed.name}">
+        <span class="m146-pip" style="background: ${ed.caseColor}; border-color: ${ed.bezelColor};"></span>
+      </button>
+    `).join('');
+
+    m146SwatchesBar.querySelectorAll('.m146-swatch-btn').forEach(btn => {
+      const id = btn.getAttribute('data-edition-id');
+      btn.addEventListener('click', () => {
+        m146SwatchesBar.querySelectorAll('.m146-swatch-btn').forEach(b => b.classList.remove('is--active'));
+        btn.classList.add('is--active');
+        selectEdition(id);
+        if (m146ActiveColor) {
+          m146ActiveColor.textContent = activeEdition.name.replace(/^\d+\.\s*/, '');
+        }
+      });
+    });
+  }
+
+  // 10. Render Four-Model Lineup Row ("FS-60P")
+  const lineupRow = document.getElementById('lineup-watches-row');
+  if (lineupRow) {
+    lineupRow.innerHTML = WATCH_EDITIONS.map((ed, idx) => `
+      <div class="lineup-watch-card ${idx === 0 ? 'is--selected' : ''}" data-lineup-edition="${ed.id}">
+        <div class="lw-thumb-stage" style="background: radial-gradient(circle, ${ed.caseColor}26 0%, transparent 70%);">
+          <div class="lw-mini-watch-render" style="border-color: ${ed.caseColor};">
+            <div class="lw-mini-dial" style="background: ${ed.dialColor};">
+              <div class="lw-mini-tourbillon" style="border-color: ${ed.accentColor};"></div>
+            </div>
           </div>
-          <h3 class="edition-title">${ed.name}</h3>
-          <p class="edition-subtitle">${ed.subtitle}</p>
-          <p class="edition-desc">${ed.description}</p>
         </div>
-        <div class="edition-price-row">
-          <span class="edition-price">${ed.price}</span>
-          <button class="btn-select-edition">${idx === 0 ? 'Active' : 'Configure'}</button>
+        <div class="lw-meta">
+          <span class="lw-badge">0${idx + 1} / METALLURGY</span>
+          <h4 class="lw-title">${ed.name.replace(/^\d+\.\s*/, '')}</h4>
+          <span class="lw-price">${ed.price}</span>
         </div>
+        <button class="lw-select-btn">${idx === 0 ? 'Active Model' : 'Select'}</button>
       </div>
     `).join('');
 
-    editionsCardsContainer.querySelectorAll('.edition-card').forEach(card => {
-      const id = card.getAttribute('data-card-edition');
+    lineupRow.querySelectorAll('.lineup-watch-card').forEach(card => {
+      const id = card.getAttribute('data-lineup-edition');
       card.addEventListener('click', () => {
+        lineupRow.querySelectorAll('.lineup-watch-card').forEach(c => {
+          c.classList.remove('is--selected');
+          const b = c.querySelector('.lw-select-btn');
+          if (b) b.textContent = 'Select';
+        });
+        card.classList.add('is--selected');
+        const b = card.querySelector('.lw-select-btn');
+        if (b) b.textContent = 'Active Model';
+
+        soundEngine.playClick(580, 0.04);
         selectEdition(id);
       });
-      // Live 3D watch material preview on hover
-      card.addEventListener('mouseenter', () => {
-        if (viewer) viewer.previewEdition(id);
-      });
-      card.addEventListener('mouseleave', () => {
-        if (viewer) viewer.restoreEdition();
-      });
+    });
+  }
+
+  const lineupSelectBtn = document.getElementById('lineup-select-btn');
+  if (lineupSelectBtn) {
+    lineupSelectBtn.addEventListener('click', () => {
+      const reserveEl = document.getElementById('reserve');
+      if (reserveEl) reserveEl.scrollIntoView({ behavior: 'smooth' });
     });
   }
 
@@ -214,13 +275,10 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.classList.toggle('is--active', btn.getAttribute('data-edition-id') === editionId);
     });
 
-    // Update Showcase Cards
-    document.querySelectorAll('.edition-card').forEach(card => {
-      const isSelected = card.getAttribute('data-card-edition') === editionId;
-      card.classList.toggle('is--selected', isSelected);
-      const selectBtn = card.querySelector('.btn-select-edition');
-      if (selectBtn) selectBtn.textContent = isSelected ? 'Active' : 'Configure';
-    });
+    // Update Model 146 color tag
+    if (m146ActiveColor) {
+      m146ActiveColor.textContent = found.name.replace(/^\d+\.\s*/, '');
+    }
 
     // Update Header & Reserve Drawer Price / Names
     const headerPrice = document.getElementById('header-price');
@@ -281,23 +339,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 13. Connect Timeline Step Navigation
+  // 13. Connect Timeline Step Navigation (10 Stages ending in Interactive Studio)
+  const targetIds = [
+    'story-launch',
+    'story-identity',
+    'story-dial',
+    'story-movement',
+    'story-exploded',
+    'story-heart',
+    'story-kinetic',
+    'story-contours',
+    'story-slim',
+    'story-studio'
+  ];
+
   document.querySelectorAll('.timeline-step').forEach(step => {
     step.style.pointerEvents = 'auto';
     step.style.cursor = 'pointer';
     step.addEventListener('click', () => {
       const stepIdx = parseInt(step.getAttribute('data-step') || '0', 10);
-      const targetIds = [
-        'story-launch',
-        'story-identity',
-        'story-dial',
-        'story-movement',
-        'story-exploded',
-        'story-engine',
-        'story-rotor',
-        'story-studio'
-      ];
-      const el = document.getElementById(targetIds[stepIdx]);
+      const targetId = targetIds[stepIdx];
+      const el = document.getElementById(targetId);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     });
   });
@@ -312,21 +374,19 @@ document.addEventListener('DOMContentLoaded', () => {
   initHeroParallax();
 
   // 17. Synchronize UI visibility with story completion
-  // Must use the same narrative container height as watchThreeViewer for correct threshold
-  // NOTE: HTML id is 'scrolly-narrative' (not 'scrolly-narrative-container')
   function handleScrollUI() {
     const narrativeEl = document.getElementById('scrolly-narrative');
     const containerHeight = narrativeEl ? narrativeEl.offsetHeight : document.documentElement.scrollHeight;
     const maxScroll = Math.max(containerHeight - window.innerHeight, 1);
     const scrollProgress = Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
-    const isCompleted = scrollProgress >= 0.86;
+    const isCompleted = scrollProgress >= 0.74;
     document.body.classList.toggle('story-completed', isCompleted);
   }
   window.addEventListener('scroll', handleScrollUI, { passive: true });
   handleScrollUI();
 });
 
-// Scroll Reveal & Animated Number Counter Engine
+// Scroll Reveal & Story Step Active State Engine
 function initScrollAnimations() {
   const revealElements = document.querySelectorAll('.scroll-reveal');
 
@@ -351,98 +411,36 @@ function initScrollAnimations() {
 
   revealElements.forEach(el => observer.observe(el));
 
-  // Dynamic Kinetic Chapter Content Mapping
-  const CHAPTER_CONTENT = {
-    'story-launch': {
-      num: 'I',
-      eyebrow: 'NEPAL OBSERVATORY HOROLOGY',
-      title: 'ALUNA',
-      subtitle: 'CELESTIAL CHRONOMETER',
-      telemetry: 'RA 05h 35m 17s • DEC -05° 23\' 28" • 40.0 MM CALIBRE'
-    },
-    'story-title': {
-      num: 'I',
-      eyebrow: 'IN-HOUSE AUTOMATIC CALIBRE',
-      title: 'ALUNA',
-      subtitle: 'CALIBRE A3016',
-      telemetry: '28,800 VPH • 4 HZ FREQUENCY • 26 SYNTHETIC RUBIES'
-    },
-    'story-identity': {
-      num: 'II',
-      eyebrow: 'METALLURGIC FORGING',
-      title: 'BRONZE',
-      subtitle: 'ANTIQUE SCULPTED FLANKS',
-      telemetry: 'DAMASCUS STEEL BEZEL • HAND-ENGRAVED CONSTELLATIONS'
-    },
-    'story-dial': {
-      num: 'III',
-      eyebrow: 'QUAD COMPLICATIONS SKELETON',
-      title: 'QUAD-DIAL',
-      subtitle: 'FOUR ASTRONOMICAL CIRCLES',
-      telemetry: 'LAPIS HOURS • MINUTE RING • SUN & MOON • 60s TOURBILLON'
-    },
-    'story-movement': {
-      num: 'IV',
-      eyebrow: 'PLANE BACKPLATE ARCHITECTURE',
-      title: 'CASEBACK',
-      subtitle: 'SOLID HERMETIC SHIELD',
-      telemetry: '10 ATM / 100M WATER RESISTANT • THREADED CASEBACK'
-    },
-    'story-exploded': {
-      num: 'V',
-      eyebrow: 'DECONSTRUCTED CALIBRE A3016',
-      title: 'CALIBRE',
-      subtitle: '7 MODULAR ASSEMBLIES',
-      telemetry: 'EXPANDED SUSPENSION • CASCADING SKELETONIZED GEAR TRAIN'
-    },
-    'story-engine': {
-      num: 'V-B',
-      eyebrow: 'CALIBRE A3016 ISOLATION',
-      title: 'ENGINE',
-      subtitle: 'FLYING TOURBILLON HEART',
-      telemetry: 'SAPPHIRE MAINPLATE • 26 SYNTHETIC RUBIES • 4 HZ ESCAPEMENT'
-    },
-    'story-rotor': {
-      num: 'VI',
-      eyebrow: 'ERGONOMIC COLD-FORGED DRAPE',
-      title: 'BRACELET',
-      subtitle: '3-LINK ARTICULATED STEEL',
-      telemetry: '20MM TAPERED • BUTTERFLY DEPLOYANT MICRO-ADJUST'
-    },
-    'story-studio': {
-      num: 'VII',
-      eyebrow: 'OBSERVATORY STUDIO',
-      title: '360° ORBIT',
-      subtitle: 'FREE TIMEPIECE INSPECTION',
-      telemetry: 'DRAG TO ROTATE • HOVER PINS TO INSPECT'
-    }
+  // Story step observer for individual directional animations
+  const storyStepClasses = {
+    'story-identity': 'step-identity-active',
+    'story-dial':     'step-dial-active',
+    'story-movement': 'step-movement-active',
+    'story-exploded': 'step-exploded-active',
+    'story-heart':    'step-heart-active',
+    'story-kinetic':  'step-kinetic-active',
+    'story-contours': 'step-contours-active',
+    'story-slim':     'step-slim-active',
+    'story-studio':   'story-completed'
   };
 
-  // Story step observer for individual directional animations & kinetic text
   const stepObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       const stepId = entry.target.id;
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is--active');
-        if (stepId === 'story-identity') document.body.classList.add('step-identity-active');
-        if (stepId === 'story-dial') document.body.classList.add('step-dial-active');
-        if (stepId === 'story-movement') document.body.classList.add('step-movement-active');
-        if (stepId === 'story-exploded') document.body.classList.add('step-exploded-active');
-        if (stepId === 'story-engine') document.body.classList.add('step-engine-active');
-        if (stepId === 'story-rotor') document.body.classList.add('step-rotor-active');
-      } else {
-        entry.target.classList.remove('is--active');
-        if (stepId === 'story-identity') document.body.classList.remove('step-identity-active');
-        if (stepId === 'story-dial') document.body.classList.remove('step-dial-active');
-        if (stepId === 'story-movement') document.body.classList.remove('step-movement-active');
-        if (stepId === 'story-exploded') document.body.classList.remove('step-exploded-active');
-        if (stepId === 'story-engine') document.body.classList.remove('step-engine-active');
-        if (stepId === 'story-rotor') document.body.classList.remove('step-rotor-active');
+      const cls = storyStepClasses[stepId];
+      if (cls) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is--active');
+          document.body.classList.add(cls);
+        } else {
+          entry.target.classList.remove('is--active');
+          document.body.classList.remove(cls);
+        }
       }
     });
   }, {
-    threshold: 0.55,
-    rootMargin: '-80px 0px -80px 0px'
+    threshold: 0.45,
+    rootMargin: '-60px 0px -60px 0px'
   });
 
   document.querySelectorAll('.story-step').forEach(step => stepObserver.observe(step));

@@ -1878,16 +1878,15 @@ function buildBracelet(parentGroup, materials, edition) {
   for (let half of ['top', 'bot']) {
     const isTop = half === 'top';
     const curve = isTop ? topCurve : botCurve;
+    const linkRight = isTop ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(-1, 0, 0);
 
     for (let i = 0; i < numLinks; i++) {
       const t = (i + 0.5) / numLinks;
       const pt = curve.getPointAt(t);
       const tangent = curve.getTangentAt(t).normalize();
-      const normal = isTop
-        ? new THREE.Vector3(0, -tangent.z, tangent.y).normalize()
-        : new THREE.Vector3(0, tangent.z, -tangent.y).normalize();
+      const normal = new THREE.Vector3().crossVectors(linkRight, tangent).normalize();
 
-      basisMatrix.makeBasis(rightVec, tangent, normal);
+      basisMatrix.makeBasis(linkRight, tangent, normal);
 
       // Smooth taper: from 2.42 at the lugs down to 1.72 at the clasp
       const totalWidth = 2.42 - t * 0.70;
@@ -1995,16 +1994,14 @@ function buildBracelet(parentGroup, materials, edition) {
     const uvs = [];
     const indices = [];
 
-    const rightVec = new THREE.Vector3(1, 0, 0);
+    const rightVec = isTop ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(-1, 0, 0);
     const numCross = 14;
 
     for (let j = 0; j <= M; j++) {
       const s = j / M;
       const pt = curve.getPointAt(s);
       const tan = curve.getTangentAt(s).normalize();
-      const norm = isTop
-        ? new THREE.Vector3(0, -tan.z, tan.y).normalize()
-        : new THREE.Vector3(0, tan.z, -tan.y).normalize();
+      const norm = new THREE.Vector3().crossVectors(rightVec, tan).normalize();
 
       // Width tapers smoothly from 2.45 at lugs down to 1.72 at clasp
       const W = 2.45 - s * 0.73;
